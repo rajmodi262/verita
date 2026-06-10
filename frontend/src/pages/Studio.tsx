@@ -1,10 +1,28 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { UploadCloud, FileSpreadsheet, Download, Loader2 } from "lucide-react";
+import { UploadCloud, FileSpreadsheet, Download, Loader2, GripVertical, X } from "lucide-react";
+import RGL, { WidthProvider, type Layout } from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 import { API_BASE } from "../config";
 import { useTheme } from "../store/themeStore";
 import EChart from "../components/EChart";
 import { specToOption } from "../lib/chartOptions";
+
+const GridLayout = WidthProvider(RGL);
+
+/** Pack chart specs left-to-right into a 12-col grid as the initial draggable layout. */
+function buildLayout(charts: any[]): Layout[] {
+  let x = 0, y = 0, rowH = 0;
+  return charts.map((c) => {
+    const w = SPAN[c.chart_type] || 6;
+    const h = c.chart_type === "heatmap" ? 6 : 5;
+    if (x + w > 12) { x = 0; y += rowH; rowH = 0; }
+    const item = { i: c.id, x, y, w, h, minW: 3, minH: 4 };
+    x += w; rowH = Math.max(rowH, h);
+    return item;
+  });
+}
 
 interface Result {
   filename: string;
@@ -32,6 +50,7 @@ export default function Studio() {
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
 
   const muted = theme === "dark" ? "#8c97b5" : "#5b6680";
@@ -48,6 +67,7 @@ export default function Studio() {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.detail || `Server error ${res.status}`);
       }
+      setHidden(new Set());
       setResult(await res.json());
       setPhase("ready");
     } catch (e: any) {
@@ -58,6 +78,8 @@ export default function Studio() {
 
   const kpis = useMemo(() => result?.dashboard.filter((c) => c.chart_type === "kpi") || [], [result]);
   const charts = useMemo(() => result?.dashboard.filter((c) => c.chart_type !== "kpi") || [], [result]);
+  const visibleCharts = useMemo(() => charts.filter((c) => !hidden.has(c.id)), [charts, hidden]);
+  const layout = useMemo(() => buildLayout(visibleCharts), [visibleCharts]);
 
   if (phase === "idle" || phase === "loading" || phase === "error") {
     return (
@@ -128,22 +150,29 @@ export default function Studio() {
             ))}
           </div>
 
-          {/* Chart grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 16 }}>
-            {charts.map((c, i) => (
-              <motion.div
-                key={c.id}
-                className="glass"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.06 }}
-                style={{ gridColumn: `span ${SPAN[c.chart_type] || 6}`, padding: "16px 18px", minWidth: 0 }}
-              >
-                <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "0.95rem", marginBottom: 4 }}>{c.title}</div>
-                <EChart option={specToOption(c, muted, grid)} height={c.chart_type === "heatmap" ? 280 : 220} />
-              </motion.div>
-            ))}
+          {/* Editable dashboard grid */}
+          <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginBottom: 8 }}>
+            Drag the ⠿ handle to rearrange · drag a panel's bottom-right corner to resize · ✕ to remove
           </div>
+          <GridLayout className="layout" layout={layout} cols={12} rowHeight={64} margin={[16, 16]} draggableHandle=".drag-handle" isBounded>
+            {visibleCharts.map((c) => (
+              <div key={c.id} className="glass" style={{ padding: "10px 14px", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <span className="drag-handle" style={{ cursor: "move", display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "0.9rem", flex: 1, minWidth: 0 }}>
+                    <GripVertical size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title}</span>
+                  </span>
+                  <button onClick={() => setHidden((h) => new Set(h).add(c.id))} title="Remove panel"
+                    style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 2, flexShrink: 0 }}>
+                    <X size={14} />
+                  </button>
+                </div>
+                <div style={{ flex: 1, minHeight: 0 }}>
+                  <EChart option={specToOption(c, muted, grid)} height="100%" />
+                </div>
+              </div>
+            ))}
+          </GridLayout>
         </div>
 
         {/* Fields panel */}
