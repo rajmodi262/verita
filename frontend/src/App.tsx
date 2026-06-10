@@ -4,6 +4,7 @@ import AppShell from "./components/AppShell";
 import Landing from "./pages/Landing";
 import Studio from "./pages/Studio";
 import Risk from "./pages/Risk";
+import NLP from "./pages/NLP";
 import Placeholder from "./pages/Placeholder";
 
 export default function App() {
@@ -16,7 +17,7 @@ export default function App() {
           <Route path="/studio" element={<Studio />} />
           <Route path="/overview" element={<Placeholder title="Overview" />} />
           <Route path="/risk" element={<Risk />} />
-          <Route path="/nlp" element={<Placeholder title="NLP Insight" note="Ask your data in plain English and get the right chart back. Coming after the Risk Engine." />} />
+          <Route path="/nlp" element={<NLP />} />
           <Route path="/settings" element={<Placeholder title="Settings" />} />
         </Route>
       </Routes>
