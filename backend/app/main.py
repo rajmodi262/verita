@@ -40,8 +40,10 @@ app.add_middleware(
 )
 
 from .routers.dashboard import router as dashboard_router
+from .routers.risk import router as risk_router
 
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["Auto-Dashboard Studio"])
+app.include_router(risk_router, prefix="/api/risk", tags=["FCC Risk & Anomaly Engine"])
 
 
 @app.get("/api/health")
