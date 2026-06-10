@@ -182,3 +182,28 @@ body {
     animation: none !important;
   }
 }
+
+/* ---- react-grid-layout theming ---- */
+.react-grid-item.react-grid-placeholder {
+  background: var(--blue) !important;
+  opacity: 0.18;
+  border-radius: 20px;
+}
+.react-grid-item > .react-resizable-handle {
+  background-image: none;
+}
+.react-grid-item > .react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  opacity: 0.6;
+}
+.react-grid-item > .react-resizable-handle:hover::after {
+  border-color: var(--blue);
+  opacity: 1;
+}

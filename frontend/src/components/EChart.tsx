@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 
 /** Thin ECharts wrapper: inits once, updates option, handles resize + dispose. */
-export default function EChart({ option, height = 240 }: { option: echarts.EChartsOption; height?: number }) {
+export default function EChart({ option, height = 240 }: { option: echarts.EChartsOption; height?: number | string }) {
   const ref = useRef<HTMLDivElement>(null);
   const chart = useRef<echarts.ECharts | null>(null);
 

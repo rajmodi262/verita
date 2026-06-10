@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ShieldAlert, Database } from "lucide-react";
+import type { EChartsOption } from "echarts";
 import { API_BASE } from "../config";
 import { useTheme } from "../store/themeStore";
 import EChart from "../components/EChart";
@@ -225,7 +226,7 @@ function axis(muted: string, grid: string, name: string, max = 1) {
   };
 }
 
-function rocOption(curve: { x: number; y: number }[], muted: string, grid: string) {
+function rocOption(curve: { x: number; y: number }[], muted: string, grid: string): EChartsOption {
   return {
     grid: { left: 44, right: 16, top: 16, bottom: 40 },
     tooltip: { trigger: "axis", backgroundColor: "rgba(11,14,26,0.92)", borderWidth: 0, textStyle: { color: "#f2f5ff" } },
@@ -243,7 +244,7 @@ function rocOption(curve: { x: number; y: number }[], muted: string, grid: strin
   };
 }
 
-function prOption(curve: { x: number; y: number }[], muted: string, grid: string) {
+function prOption(curve: { x: number; y: number }[], muted: string, grid: string): EChartsOption {
   return {
     grid: { left: 44, right: 16, top: 16, bottom: 40 },
     tooltip: { trigger: "axis", backgroundColor: "rgba(11,14,26,0.92)", borderWidth: 0, textStyle: { color: "#f2f5ff" } },
@@ -260,7 +261,7 @@ function prOption(curve: { x: number; y: number }[], muted: string, grid: string
   };
 }
 
-function importanceOption(items: { feature: string; importance: number }[], muted: string, grid: string) {
+function importanceOption(items: { feature: string; importance: number }[], muted: string, grid: string): EChartsOption {
   const sorted = [...items].sort((a, b) => a.importance - b.importance);
   return {
     grid: { left: 110, right: 24, top: 8, bottom: 24 },
