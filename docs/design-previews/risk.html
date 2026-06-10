@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCC Risk & Anomaly Dashboard | Verita Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { fontFamily: {"mono":["'JetBrains Mono'","monospace"]} } }
+}
+</script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="view-transition" content="same-origin">
+    <link rel="prefetch" href="https://p.superdesign.dev/draft/023f92a2-53aa-44b3-8f20-a345f5184303" as="document">
+    <link rel="prefetch" href="https://p.superdesign.dev/draft/593f6df0-4504-48ae-845e-942c394b9983" as="document">
+    <link rel="prefetch" href="https://p.superdesign.dev/draft/982012bb-578b-43e3-a948-2cbf9746620a" as="document">
+    <style>
+        :root {
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+            --text: #0F172A;
+            --text-muted: #64748B;
+            --primary: #3B6CF6;
+            --ai: #8B5CF6;
+            --accent: #12B5A3;
+            --danger: #EF4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        /* View Transitions */
+        @view-transition { navigation: auto; }
+        
+        ::view-transition-old(main-nav), ::view-transition-new(main-nav),
+        ::view-transition-old(brand), ::view-transition-new(brand) {
+            animation: none;
+            mix-blend-mode: normal;
+        }
+
+        ::view-transition-old(main-content) {
+            animation: 0.2s ease-out both fade-out;
+        }
+        ::view-transition-new(main-content) {
+            animation: 0.3s ease-in 0.1s both fade-in;
+        }
+
+        @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Custom Range Slider */
+        input[type='range'] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type='range']::-webkit-slider-runnable-track {
+            background: var(--border);
+            height: 6px;
+            border-radius: 3px;
+        }
+        input[type='range']::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -6px;
+            background-color: var(--primary);
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+
+<meta name="preview-version" content="982012bb-578b-43e3-a948-2cbf9746620a" />
+<meta name="preview-timestamp" content="2026-06-10T17:47:40.107Z" />
+
+<style>
+  html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
+    display: none !important; width: 0 !important; height: 0 !important;
+  }
+  html, body, * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+</style>
+<style>
+          body:not(.sd-ready) { opacity: 0 !important; }
+          body.sd-ready { opacity: 1 !important; transition: opacity 0.1s ease-in; }
+          sd-component { display: block; }
+        </style>
+
+<script type="module">
+  (function() {
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+  })();
+</script>
+<script type="module">
+    // SuperDesign Runtime
+    console.log('[SuperDesign] Preview loaded for versionId:', "982012bb-578b-43e3-a948-2cbf9746620a");
+
+    window.__SUPERDESIGN_PREVIEW__ = {
+      versionId: "982012bb-578b-43e3-a948-2cbf9746620a",
+      timestamp: "2026-06-10T17:47:40.107Z",
+      _modernScreenshotModule: null,
+
+      sendMessage: function(type, data) {
+        if (window.parent) {
+          window.parent.postMessage({
+            source: 'superdesign-preview',
+            type: type,
+            data: data,
+            versionId: this.versionId
+          }, '*');
+        }
+      },
+
+      ready: function() {
+        this.sendMessage('ready', { timestamp: Date.now() });
+      },
+
+      
+      _captureScreenshotInternal: async function() {
+        if (!this._modernScreenshotModule) {
+          console.log('[SuperDesign] Loading modern-screenshot library...');
+          this._modernScreenshotModule = await import('https://esm.sh/modern-screenshot@4.6.6');
+        }
+        var modernScreenshot = this._modernScreenshotModule;
+        if (!modernScreenshot || !modernScreenshot.domToCanvas) {
+          throw new Error('modern-screenshot library not loaded');
+        }
+
+        var scrollX = window.scrollX || window.pageXOffset;
+        var scrollY = window.scrollY || window.pageYOffset;
+        var viewportWidth = window.innerWidth;
+        var viewportHeight = window.innerHeight;
+        var documentWidth = Math.max(
+          document.documentElement.scrollWidth,
+          document.documentElement.offsetWidth,
+          document.documentElement.clientWidth,
+          document.body.scrollWidth,
+          document.body.offsetWidth
+        );
+        var documentHeight = Math.max(
+          document.documentElement.scrollHeight,
+          document.documentElement.offsetHeight,
+          document.documentElement.clientHeight,
+          document.body.scrollHeight,
+          document.body.offsetHeight
+        );
+
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        var pixelRatio = isMobile ? 1 : (window.devicePixelRatio || 1);
+
+        var dataUrl;
+
+        if (isMobile) {
+          var wrapper = document.createElement('div');
+          wrapper.style.cssText = 'position:fixed;top:0;left:0;width:' + viewportWidth + 'px;height:' + viewportHeight + 'px;overflow:hidden;z-index:999999;pointer-events:none;';
+          var clone = document.body.cloneNode(true);
+          clone.style.cssText = 'position:absolute;top:' + (-scrollY) + 'px;left:' + (-scrollX) + 'px;margin:0;width:' + documentWidth + 'px;';
+          wrapper.appendChild(clone);
+          document.body.appendChild(wrapper);
+          try {
+            var viewportCanvas = await modernScreenshot.domToCanvas(wrapper, {
+              scale: 1, backgroundColor: '#ffffff',
+              width: viewportWidth, height: viewportHeight,
+            });
+            dataUrl = viewportCanvas.toDataURL('image/png', 0.5);
+          } finally {
+            document.body.removeChild(wrapper);
+          }
+        } else {
+          var fullCanvas = await modernScreenshot.domToCanvas(document.documentElement, {
+            scale: pixelRatio, backgroundColor: '#ffffff',
+            width: documentWidth, height: documentHeight,
+          });
+          var viewportCanvas = document.createElement('canvas');
+          viewportCanvas.width = viewportWidth * pixelRatio;
+          viewportCanvas.height = viewportHeight * pixelRatio;
+          var ctx = viewportCanvas.getContext('2d');
+          if (!ctx) throw new Error('Failed to get canvas context');
+          ctx.drawImage(
+            fullCanvas,
+            scrollX * pixelRatio, scrollY * pixelRatio,
+            viewportWidth * pixelRatio, viewportHeight * pixelRatio,
+            0, 0, viewportWidth * pixelRatio, viewportHeight * pixelRatio
+          );
+          dataUrl = viewportCanvas.toDataURL('image/png', 1.0);
+        }
+
+        if (!dataUrl || !dataUrl.startsWith('data:image/png;base64,') || dataUrl.length < 100) {
+          throw new Error('Invalid screenshot data');
+        }
+
+        return {
+          dataUrl: dataUrl,
+          viewportWidth: viewportWidth,
+          viewportHeight: viewportHeight,
+          pixelRatio: pixelRatio
+        };
+      },
+
+      autoCapture: async function() {
+        if (window === window.parent) return;
+        try {
+          var result = await this._captureScreenshotInternal();
+          this.sendMessage('auto-screenshot', {
+            dataUrl: result.dataUrl,
+            timestamp: Date.now(),
+            viewportWidth: result.viewportWidth,
+            viewportHeight: result.viewportHeight,
+            pixelRatio: result.pixelRatio,
+          });
+        } catch (error) {
+          console.error('[SuperDesign] Auto-capture failed:', error);
+        }
+      },
+
+      captureScreenshot: async function(requestId, autoCaptureId) {
+        try {
+          this._currentRequestId = requestId;
+          this._currentAutoCaptureId = autoCaptureId;
+          var result = await this._captureScreenshotInternal();
+          this.sendMessage('screenshot-captured', {
+            dataUrl: result.dataUrl,
+            timestamp: Date.now(),
+            viewportWidth: result.viewportWidth,
+            viewportHeight: result.viewportHeight,
+            pixelRatio: result.pixelRatio,
+            requestId: this._currentRequestId,
+            autoCaptureId: this._currentAutoCaptureId
+          });
+          return result.dataUrl;
+        } catch (error) {
+          console.error('[SuperDesign] Screenshot capture failed:', error);
+          this.sendMessage('screenshot-error', {
+            error: error.message || String(error),
+            timestamp: Date.now(),
+            requestId: this._currentRequestId,
+            autoCaptureId: this._currentAutoCaptureId
+          });
+          throw error;
+        }
+      }
+  
+    };
+
+    
+    // Font loading helpers
+    window.__SUPERDESIGN_PREVIEW__.loadedFonts = new Set();
+    window.__SUPERDESIGN_PREVIEW__.loadGoogleFont = function(fontFamily) {
+      if (!fontFamily || this.loadedFonts.has(fontFamily)) return;
+      if (fontFamily.startsWith('Custom-')) return;
+
+      var systemFonts = ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI',
+        'Roboto', 'Helvetica', 'Arial', 'sans-serif', 'Georgia', 'Times New Roman',
+        'Times', 'serif', 'Menlo', 'Monaco', 'Consolas', 'Courier New', 'monospace'];
+      if (systemFonts.some(function(sf) { return fontFamily.toLowerCase().includes(sf.toLowerCase()); })) return;
+
+      if (!document.querySelector('link[href*="fonts.googleapis.com"]')) {
+        var preconnect1 = document.createElement('link');
+        preconnect1.rel = 'preconnect';
+        preconnect1.href = 'https://fonts.googleapis.com';
+        document.head.appendChild(preconnect1);
+        var preconnect2 = document.createElement('link');
+        preconnect2.rel = 'preconnect';
+        preconnect2.href = 'https://fonts.gstatic.com';
+        preconnect2.crossOrigin = 'anonymous';
+        document.head.appendChild(preconnect2);
+      }
+
+      var linkId = 'google-font-' + fontFamily.replace(/\\s+/g, '-').toLowerCase();
+      if (!document.getElementById(linkId)) {
+        var link = document.createElement('link');
+        link.id = linkId;
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(fontFamily) + ':wght@400;500;600;700&display=swap';
+        link.onerror = function() { console.error('[SuperDesign] Failed to load Google Font:', fontFamily); };
+        document.head.appendChild(link);
+      }
+      this.loadedFonts.add(fontFamily);
+    };
+
+    window.__SUPERDESIGN_PREVIEW__.loadedCustomFonts = new Set();
+    window.__SUPERDESIGN_PREVIEW__.loadCustomFont = function(fontInfo) {
+      if (!fontInfo || !fontInfo.family || !fontInfo.url) return;
+      if (this.loadedCustomFonts.has(fontInfo.family)) return;
+      var styleId = 'custom-font-' + fontInfo.family.replace(/[^a-zA-Z0-9]/g, '-');
+      if (document.getElementById(styleId)) return;
+      var style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = '@font-face { ' +
+        'font-family: "' + fontInfo.family + '"; ' +
+        'src: url("' + fontInfo.url + '") format("' + (fontInfo.format || 'woff2') + '"); ' +
+        'font-weight: 100 900; font-style: normal; font-display: swap; }';
+      document.head.appendChild(style);
+      this.loadedCustomFonts.add(fontInfo.family);
+    };
+  
+    
+    // Theme sync
+    window.__SUPERDESIGN_PREVIEW__.applyTheme = function(payload, isDark) {
+      var root = document.documentElement;
+      var colorVars = isDark ? payload.dark : payload.light;
+      for (var name in colorVars) {
+        if (colorVars.hasOwnProperty(name)) {
+          root.style.setProperty(name, colorVars[name]);
+        }
+      }
+
+      if (payload.customFonts && Array.isArray(payload.customFonts)) {
+        payload.customFonts.forEach(function(fontInfo) {
+          window.__SUPERDESIGN_PREVIEW__.loadCustomFont(fontInfo);
+        });
+      }
+
+      if (payload.typography) {
+        var t = payload.typography;
+        if (t.fontSans && !t.fontSans.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontSans);
+        if (t.fontSerif && !t.fontSerif.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontSerif);
+        if (t.fontMono && !t.fontMono.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontMono);
+
+        var formatFontValue = function(ff) {
+          if (!ff) return ff;
+          var first = ff.split(',')[0].trim().replace(/^["']|["']$/g, '');
+          return first.startsWith('var(') ? first : '"' + first + '"';
+        };
+        root.style.setProperty('--font-sans', formatFontValue(t.fontSans));
+        root.style.setProperty('--font-serif', formatFontValue(t.fontSerif));
+        root.style.setProperty('--font-mono', formatFontValue(t.fontMono));
+        root.style.setProperty('--font-size', t.fontSize);
+        root.style.setProperty('--line-height', t.lineHeight);
+        root.style.setProperty('--letter-spacing-body', t.letterSpacing);
+        root.style.setProperty('--letter-spacing-heading', t.headingLetterSpacing);
+        root.style.setProperty('--font-weight-regular', t.fontWeightRegular);
+        root.style.setProperty('--font-weight-bold', t.fontWeightBold);
+      }
+
+      if (payload.effects) {
+        root.style.setProperty('--radius', payload.effects.radius);
+        root.style.setProperty('--shadow', payload.effects.shadow);
+      }
+
+      if (isDark) { root.classList.add('dark'); } else { root.classList.remove('dark'); }
+    };
+  
+    
+    // Message listener
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'request-screenshot') {
+        if (window.__SUPERDESIGN_PREVIEW__) {
+          window.__SUPERDESIGN_PREVIEW__.captureScreenshot(event.data.requestId, event.data.autoCaptureId);
+        }
+      }
+
+      if (event.data && event.data.type === 'superdesign-theme-update') {
+        if (window.__SUPERDESIGN_PREVIEW__ && event.data.payload) {
+          var isDark = event.data.isDark || false;
+          window.__SUPERDESIGN_PREVIEW__.applyTheme(event.data.payload, isDark);
+          window.__SUPERDESIGN_PREVIEW__.sendMessage('theme-applied', { timestamp: Date.now(), isDark: isDark });
+        }
+      }
+
+      if (event.data && event.data.type === 'navigate-to-route') {
+        var route = event.data.route;
+        if (route) {
+          if (route === '/') {
+            if (window.location.hash) {
+              history.pushState(null, '', window.location.pathname + window.location.search);
+              window.dispatchEvent(new HashChangeEvent('hashchange'));
+            }
+          } else {
+            var newHash = '#' + route;
+            if (window.location.hash !== newHash) {
+              window.location.hash = route;
+            }
+          }
+        }
+      }
+    });
+  
+    
+    // Page lifecycle
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { window.__SUPERDESIGN_PREVIEW__.ready(); });
+    } else {
+      window.__SUPERDESIGN_PREVIEW__.ready();
+    }
+
+    function onPageFullyLoaded() {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          setTimeout(function() {
+            window.__SUPERDESIGN_PREVIEW__.sendMessage('loaded', { timestamp: Date.now() });
+          }, 1500);
+          // Auto-capture disabled for this preview type
+        });
+      });
+    }
+
+    if (document.readyState === 'complete') {
+      onPageFullyLoaded();
+    } else {
+      window.addEventListener('load', onPageFullyLoaded);
+    }
+  
+  </script>
+<script type="module">
+  window.addEventListener('error', function(event) {
+    var msg = event.message || '';
+    var name = (event.error && event.error.name) || msg.split(':')[0] || '';
+    if (name === 'HierarchyRequestError' || msg.includes("Failed to execute 'appendChild' on 'Node'")) return;
+    if (window.__SUPERDESIGN_PREVIEW__) {
+      var err = event.error;
+      window.__SUPERDESIGN_PREVIEW__.sendMessage('error', {
+        message: event.message, filename: event.filename,
+        lineno: event.lineno, colno: event.colno,
+        name: (err && err.name) || name || 'Error',
+        stack: (err && err.stack) || null
+      });
+    }
+  });
+  window.addEventListener('unhandledrejection', function(event) {
+    var reason = event.reason;
+    var msg = (reason && reason.message) || (typeof reason === 'string' ? reason : '');
+    var name = (reason && reason.name) || 'UnhandledRejection';
+    if (name === 'HierarchyRequestError' || msg.includes("Failed to execute 'appendChild' on 'Node'")) return;
+    if (window.__SUPERDESIGN_PREVIEW__) {
+      window.__SUPERDESIGN_PREVIEW__.sendMessage('unhandled-rejection', {
+        reason: (reason && reason.message) || String(reason),
+        name: name,
+        stack: (reason && reason.stack) || null
+      });
+    }
+  });
+</script>
+<script type="module">import '/__visual-edit-bridge/iframe-runtime.mjs?v=a57a0939';</script>
+<script  src="https://cdn.jsdelivr.net/npm/petite-vue@0.4.1/dist/petite-vue.iife.js"></script>
+<script type="module">
+  (function() {
+    'use strict';
+
+    var MAX_RENDER_DEPTH = 5;
+
+    function showPage() {
+      document.body.classList.add('sd-ready');
+    }
+
+    var componentRegistry = new Map();
+    var instanceRegistry = new Map();
+    var API_BASE = "https://api.superdesign.dev";
+    var DRAFT_ID = "982012bb-578b-43e3-a948-2cbf9746620a";
+
+    function buildDefaultProps(definition) {
+      var defaultProps = {};
+      var props = definition.props;
+      if (!props || !Array.isArray(props)) return defaultProps;
+      for (var i = 0; i < props.length; i++) {
+        var prop = props[i];
+        if (prop.defaultValue === undefined) continue;
+        var path = prop.name.split('.');
+        var current = defaultProps;
+        for (var j = 0; j < path.length - 1; j++) {
+          var key = path[j];
+          if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
+            current[key] = {};
+          }
+          current = current[key];
+        }
+        current[path[path.length - 1]] = prop.defaultValue;
+      }
+      return defaultProps;
+    }
+
+    function deepMerge(target, source) {
+      var result = Object.assign({}, target);
+      for (var key in source) {
+        if (!source.hasOwnProperty(key)) continue;
+        if (
+          source[key] && typeof source[key] === 'object' && !Array.isArray(source[key]) &&
+          result[key] && typeof result[key] === 'object' && !Array.isArray(result[key])
+        ) {
+          result[key] = deepMerge(result[key], source[key]);
+        } else {
+          result[key] = source[key];
+        }
+      }
+      return result;
+    }
+
+    function registerComponent(id, definition) {
+      componentRegistry.set(id, definition);
+      console.log('[SDComponent] Registered component:', id);
+    }
+
+    function renderComponent(element, depth) {
+      depth = depth || 0;
+      var componentId = element.getAttribute('componentid') || element.getAttribute('ref');
+      var instanceId = element.getAttribute('instance');
+      var propsAttr = element.getAttribute('props');
+
+      if (!componentId) {
+        console.warn('[SDComponent] Missing componentId attribute on sd-component');
+        return;
+      }
+
+      if (depth >= MAX_RENDER_DEPTH) {
+        console.warn('[SDComponent] Max render depth reached for:', componentId);
+        element.setAttribute('data-error', 'max-depth');
+        return;
+      }
+
+      var definition = componentRegistry.get(componentId);
+      if (!definition) {
+        console.warn('[SDComponent] Component not found:', componentId);
+        element.setAttribute('data-pending', 'true');
+        return;
+      }
+
+      var instanceProps = {};
+      if (propsAttr) {
+        try { instanceProps = JSON.parse(propsAttr); }
+        catch (e) { console.warn('[SDComponent] Invalid props JSON:', propsAttr); }
+      }
+
+      var defaultProps = buildDefaultProps(definition);
+      var finalProps = deepMerge(defaultProps, instanceProps);
+
+      element.innerHTML = definition.htmlContent;
+
+      if (window.PetiteVue) {
+        finalProps.$emit = function(eventName, payload) {
+          if (payload && typeof payload === 'object' && payload.href) {
+            window.location.href = payload.href;
+            return;
+          }
+          var customEvent = new CustomEvent('sd-' + eventName, {
+            detail: payload, bubbles: true, composed: true,
+          });
+          element.dispatchEvent(customEvent);
+        };
+        window.PetiteVue.createApp(finalProps).mount(element);
+      } else {
+        console.warn('[SDComponent] Petite-Vue not loaded, template syntax will not be resolved');
+      }
+
+      instanceRegistry.set(instanceId, {
+        componentId: componentId,
+        element: element,
+        props: finalProps,
+        version: definition.version,
+      });
+
+      element.removeAttribute('data-pending');
+      element.setAttribute('data-rendered', 'true');
+      element.setAttribute('data-version', String(definition.version));
+      console.log('[SDComponent] Rendered:', componentId, instanceId);
+
+      // Render any nested sd-component children that were just injected
+      var nestedElements = element.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      if (nestedElements.length > 0) {
+        var missingIds = [];
+        nestedElements.forEach(function(nested) {
+          var nestedId = nested.getAttribute('componentid') || nested.getAttribute('ref');
+          if (nestedId && !componentRegistry.has(nestedId)) {
+            missingIds.push(nestedId);
+          }
+        });
+
+        if (missingIds.length > 0) {
+          // Fetch missing nested components, then render
+          loadComponentsByIds(missingIds).then(function() {
+            nestedElements.forEach(function(nested) {
+              if (!nested.getAttribute('data-rendered')) {
+                renderComponent(nested, depth + 1);
+              }
+            });
+          });
+        } else {
+          // All nested definitions already loaded — render immediately
+          nestedElements.forEach(function(nested) {
+            if (!nested.getAttribute('data-rendered')) {
+              renderComponent(nested, depth + 1);
+            }
+          });
+        }
+      }
+    }
+
+    function updateComponentInstances(componentId) {
+      var elements = document.querySelectorAll('sd-component[componentid="' + componentId + '"], sd-component[ref="' + componentId + '"]');
+      elements.forEach(function(el) { renderComponent(el); });
+    }
+
+    function initializeComponents() {
+      var elements = document.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      elements.forEach(function(el) {
+        if (!el.getAttribute('data-rendered')) { renderComponent(el); }
+      });
+    }
+
+    async function loadComponentsByIds(ids) {
+      if (!ids || ids.length === 0) return;
+      // Deduplicate and filter already-loaded
+      var uniqueIds = ids.filter(function(id, i, arr) {
+        return arr.indexOf(id) === i && !componentRegistry.has(id);
+      });
+      if (uniqueIds.length === 0) return;
+
+      try {
+        console.log('[SDComponent] Batch loading components:', uniqueIds);
+        var response = await fetch(API_BASE + '/v1/design-drafts/components/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ componentIds: uniqueIds }),
+        });
+        if (!response.ok) throw new Error('Batch load failed: ' + response.status);
+        var components = await response.json();
+        console.log('[SDComponent] Batch loaded', components.length, 'components');
+        components.forEach(function(comp) { registerComponent(comp.id, comp); });
+      } catch (error) {
+        console.error('[SDComponent] Failed to batch load components:', error);
+      }
+    }
+
+    async function loadComponentsForDraft() {
+      if (!DRAFT_ID) {
+        console.warn('[SDComponent] No draft ID configured');
+        showPage();
+        return;
+      }
+      try {
+        console.log('[SDComponent] Loading components for draft:', DRAFT_ID);
+        var response = await fetch(API_BASE + '/v1/design-drafts/' + DRAFT_ID + '/components', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error('Failed to load components: ' + response.status);
+        var components = await response.json();
+        console.log('[SDComponent] Loaded', components.length, 'components');
+        components.forEach(function(comp) { registerComponent(comp.id, comp); });
+        initializeComponents();
+        showPage();
+      } catch (error) {
+        console.error('[SDComponent] Failed to load components:', error);
+        showPage();
+      }
+    }
+
+    function findReferencedComponents() {
+      var elements = document.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      var ids = new Set();
+      elements.forEach(function(el) {
+        var ref = el.getAttribute('componentid') || el.getAttribute('ref');
+        if (ref) ids.add(ref);
+      });
+      return Array.from(ids);
+    }
+
+    window.__SD_COMPONENTS__ = {
+      register: registerComponent,
+      render: renderComponent,
+      update: updateComponentInstances,
+      loadForDraft: loadComponentsForDraft,
+      loadByIds: loadComponentsByIds,
+      init: initializeComponents,
+      findRefs: findReferencedComponents,
+      getRegistry: function() { return componentRegistry; },
+      getInstances: function() { return instanceRegistry; },
+      getDraftId: function() { return DRAFT_ID; },
+    };
+
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'SD_COMPONENT_UPDATE') {
+        var cId = event.data.componentId;
+        var def = event.data.definition;
+        if (cId && def) { registerComponent(cId, def); updateComponentInstances(cId); }
+      }
+      if (event.data && event.data.type === 'SD_COMPONENTS_REGISTER') {
+        var comps = event.data.components;
+        if (Array.isArray(comps)) {
+          comps.forEach(function(c) { registerComponent(c.id, c); });
+          initializeComponents();
+        }
+      }
+    });
+
+    function bootComponents() {
+      // Pre-register components from __SD_COMPONENT_PRELOAD__ (injected by backend for standalone previews)
+      if (window.__SD_COMPONENT_PRELOAD__ && Array.isArray(window.__SD_COMPONENT_PRELOAD__)) {
+        console.log('[SDComponent] Pre-registering', window.__SD_COMPONENT_PRELOAD__.length, 'preloaded components');
+        window.__SD_COMPONENT_PRELOAD__.forEach(function(comp) {
+          registerComponent(comp.id, comp);
+        });
+      }
+
+      var refs = findReferencedComponents();
+      var unloaded = refs.filter(function(id) { return !componentRegistry.has(id); });
+
+      if (unloaded.length > 0) {
+        if (DRAFT_ID) {
+          loadComponentsForDraft();
+        } else {
+          // No draft ID — try batch loading the missing IDs directly
+          loadComponentsByIds(unloaded).then(function() {
+            initializeComponents();
+            showPage();
+          });
+        }
+      } else if (refs.length > 0) {
+        // All components already registered (e.g. from preload) — render immediately
+        initializeComponents();
+        showPage();
+      } else {
+        showPage();
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootComponents);
+    } else {
+      bootComponents();
+    }
+
+    var observer = new MutationObserver(function(mutations) {
+      var hasNew = false;
+      mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) {
+            if (node.tagName === 'SD-COMPONENT') { hasNew = true; }
+            else if (node.querySelector) {
+              if (node.querySelectorAll('sd-component[componentid], sd-component[ref]').length > 0) hasNew = true;
+            }
+          }
+        });
+      });
+      if (hasNew) {
+        var refs = findReferencedComponents();
+        var unloaded = refs.filter(function(id) { return !componentRegistry.has(id); });
+        if (unloaded.length > 0) {
+          loadComponentsByIds(unloaded).then(function() {
+            initializeComponents();
+          });
+        } else {
+          initializeComponents();
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    console.log('[SDComponent] Runtime initialized');
+  })();
+  </script>
+</head>
+<body>
+    <div class="min-h-screen flex bg-slate-50">
+        
+        <!-- Sidebar (Persistent Navigation) -->
+        <aside class="w-64 border-r border-slate-200 bg-white hidden lg:flex flex-col z-40" style="view-transition-name: main-nav">
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3" style="view-transition-name: brand">
+                <div class="w-8 h-8 bg-gradient-to-tr from-[#3B6CF6] to-[#8B5CF6] rounded-lg flex items-center justify-center shadow-md">
+                    <iconify-icon icon="lucide:shield-check" class="text-white text-xl"></iconify-icon>
+                </div>
+                <span class="font-display text-xl font-bold tracking-tight text-slate-900">Verita</span>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-1">
+                <a href="#dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all">
+                    <iconify-icon icon="lucide:layout-grid" class="text-lg"></iconify-icon>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </a>
+                <a href="https://p.superdesign.dev/draft/982012bb-578b-43e3-a948-2cbf9746620a" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-100 text-[#3B6CF6] font-semibold transition-all">
+                    <iconify-icon icon="lucide:brain-circuit" class="text-lg"></iconify-icon>
+                    <span class="text-sm">Risk Engine</span>
+                </a>
+                <a href="https://p.superdesign.dev/draft/593f6df0-4504-48ae-845e-942c394b9983" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all">
+                    <iconify-icon icon="lucide:terminal" class="text-lg"></iconify-icon>
+                    <span class="text-sm font-medium">Studio</span>
+                </a>
+                <a href="#audits" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all">
+                    <iconify-icon icon="lucide:clipboard-list" class="text-lg"></iconify-icon>
+                    <span class="text-sm font-medium">Audit Logs</span>
+                </a>
+                <div class="pt-4 pb-2 px-3">
+                    <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400">System</span>
+                </div>
+                <a href="#docs" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all">
+                    <iconify-icon icon="lucide:book-open" class="text-lg"></iconify-icon>
+                    <span class="text-sm font-medium">Documentation</span>
+                </a>
+                <a href="#settings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all">
+                    <iconify-icon icon="lucide:settings" class="text-lg"></iconify-icon>
+                    <span class="text-sm font-medium">Settings</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-100">
+                <div class="p-3 bg-slate-50 rounded-xl flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-200"></div>
+                    <div class="flex-1">
+                        <p class="text-xs font-semibold text-slate-900">Compliance Lead</p>
+                        <p class="text-[10px] text-slate-500">Tier 1 Admin</p>
+                    </div>
+                    <iconify-icon icon="lucide:log-out" class="text-slate-400 cursor-pointer hover:text-red-500"></iconify-icon>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <main class="flex-1 flex flex-col min-h-screen relative overflow-y-auto" style="view-transition-name: main-content">
+            
+            <!-- Header -->
+            <header class="sticky top-0 z-30 bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-display font-bold text-slate-900">FCC Risk & Anomaly Engine</h1>
+                    <p class="text-xs text-slate-500 font-medium">Live model performance and risk prioritization</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span class="text-[10px] font-bold font-mono">ML MODEL v4.2.0 ACTIVE</span>
+                    </div>
+                    <button id="theme-toggle-btn" class="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors">
+                        <iconify-icon icon="lucide:moon" class="text-lg"></iconify-icon>
+                    </button>
+                    <button id="refresh-btn" class="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
+                        <iconify-icon icon="lucide:refresh-cw"></iconify-icon>
+                        Retrain Model
+                    </button>
+                </div>
+            </header>
+
+            <div class="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
+                
+                <!-- KPI Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Transactions Scored</span>
+                            <iconify-icon icon="lucide:activity" class="text-slate-300"></iconify-icon>
+                        </div>
+                        <p class="text-3xl font-mono font-bold text-slate-900">1,482,901</p>
+                        <div class="mt-2 flex items-center gap-1.5 text-emerald-600">
+                            <iconify-icon icon="lucide:trending-up" class="text-xs"></iconify-icon>
+                            <span class="text-[10px] font-bold">+12.4% vs prev. month</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Frauds Caught</span>
+                            <iconify-icon icon="lucide:shield-alert" class="text-slate-300"></iconify-icon>
+                        </div>
+                        <p class="text-3xl font-mono font-bold text-slate-900">2,841</p>
+                        <div class="mt-2 flex items-center gap-1.5 text-red-600">
+                            <iconify-icon icon="lucide:alert-circle" class="text-xs"></iconify-icon>
+                            <span class="text-[10px] font-bold">0.19% Hit Rate</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Precision</span>
+                            <iconify-icon icon="lucide:target" class="text-slate-300"></iconify-icon>
+                        </div>
+                        <p class="text-3xl font-mono font-bold text-slate-900 text-[#12B5A3]">99.2%</p>
+                        <div class="mt-2 flex items-center gap-1.5 text-slate-400">
+                            <span class="text-[10px] font-medium">Confidence Interval: 0.12</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Recall</span>
+                            <iconify-icon icon="lucide:search-check" class="text-slate-300"></iconify-icon>
+                        </div>
+                        <p class="text-3xl font-mono font-bold text-slate-900 text-[#3B6CF6]">94.5%</p>
+                        <div class="mt-2 flex items-center gap-1.5 text-slate-400">
+                            <span class="text-[10px] font-medium">Threshold Dependent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Region -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <!-- ROC Curve -->
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col min-h-[400px]">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-lg font-display font-bold text-slate-900">ROC Curve</h3>
+                                <p class="text-xs text-slate-500">True Positive vs False Positive Rate</p>
+                            </div>
+                            <div class="bg-[#3B6CF6]/10 text-[#3B6CF6] px-3 py-1 rounded-full flex items-center gap-2">
+                                <span class="text-[10px] font-mono font-bold uppercase tracking-wider">AUC</span>
+                                <span class="text-sm font-mono font-bold">0.97</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 bg-slate-50 rounded-2xl relative overflow-hidden border border-slate-100 flex items-center justify-center">
+                            <!-- Simple Chart Mockup SVG -->
+                            <svg class="w-full h-full p-8" viewBox="0 0 100 100">
+                                <line x1="0" y1="100" x2="100" y2="0" stroke="#CBD5E1" stroke-width="0.5" stroke-dasharray="2,2" />
+                                <path d="M0,100 Q10,20 100,0" fill="rgba(59, 108, 246, 0.05)" />
+                                <path d="M0,100 Q10,20 100,0" fill="none" stroke="#3B6CF6" stroke-width="2" />
+                                <circle cx="15" cy="35" r="3" fill="#3B6CF6" />
+                                <text x="18" y="32" font-size="3" font-weight="bold" fill="#3B6CF6" font-family="monospace">Current Point</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Precision-Recall Curve -->
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col min-h-[400px]">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-lg font-display font-bold text-slate-900">Precision-Recall Curve</h3>
+                                <p class="text-xs text-slate-500">Model performance across classification thresholds</p>
+                            </div>
+                            <button class="text-slate-400 hover:text-slate-900">
+                                <iconify-icon icon="lucide:maximize-2"></iconify-icon>
+                            </button>
+                        </div>
+                        <div class="flex-1 bg-slate-50 rounded-2xl relative overflow-hidden border border-slate-100 flex items-center justify-center">
+                             <svg class="w-full h-full p-8" viewBox="0 0 100 100">
+                                <path d="M0,10 Q80,10 100,100" fill="rgba(139, 92, 246, 0.05)" />
+                                <path d="M0,10 Q80,10 100,100" fill="none" stroke="#8B5CF6" stroke-width="2" />
+                                <line x1="0" y1="100" x2="100" y2="100" stroke="#E2E8F0" stroke-width="1" />
+                                <line x1="0" y1="0" x2="0" y2="100" stroke="#E2E8F0" stroke-width="1" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Row: Threshold & Importance -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Threshold Panel -->
+                    <div class="glass-panel p-8 rounded-3xl lg:col-span-1 border-t-4 border-[#3B6CF6]">
+                        <h3 class="text-lg font-display font-bold text-slate-900 mb-2">Decision Threshold</h3>
+                        <p class="text-xs text-slate-500 mb-8">Adjust the sensitivity of the anomaly engine</p>
+                        
+                        <div class="space-y-8">
+                            <div>
+                                <div class="flex justify-between items-end mb-4">
+                                    <span class="text-3xl font-mono font-bold text-slate-900">0.75</span>
+                                    <div class="text-right">
+                                        <p class="text-[10px] font-mono text-slate-400 uppercase">Tradeoff Prediction</p>
+                                        <p class="text-xs font-semibold text-[#12B5A3]">Balanced Accuracy</p>
+                                    </div>
+                                </div>
+                                <input type="range" min="0" max="100" value="75" class="w-full">
+                                <div class="flex justify-between mt-2 text-[10px] font-mono text-slate-400 uppercase tracking-widest">
+                                    <span>Lower Recall</span>
+                                    <span>Lower Precision</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div class="flex items-center gap-3 text-slate-600 mb-2">
+                                    <iconify-icon icon="lucide:info" class="text-sm"></iconify-icon>
+                                    <p class="text-[11px] font-medium leading-relaxed">Increasing threshold focuses on high-precision catching but may increase false negatives in low-risk channels.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confusion Matrix -->
+                    <div class="glass-panel p-6 rounded-3xl">
+                        <h3 class="text-lg font-display font-bold text-slate-900 mb-1">Confusion Matrix</h3>
+                        <p class="text-xs text-slate-500 mb-6">Validation Set (N=100,000)</p>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="aspect-square bg-[#3B6CF6]/20 rounded-xl p-4 flex flex-col justify-center items-center border border-[#3B6CF6]/30">
+                                <span class="text-[10px] font-mono text-slate-500 uppercase">True Positive</span>
+                                <span class="text-2xl font-mono font-bold text-[#3B6CF6]">1,402</span>
+                                <span class="text-[10px] font-mono font-semibold text-[#3B6CF6]">98.8%</span>
+                            </div>
+                            <div class="aspect-square bg-slate-50 rounded-xl p-4 flex flex-col justify-center items-center border border-slate-100">
+                                <span class="text-[10px] font-mono text-slate-500 uppercase">False Positive</span>
+                                <span class="text-2xl font-mono font-bold text-slate-300">21</span>
+                                <span class="text-[10px] font-mono font-semibold text-slate-400">1.2%</span>
+                            </div>
+                            <div class="aspect-square bg-slate-50 rounded-xl p-4 flex flex-col justify-center items-center border border-slate-100">
+                                <span class="text-[10px] font-mono text-slate-500 uppercase">False Negative</span>
+                                <span class="text-2xl font-mono font-bold text-slate-300">182</span>
+                                <span class="text-[10px] font-mono font-semibold text-slate-400">5.5%</span>
+                            </div>
+                            <div class="aspect-square bg-[#12B5A3]/20 rounded-xl p-4 flex flex-col justify-center items-center border border-[#12B5A3]/30">
+                                <span class="text-[10px] font-mono text-slate-500 uppercase">True Negative</span>
+                                <span class="text-2xl font-mono font-bold text-[#12B5A3]">98,395</span>
+                                <span class="text-[10px] font-mono font-semibold text-[#12B5A3]">94.5%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature Importance -->
+                    <div class="glass-panel p-6 rounded-3xl">
+                        <h3 class="text-lg font-display font-bold text-slate-900 mb-1">Feature Importance</h3>
+                        <p class="text-xs text-slate-500 mb-6">SHAP weight values for model v4.2</p>
+                        
+                        <div class="space-y-6">
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[11px] font-mono">
+                                    <span class="text-slate-700">velocity_30m</span>
+                                    <span class="text-slate-500">0.42</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-[#3B6CF6] h-full w-[84%]"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[11px] font-mono">
+                                    <span class="text-slate-700">channel_risk_index</span>
+                                    <span class="text-slate-500">0.28</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-[#8B5CF6] h-full w-[56%]"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[11px] font-mono">
+                                    <span class="text-slate-700">hour_of_day</span>
+                                    <span class="text-slate-500">0.15</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-[#12B5A3] h-full w-[30%]"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[11px] font-mono">
+                                    <span class="text-slate-700">transaction_amount</span>
+                                    <span class="text-slate-500">0.09</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-slate-300 h-full w-[18%]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AML Alert Queue -->
+                <div class="glass-panel rounded-3xl overflow-hidden">
+                    <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-lg font-display font-bold text-slate-900">AML Alert Queue</h3>
+                        <div class="flex gap-4">
+                            <div class="flex border border-slate-200 rounded-lg overflow-hidden">
+                                <button class="px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold">All Alerts</button>
+                                <button class="px-3 py-1.5 bg-white text-slate-500 text-xs font-semibold hover:bg-slate-50">High Risk</button>
+                            </div>
+                            <button class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold">
+                                <iconify-icon icon="lucide:filter"></iconify-icon>
+                                Filters
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-100">
+                                <tr>
+                                    <th class="px-8 py-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">Tier</th>
+                                    <th class="px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">TXID</th>
+                                    <th class="px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">Amount</th>
+                                    <th class="px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">Channel</th>
+                                    <th class="px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">Risk Score</th>
+                                    <th class="px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">Status</th>
+                                    <th class="px-8 py-4 text-[10px] font-mono uppercase tracking-widest text-slate-400">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4">
+                                        <div class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-xs font-mono font-semibold text-slate-900">TXN-90284-A</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-xs font-semibold">$12,450.00</td>
+                                    <td class="px-6 py-4 text-xs text-slate-500">Swift Wire</td>
+                                    <td class="px-6 py-4 w-48">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="bg-red-500 h-full w-[94%]"></div>
+                                            </div>
+                                            <span class="text-[10px] font-mono font-bold text-red-600">94</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-1 bg-red-50 text-red-700 text-[10px] font-bold rounded-full uppercase tracking-wider">New Alert</span>
+                                    </td>
+                                    <td class="px-8 py-4">
+                                        <button class="text-slate-400 hover:text-slate-900 transition-colors"><iconify-icon icon="lucide:more-horizontal" class="text-lg"></iconify-icon></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4">
+                                        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-xs font-mono font-semibold text-slate-900">TXN-88121-B</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-xs font-semibold">$1,200.00</td>
+                                    <td class="px-6 py-4 text-xs text-slate-500">P2P Transfer</td>
+                                    <td class="px-6 py-4 w-48">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="bg-amber-500 h-full w-[68%]"></div>
+                                            </div>
+                                            <span class="text-[10px] font-mono font-bold text-amber-600">68</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-1 bg-amber-50 text-amber-700 text-[10px] font-bold rounded-full uppercase tracking-wider">Reviewing</span>
+                                    </td>
+                                    <td class="px-8 py-4">
+                                        <button class="text-slate-400 hover:text-slate-900 transition-colors"><iconify-icon icon="lucide:more-horizontal" class="text-lg"></iconify-icon></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4">
+                                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-xs font-mono font-semibold text-slate-900">TXN-77402-C</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-xs font-semibold">$45.00</td>
+                                    <td class="px-6 py-4 text-xs text-slate-500">Merchant POS</td>
+                                    <td class="px-6 py-4 w-48">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="bg-emerald-500 h-full w-[12%]"></div>
+                                            </div>
+                                            <span class="text-[10px] font-mono font-bold text-emerald-600">12</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full uppercase tracking-wider">Cleared</span>
+                                    </td>
+                                    <td class="px-8 py-4">
+                                        <button class="text-slate-400 hover:text-slate-900 transition-colors"><iconify-icon icon="lucide:more-horizontal" class="text-lg"></iconify-icon></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom padding for scroll -->
+            <div class="h-12"></div>
+
+        </main>
+    </div>
+
+    <script>
+        // Interactive Threshold Mockup
+        const slider = document.querySelector('input[type="range"]');
+        const thresholdDisplay = document.querySelector('.text-3xl.font-mono.font-bold.text-slate-900');
+        
+        slider.addEventListener('input', (e) => {
+            const val = (e.target.value / 100).toFixed(2);
+            thresholdDisplay.innerText = val;
+        });
+
+        // Refresh Button Mock
+        document.getElementById('refresh-btn').addEventListener('click', function() {
+            this.classList.add('opacity-50', 'pointer-events-none');
+            const originalText = this.innerHTML;
+            this.innerHTML = '<iconify-icon icon="lucide:loader-2" class="animate-spin"></iconify-icon> Processing...';
+            
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.classList.remove('opacity-50', 'pointer-events-none');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
