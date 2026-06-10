@@ -1,0 +1,9 @@
+# Phase 9 — Monitoring: scrape the Verita backend's /metrics endpoint.
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: verita-backend
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["backend:8000"]

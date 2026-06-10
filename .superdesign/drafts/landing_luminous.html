@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verita | Financial Crime & Compliance Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { fontFamily: {"mono":["'JetBrains Mono'","monospace"]} } }
+}
+</script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06070D;
+            --bg-2: #0B0E1A;
+            --surface: rgba(255, 255, 255, 0.045);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #F2F5FF;
+            --text-muted: #8C97B5;
+            --signature-gradient: linear-gradient(120deg, #4D7CFF, #A855F7 55%, #22D3EE);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-panel {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+        }
+
+        .neon-glass {
+            background: var(--surface);
+            backdrop-filter: blur(24px);
+            position: relative;
+        }
+
+        .neon-glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 1px;
+            border-radius: inherit;
+            background: linear-gradient(120deg, rgba(77,124,255,0.3), rgba(168,85,247,0.3), rgba(34,211,238,0.3));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .text-gradient {
+            background: var(--signature-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .aurora-glow {
+            filter: blur(120px);
+            opacity: 0.2;
+            position: absolute;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        .film-grain {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.04;
+            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 40s linear infinite;
+        }
+
+        .hero-headline {
+            font-size: clamp(3rem, 7vw, 7.5rem);
+            line-height: 1.05;
+            letter-spacing: -0.04em;
+        }
+
+        @view-transition { navigation: auto; }
+        ::view-transition-old(root) { animation: 0.4s cubic-bezier(0.4, 0, 0.2, 1) both fade-out; }
+        ::view-transition-new(root) { animation: 0.4s cubic-bezier(0.4, 0, 0.2, 1) both fade-in; }
+        @keyframes fade-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.98); } }
+        @keyframes fade-in { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
+
+        .persistent-nav { view-transition-name: main-nav; }
+    </style>
+
+<meta name="preview-version" content="a7a1af2f-0da7-4f6a-873f-446afaba12cb" />
+<meta name="preview-timestamp" content="2026-06-10T17:54:59.001Z" />
+
+<style>
+  html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
+    display: none !important; width: 0 !important; height: 0 !important;
+  }
+  html, body, * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+</style>
+<style>
+          body:not(.sd-ready) { opacity: 0 !important; }
+          body.sd-ready { opacity: 1 !important; transition: opacity 0.1s ease-in; }
+          sd-component { display: block; }
+        </style>
+
+<script type="module">
+  (function() {
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+  })();
+</script>
+<script type="module">
+    // SuperDesign Runtime
+    console.log('[SuperDesign] Preview loaded for versionId:', "a7a1af2f-0da7-4f6a-873f-446afaba12cb");
+
+    window.__SUPERDESIGN_PREVIEW__ = {
+      versionId: "a7a1af2f-0da7-4f6a-873f-446afaba12cb",
+      timestamp: "2026-06-10T17:54:59.001Z",
+      _modernScreenshotModule: null,
+
+      sendMessage: function(type, data) {
+        if (window.parent) {
+          window.parent.postMessage({
+            source: 'superdesign-preview',
+            type: type,
+            data: data,
+            versionId: this.versionId
+          }, '*');
+        }
+      },
+
+      ready: function() {
+        this.sendMessage('ready', { timestamp: Date.now() });
+      },
+
+      
+      _captureScreenshotInternal: async function() {
+        if (!this._modernScreenshotModule) {
+          console.log('[SuperDesign] Loading modern-screenshot library...');
+          this._modernScreenshotModule = await import('https://esm.sh/modern-screenshot@4.6.6');
+        }
+        var modernScreenshot = this._modernScreenshotModule;
+        if (!modernScreenshot || !modernScreenshot.domToCanvas) {
+          throw new Error('modern-screenshot library not loaded');
+        }
+
+        var scrollX = window.scrollX || window.pageXOffset;
+        var scrollY = window.scrollY || window.pageYOffset;
+        var viewportWidth = window.innerWidth;
+        var viewportHeight = window.innerHeight;
+        var documentWidth = Math.max(
+          document.documentElement.scrollWidth,
+          document.documentElement.offsetWidth,
+          document.documentElement.clientWidth,
+          document.body.scrollWidth,
+          document.body.offsetWidth
+        );
+        var documentHeight = Math.max(
+          document.documentElement.scrollHeight,
+          document.documentElement.offsetHeight,
+          document.documentElement.clientHeight,
+          document.body.scrollHeight,
+          document.body.offsetHeight
+        );
+
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        var pixelRatio = isMobile ? 1 : (window.devicePixelRatio || 1);
+
+        var dataUrl;
+
+        if (isMobile) {
+          var wrapper = document.createElement('div');
+          wrapper.style.cssText = 'position:fixed;top:0;left:0;width:' + viewportWidth + 'px;height:' + viewportHeight + 'px;overflow:hidden;z-index:999999;pointer-events:none;';
+          var clone = document.body.cloneNode(true);
+          clone.style.cssText = 'position:absolute;top:' + (-scrollY) + 'px;left:' + (-scrollX) + 'px;margin:0;width:' + documentWidth + 'px;';
+          wrapper.appendChild(clone);
+          document.body.appendChild(wrapper);
+          try {
+            var viewportCanvas = await modernScreenshot.domToCanvas(wrapper, {
+              scale: 1, backgroundColor: '#ffffff',
+              width: viewportWidth, height: viewportHeight,
+            });
+            dataUrl = viewportCanvas.toDataURL('image/png', 0.5);
+          } finally {
+            document.body.removeChild(wrapper);
+          }
+        } else {
+          var fullCanvas = await modernScreenshot.domToCanvas(document.documentElement, {
+            scale: pixelRatio, backgroundColor: '#ffffff',
+            width: documentWidth, height: documentHeight,
+          });
+          var viewportCanvas = document.createElement('canvas');
+          viewportCanvas.width = viewportWidth * pixelRatio;
+          viewportCanvas.height = viewportHeight * pixelRatio;
+          var ctx = viewportCanvas.getContext('2d');
+          if (!ctx) throw new Error('Failed to get canvas context');
+          ctx.drawImage(
+            fullCanvas,
+            scrollX * pixelRatio, scrollY * pixelRatio,
+            viewportWidth * pixelRatio, viewportHeight * pixelRatio,
+            0, 0, viewportWidth * pixelRatio, viewportHeight * pixelRatio
+          );
+          dataUrl = viewportCanvas.toDataURL('image/png', 1.0);
+        }
+
+        if (!dataUrl || !dataUrl.startsWith('data:image/png;base64,') || dataUrl.length < 100) {
+          throw new Error('Invalid screenshot data');
+        }
+
+        return {
+          dataUrl: dataUrl,
+          viewportWidth: viewportWidth,
+          viewportHeight: viewportHeight,
+          pixelRatio: pixelRatio
+        };
+      },
+
+      autoCapture: async function() {
+        if (window === window.parent) return;
+        try {
+          var result = await this._captureScreenshotInternal();
+          this.sendMessage('auto-screenshot', {
+            dataUrl: result.dataUrl,
+            timestamp: Date.now(),
+            viewportWidth: result.viewportWidth,
+            viewportHeight: result.viewportHeight,
+            pixelRatio: result.pixelRatio,
+          });
+        } catch (error) {
+          console.error('[SuperDesign] Auto-capture failed:', error);
+        }
+      },
+
+      captureScreenshot: async function(requestId, autoCaptureId) {
+        try {
+          this._currentRequestId = requestId;
+          this._currentAutoCaptureId = autoCaptureId;
+          var result = await this._captureScreenshotInternal();
+          this.sendMessage('screenshot-captured', {
+            dataUrl: result.dataUrl,
+            timestamp: Date.now(),
+            viewportWidth: result.viewportWidth,
+            viewportHeight: result.viewportHeight,
+            pixelRatio: result.pixelRatio,
+            requestId: this._currentRequestId,
+            autoCaptureId: this._currentAutoCaptureId
+          });
+          return result.dataUrl;
+        } catch (error) {
+          console.error('[SuperDesign] Screenshot capture failed:', error);
+          this.sendMessage('screenshot-error', {
+            error: error.message || String(error),
+            timestamp: Date.now(),
+            requestId: this._currentRequestId,
+            autoCaptureId: this._currentAutoCaptureId
+          });
+          throw error;
+        }
+      }
+  
+    };
+
+    
+    // Font loading helpers
+    window.__SUPERDESIGN_PREVIEW__.loadedFonts = new Set();
+    window.__SUPERDESIGN_PREVIEW__.loadGoogleFont = function(fontFamily) {
+      if (!fontFamily || this.loadedFonts.has(fontFamily)) return;
+      if (fontFamily.startsWith('Custom-')) return;
+
+      var systemFonts = ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI',
+        'Roboto', 'Helvetica', 'Arial', 'sans-serif', 'Georgia', 'Times New Roman',
+        'Times', 'serif', 'Menlo', 'Monaco', 'Consolas', 'Courier New', 'monospace'];
+      if (systemFonts.some(function(sf) { return fontFamily.toLowerCase().includes(sf.toLowerCase()); })) return;
+
+      if (!document.querySelector('link[href*="fonts.googleapis.com"]')) {
+        var preconnect1 = document.createElement('link');
+        preconnect1.rel = 'preconnect';
+        preconnect1.href = 'https://fonts.googleapis.com';
+        document.head.appendChild(preconnect1);
+        var preconnect2 = document.createElement('link');
+        preconnect2.rel = 'preconnect';
+        preconnect2.href = 'https://fonts.gstatic.com';
+        preconnect2.crossOrigin = 'anonymous';
+        document.head.appendChild(preconnect2);
+      }
+
+      var linkId = 'google-font-' + fontFamily.replace(/\\s+/g, '-').toLowerCase();
+      if (!document.getElementById(linkId)) {
+        var link = document.createElement('link');
+        link.id = linkId;
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(fontFamily) + ':wght@400;500;600;700&display=swap';
+        link.onerror = function() { console.error('[SuperDesign] Failed to load Google Font:', fontFamily); };
+        document.head.appendChild(link);
+      }
+      this.loadedFonts.add(fontFamily);
+    };
+
+    window.__SUPERDESIGN_PREVIEW__.loadedCustomFonts = new Set();
+    window.__SUPERDESIGN_PREVIEW__.loadCustomFont = function(fontInfo) {
+      if (!fontInfo || !fontInfo.family || !fontInfo.url) return;
+      if (this.loadedCustomFonts.has(fontInfo.family)) return;
+      var styleId = 'custom-font-' + fontInfo.family.replace(/[^a-zA-Z0-9]/g, '-');
+      if (document.getElementById(styleId)) return;
+      var style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = '@font-face { ' +
+        'font-family: "' + fontInfo.family + '"; ' +
+        'src: url("' + fontInfo.url + '") format("' + (fontInfo.format || 'woff2') + '"); ' +
+        'font-weight: 100 900; font-style: normal; font-display: swap; }';
+      document.head.appendChild(style);
+      this.loadedCustomFonts.add(fontInfo.family);
+    };
+  
+    
+    // Theme sync
+    window.__SUPERDESIGN_PREVIEW__.applyTheme = function(payload, isDark) {
+      var root = document.documentElement;
+      var colorVars = isDark ? payload.dark : payload.light;
+      for (var name in colorVars) {
+        if (colorVars.hasOwnProperty(name)) {
+          root.style.setProperty(name, colorVars[name]);
+        }
+      }
+
+      if (payload.customFonts && Array.isArray(payload.customFonts)) {
+        payload.customFonts.forEach(function(fontInfo) {
+          window.__SUPERDESIGN_PREVIEW__.loadCustomFont(fontInfo);
+        });
+      }
+
+      if (payload.typography) {
+        var t = payload.typography;
+        if (t.fontSans && !t.fontSans.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontSans);
+        if (t.fontSerif && !t.fontSerif.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontSerif);
+        if (t.fontMono && !t.fontMono.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontMono);
+
+        var formatFontValue = function(ff) {
+          if (!ff) return ff;
+          var first = ff.split(',')[0].trim().replace(/^["']|["']$/g, '');
+          return first.startsWith('var(') ? first : '"' + first + '"';
+        };
+        root.style.setProperty('--font-sans', formatFontValue(t.fontSans));
+        root.style.setProperty('--font-serif', formatFontValue(t.fontSerif));
+        root.style.setProperty('--font-mono', formatFontValue(t.fontMono));
+        root.style.setProperty('--font-size', t.fontSize);
+        root.style.setProperty('--line-height', t.lineHeight);
+        root.style.setProperty('--letter-spacing-body', t.letterSpacing);
+        root.style.setProperty('--letter-spacing-heading', t.headingLetterSpacing);
+        root.style.setProperty('--font-weight-regular', t.fontWeightRegular);
+        root.style.setProperty('--font-weight-bold', t.fontWeightBold);
+      }
+
+      if (payload.effects) {
+        root.style.setProperty('--radius', payload.effects.radius);
+        root.style.setProperty('--shadow', payload.effects.shadow);
+      }
+
+      if (isDark) { root.classList.add('dark'); } else { root.classList.remove('dark'); }
+    };
+  
+    
+    // Message listener
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'request-screenshot') {
+        if (window.__SUPERDESIGN_PREVIEW__) {
+          window.__SUPERDESIGN_PREVIEW__.captureScreenshot(event.data.requestId, event.data.autoCaptureId);
+        }
+      }
+
+      if (event.data && event.data.type === 'superdesign-theme-update') {
+        if (window.__SUPERDESIGN_PREVIEW__ && event.data.payload) {
+          var isDark = event.data.isDark || false;
+          window.__SUPERDESIGN_PREVIEW__.applyTheme(event.data.payload, isDark);
+          window.__SUPERDESIGN_PREVIEW__.sendMessage('theme-applied', { timestamp: Date.now(), isDark: isDark });
+        }
+      }
+
+      if (event.data && event.data.type === 'navigate-to-route') {
+        var route = event.data.route;
+        if (route) {
+          if (route === '/') {
+            if (window.location.hash) {
+              history.pushState(null, '', window.location.pathname + window.location.search);
+              window.dispatchEvent(new HashChangeEvent('hashchange'));
+            }
+          } else {
+            var newHash = '#' + route;
+            if (window.location.hash !== newHash) {
+              window.location.hash = route;
+            }
+          }
+        }
+      }
+    });
+  
+    
+    // Page lifecycle
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { window.__SUPERDESIGN_PREVIEW__.ready(); });
+    } else {
+      window.__SUPERDESIGN_PREVIEW__.ready();
+    }
+
+    function onPageFullyLoaded() {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          setTimeout(function() {
+            window.__SUPERDESIGN_PREVIEW__.sendMessage('loaded', { timestamp: Date.now() });
+          }, 1500);
+          // Auto-capture disabled for this preview type
+        });
+      });
+    }
+
+    if (document.readyState === 'complete') {
+      onPageFullyLoaded();
+    } else {
+      window.addEventListener('load', onPageFullyLoaded);
+    }
+  
+  </script>
+<script type="module">
+  window.addEventListener('error', function(event) {
+    var msg = event.message || '';
+    var name = (event.error && event.error.name) || msg.split(':')[0] || '';
+    if (name === 'HierarchyRequestError' || msg.includes("Failed to execute 'appendChild' on 'Node'")) return;
+    if (window.__SUPERDESIGN_PREVIEW__) {
+      var err = event.error;
+      window.__SUPERDESIGN_PREVIEW__.sendMessage('error', {
+        message: event.message, filename: event.filename,
+        lineno: event.lineno, colno: event.colno,
+        name: (err && err.name) || name || 'Error',
+        stack: (err && err.stack) || null
+      });
+    }
+  });
+  window.addEventListener('unhandledrejection', function(event) {
+    var reason = event.reason;
+    var msg = (reason && reason.message) || (typeof reason === 'string' ? reason : '');
+    var name = (reason && reason.name) || 'UnhandledRejection';
+    if (name === 'HierarchyRequestError' || msg.includes("Failed to execute 'appendChild' on 'Node'")) return;
+    if (window.__SUPERDESIGN_PREVIEW__) {
+      window.__SUPERDESIGN_PREVIEW__.sendMessage('unhandled-rejection', {
+        reason: (reason && reason.message) || String(reason),
+        name: name,
+        stack: (reason && reason.stack) || null
+      });
+    }
+  });
+</script>
+<script type="module">import '/__visual-edit-bridge/iframe-runtime.mjs?v=a57a0939';</script>
+<script  src="https://cdn.jsdelivr.net/npm/petite-vue@0.4.1/dist/petite-vue.iife.js"></script>
+<script type="module">
+  (function() {
+    'use strict';
+
+    var MAX_RENDER_DEPTH = 5;
+
+    function showPage() {
+      document.body.classList.add('sd-ready');
+    }
+
+    var componentRegistry = new Map();
+    var instanceRegistry = new Map();
+    var API_BASE = "https://api.superdesign.dev";
+    var DRAFT_ID = "a7a1af2f-0da7-4f6a-873f-446afaba12cb";
+
+    function buildDefaultProps(definition) {
+      var defaultProps = {};
+      var props = definition.props;
+      if (!props || !Array.isArray(props)) return defaultProps;
+      for (var i = 0; i < props.length; i++) {
+        var prop = props[i];
+        if (prop.defaultValue === undefined) continue;
+        var path = prop.name.split('.');
+        var current = defaultProps;
+        for (var j = 0; j < path.length - 1; j++) {
+          var key = path[j];
+          if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
+            current[key] = {};
+          }
+          current = current[key];
+        }
+        current[path[path.length - 1]] = prop.defaultValue;
+      }
+      return defaultProps;
+    }
+
+    function deepMerge(target, source) {
+      var result = Object.assign({}, target);
+      for (var key in source) {
+        if (!source.hasOwnProperty(key)) continue;
+        if (
+          source[key] && typeof source[key] === 'object' && !Array.isArray(source[key]) &&
+          result[key] && typeof result[key] === 'object' && !Array.isArray(result[key])
+        ) {
+          result[key] = deepMerge(result[key], source[key]);
+        } else {
+          result[key] = source[key];
+        }
+      }
+      return result;
+    }
+
+    function registerComponent(id, definition) {
+      componentRegistry.set(id, definition);
+      console.log('[SDComponent] Registered component:', id);
+    }
+
+    function renderComponent(element, depth) {
+      depth = depth || 0;
+      var componentId = element.getAttribute('componentid') || element.getAttribute('ref');
+      var instanceId = element.getAttribute('instance');
+      var propsAttr = element.getAttribute('props');
+
+      if (!componentId) {
+        console.warn('[SDComponent] Missing componentId attribute on sd-component');
+        return;
+      }
+
+      if (depth >= MAX_RENDER_DEPTH) {
+        console.warn('[SDComponent] Max render depth reached for:', componentId);
+        element.setAttribute('data-error', 'max-depth');
+        return;
+      }
+
+      var definition = componentRegistry.get(componentId);
+      if (!definition) {
+        console.warn('[SDComponent] Component not found:', componentId);
+        element.setAttribute('data-pending', 'true');
+        return;
+      }
+
+      var instanceProps = {};
+      if (propsAttr) {
+        try { instanceProps = JSON.parse(propsAttr); }
+        catch (e) { console.warn('[SDComponent] Invalid props JSON:', propsAttr); }
+      }
+
+      var defaultProps = buildDefaultProps(definition);
+      var finalProps = deepMerge(defaultProps, instanceProps);
+
+      element.innerHTML = definition.htmlContent;
+
+      if (window.PetiteVue) {
+        finalProps.$emit = function(eventName, payload) {
+          if (payload && typeof payload === 'object' && payload.href) {
+            window.location.href = payload.href;
+            return;
+          }
+          var customEvent = new CustomEvent('sd-' + eventName, {
+            detail: payload, bubbles: true, composed: true,
+          });
+          element.dispatchEvent(customEvent);
+        };
+        window.PetiteVue.createApp(finalProps).mount(element);
+      } else {
+        console.warn('[SDComponent] Petite-Vue not loaded, template syntax will not be resolved');
+      }
+
+      instanceRegistry.set(instanceId, {
+        componentId: componentId,
+        element: element,
+        props: finalProps,
+        version: definition.version,
+      });
+
+      element.removeAttribute('data-pending');
+      element.setAttribute('data-rendered', 'true');
+      element.setAttribute('data-version', String(definition.version));
+      console.log('[SDComponent] Rendered:', componentId, instanceId);
+
+      // Render any nested sd-component children that were just injected
+      var nestedElements = element.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      if (nestedElements.length > 0) {
+        var missingIds = [];
+        nestedElements.forEach(function(nested) {
+          var nestedId = nested.getAttribute('componentid') || nested.getAttribute('ref');
+          if (nestedId && !componentRegistry.has(nestedId)) {
+            missingIds.push(nestedId);
+          }
+        });
+
+        if (missingIds.length > 0) {
+          // Fetch missing nested components, then render
+          loadComponentsByIds(missingIds).then(function() {
+            nestedElements.forEach(function(nested) {
+              if (!nested.getAttribute('data-rendered')) {
+                renderComponent(nested, depth + 1);
+              }
+            });
+          });
+        } else {
+          // All nested definitions already loaded — render immediately
+          nestedElements.forEach(function(nested) {
+            if (!nested.getAttribute('data-rendered')) {
+              renderComponent(nested, depth + 1);
+            }
+          });
+        }
+      }
+    }
+
+    function updateComponentInstances(componentId) {
+      var elements = document.querySelectorAll('sd-component[componentid="' + componentId + '"], sd-component[ref="' + componentId + '"]');
+      elements.forEach(function(el) { renderComponent(el); });
+    }
+
+    function initializeComponents() {
+      var elements = document.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      elements.forEach(function(el) {
+        if (!el.getAttribute('data-rendered')) { renderComponent(el); }
+      });
+    }
+
+    async function loadComponentsByIds(ids) {
+      if (!ids || ids.length === 0) return;
+      // Deduplicate and filter already-loaded
+      var uniqueIds = ids.filter(function(id, i, arr) {
+        return arr.indexOf(id) === i && !componentRegistry.has(id);
+      });
+      if (uniqueIds.length === 0) return;
+
+      try {
+        console.log('[SDComponent] Batch loading components:', uniqueIds);
+        var response = await fetch(API_BASE + '/v1/design-drafts/components/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ componentIds: uniqueIds }),
+        });
+        if (!response.ok) throw new Error('Batch load failed: ' + response.status);
+        var components = await response.json();
+        console.log('[SDComponent] Batch loaded', components.length, 'components');
+        components.forEach(function(comp) { registerComponent(comp.id, comp); });
+      } catch (error) {
+        console.error('[SDComponent] Failed to batch load components:', error);
+      }
+    }
+
+    async function loadComponentsForDraft() {
+      if (!DRAFT_ID) {
+        console.warn('[SDComponent] No draft ID configured');
+        showPage();
+        return;
+      }
+      try {
+        console.log('[SDComponent] Loading components for draft:', DRAFT_ID);
+        var response = await fetch(API_BASE + '/v1/design-drafts/' + DRAFT_ID + '/components', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error('Failed to load components: ' + response.status);
+        var components = await response.json();
+        console.log('[SDComponent] Loaded', components.length, 'components');
+        components.forEach(function(comp) { registerComponent(comp.id, comp); });
+        initializeComponents();
+        showPage();
+      } catch (error) {
+        console.error('[SDComponent] Failed to load components:', error);
+        showPage();
+      }
+    }
+
+    function findReferencedComponents() {
+      var elements = document.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      var ids = new Set();
+      elements.forEach(function(el) {
+        var ref = el.getAttribute('componentid') || el.getAttribute('ref');
+        if (ref) ids.add(ref);
+      });
+      return Array.from(ids);
+    }
+
+    window.__SD_COMPONENTS__ = {
+      register: registerComponent,
+      render: renderComponent,
+      update: updateComponentInstances,
+      loadForDraft: loadComponentsForDraft,
+      loadByIds: loadComponentsByIds,
+      init: initializeComponents,
+      findRefs: findReferencedComponents,
+      getRegistry: function() { return componentRegistry; },
+      getInstances: function() { return instanceRegistry; },
+      getDraftId: function() { return DRAFT_ID; },
+    };
+
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'SD_COMPONENT_UPDATE') {
+        var cId = event.data.componentId;
+        var def = event.data.definition;
+        if (cId && def) { registerComponent(cId, def); updateComponentInstances(cId); }
+      }
+      if (event.data && event.data.type === 'SD_COMPONENTS_REGISTER') {
+        var comps = event.data.components;
+        if (Array.isArray(comps)) {
+          comps.forEach(function(c) { registerComponent(c.id, c); });
+          initializeComponents();
+        }
+      }
+    });
+
+    function bootComponents() {
+      // Pre-register components from __SD_COMPONENT_PRELOAD__ (injected by backend for standalone previews)
+      if (window.__SD_COMPONENT_PRELOAD__ && Array.isArray(window.__SD_COMPONENT_PRELOAD__)) {
+        console.log('[SDComponent] Pre-registering', window.__SD_COMPONENT_PRELOAD__.length, 'preloaded components');
+        window.__SD_COMPONENT_PRELOAD__.forEach(function(comp) {
+          registerComponent(comp.id, comp);
+        });
+      }
+
+      var refs = findReferencedComponents();
+      var unloaded = refs.filter(function(id) { return !componentRegistry.has(id); });
+
+      if (unloaded.length > 0) {
+        if (DRAFT_ID) {
+          loadComponentsForDraft();
+        } else {
+          // No draft ID — try batch loading the missing IDs directly
+          loadComponentsByIds(unloaded).then(function() {
+            initializeComponents();
+            showPage();
+          });
+        }
+      } else if (refs.length > 0) {
+        // All components already registered (e.g. from preload) — render immediately
+        initializeComponents();
+        showPage();
+      } else {
+        showPage();
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootComponents);
+    } else {
+      bootComponents();
+    }
+
+    var observer = new MutationObserver(function(mutations) {
+      var hasNew = false;
+      mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) {
+            if (node.tagName === 'SD-COMPONENT') { hasNew = true; }
+            else if (node.querySelector) {
+              if (node.querySelectorAll('sd-component[componentid], sd-component[ref]').length > 0) hasNew = true;
+            }
+          }
+        });
+      });
+      if (hasNew) {
+        var refs = findReferencedComponents();
+        var unloaded = refs.filter(function(id) { return !componentRegistry.has(id); });
+        if (unloaded.length > 0) {
+          loadComponentsByIds(unloaded).then(function() {
+            initializeComponents();
+          });
+        } else {
+          initializeComponents();
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    console.log('[SDComponent] Runtime initialized');
+  })();
+  </script>
+</head>
+<body>
+    <div class="film-grain"></div>
+    
+    <div class="min-h-screen relative">
+        <!-- Luminous Aurora Backgrounds -->
+        <div class="aurora-glow bg-[#4D7CFF] w-[600px] h-[600px] -top-20 -left-20"></div>
+        <div class="aurora-glow bg-[#A855F7] w-[500px] h-[500px] top-1/4 -right-20"></div>
+        <div class="aurora-glow bg-[#22D3EE] w-[700px] h-[700px] -bottom-40 left-1/3"></div>
+
+        <canvas id="particleCanvas" class="fixed inset-0 w-full h-full opacity-30 z-0 pointer-events-none"></canvas>
+
+        <!-- (1) Top Nav Bar -->
+        <nav class="fixed top-0 left-0 right-0 z-[100] px-6 py-6 persistent-nav">
+            <div class="max-w-7xl mx-auto neon-glass rounded-full px-8 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 bg-gradient-to-tr from-[#4D7CFF] via-[#A855F7] to-[#22D3EE] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(77,124,255,0.4)]">
+                        <iconify-icon icon="lucide:shield-check" class="text-white text-xl"></iconify-icon>
+                    </div>
+                    <span class="font-display text-2xl font-bold tracking-tight text-white">Verita</span>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="#" id="nav-product" class="text-sm font-medium text-[#8C97B5] hover:text-white transition-colors">Product</a>
+                    <a href="https://p.superdesign.dev/draft/982012bb-578b-43e3-a948-2cbf9746620a" id="nav-risk" class="text-sm font-medium text-[#8C97B5] hover:text-white transition-colors">Risk Engine</a>
+                    <a href="https://p.superdesign.dev/draft/593f6df0-4504-48ae-845e-942c394b9983" id="nav-studio" class="text-sm font-medium text-[#8C97B5] hover:text-white transition-colors">Studio</a>
+                    <a href="#" id="nav-docs" class="text-sm font-medium text-[#8C97B5] hover:text-white transition-colors">Docs</a>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <button id="theme-toggle" class="w-10 h-10 flex items-center justify-center text-[#8C97B5] hover:text-white transition-colors">
+                        <iconify-icon icon="lucide:sun" class="text-xl"></iconify-icon>
+                    </button>
+                    <a href="#" id="cta-access" class="bg-white text-black px-6 py-2.5 rounded-full text-sm font-bold transition-transform hover:scale-105 shadow-xl">
+                        Request Access
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- (2) Hero Section -->
+        <main class="relative pt-44 pb-32 px-6 flex flex-col items-center text-center">
+            <div class="relative z-10 max-w-6xl">
+                <h1 class="hero-headline font-display font-bold text-white mb-10">
+                    Decode financial <br/>
+                    <span class="text-gradient">signals</span> at scale
+                </h1>
+                <p class="text-lg md:text-2xl text-[#8C97B5] mb-14 max-w-2xl mx-auto leading-relaxed font-medium">
+                    Verita transforms complex transaction trails into predictive compliance intelligence using hyper-advanced AI.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+                    <a href="#" id="hero-upload" class="bg-gradient-to-r from-[#4D7CFF] to-[#A855F7] text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-3 transition-all hover:scale-105 shadow-[0_0_40px_rgba(77,124,255,0.25)]">
+                        <iconify-icon icon="lucide:upload-cloud" class="text-xl"></iconify-icon>
+                        Launch Workspace
+                    </a>
+                    <a href="#" id="hero-engine" class="neon-glass text-white px-10 py-5 rounded-2xl font-bold border border-white/10 hover:bg-white/10 transition-all">
+                        View Performance
+                    </a>
+                </div>
+            </div>
+
+            <!-- Floating Neon Chips -->
+            <div class="absolute top-1/2 left-10 lg:left-24 animate-bounce [animation-duration:5s] hidden xl:block">
+                <div class="neon-glass p-5 rounded-[24px] flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-[#4D7CFF]/20 flex items-center justify-center">
+                        <iconify-icon icon="lucide:activity" class="text-[#4D7CFF] text-2xl"></iconify-icon>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-mono text-[10px] text-[#8C97B5] uppercase tracking-widest">Throughput</p>
+                        <p class="text-white font-bold font-mono text-lg">8.2k tx/sec</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-1/4 right-10 lg:right-24 animate-bounce [animation-duration:7s] hidden xl:block">
+                <div class="neon-glass p-5 rounded-[24px] flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-[#22D3EE]/20 flex items-center justify-center">
+                        <iconify-icon icon="lucide:shield" class="text-[#22D3EE] text-2xl"></iconify-icon>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-mono text-[10px] text-[#8C97B5] uppercase tracking-widest">Detection Rate</p>
+                        <p class="text-white font-bold font-mono text-lg">99.82%</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- (3) Marquee Strip -->
+        <section class="py-20 border-y border-white/5 bg-[#06070D]/40 backdrop-blur-xl">
+            <div class="marquee-container">
+                <div class="marquee-content gap-16 md:gap-32 items-center px-16">
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">REVOLUT</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">GOLDMAN SACHS</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">STRIPE</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">JP MORGAN</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">CITIBANK</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">MONZO</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">BINANCE</span>
+                    <!-- Repeat for smooth loop -->
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">REVOLUT</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">GOLDMAN SACHS</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">STRIPE</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">JP MORGAN</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">CITIBANK</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">MONZO</span>
+                    <span class="font-display font-bold text-3xl text-white/40 tracking-tighter uppercase">BINANCE</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- (4) Asymmetric Bento Capabilities -->
+        <section class="py-40 px-6 max-w-7xl mx-auto">
+            <div class="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div>
+                    <p class="font-mono text-sm text-[#4D7CFF] uppercase tracking-[0.3em] mb-4 font-bold">Capabilities</p>
+                    <h2 class="font-display text-5xl md:text-6xl font-bold text-white">Futuristic infra for <br/>compliance pioneers.</h2>
+                </div>
+                <p class="text-[#8C97B5] max-w-md font-medium text-lg">
+                    Built for the next decade of financial regulation, Verita eliminates false positives through deep contextual awareness.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <!-- Feature 1: Studio (Spans 8) -->
+                <div class="md:col-span-8 group">
+                    <div class="neon-glass p-10 rounded-[40px] h-[500px] overflow-hidden flex flex-col justify-between hover:shadow-[0_0_80px_rgba(77,124,255,0.15)] transition-all duration-500">
+                        <div class="max-w-md">
+                            <div class="w-14 h-14 rounded-2xl bg-[#4D7CFF]/10 flex items-center justify-center mb-8">
+                                <iconify-icon icon="lucide:layers" class="text-[#4D7CFF] text-3xl"></iconify-icon>
+                            </div>
+                            <h3 class="text-3xl font-display font-bold text-white mb-4">Auto-Dashboard Studio</h3>
+                            <p class="text-[#8C97B5] leading-relaxed">Instantly turn raw settlement data into production-grade risk surfaces. No coding required—just pure insight flow.</p>
+                        </div>
+                        <div class="relative h-48">
+                            <div class="absolute -bottom-10 right-0 w-full bg-[#111729] rounded-2xl p-6 border border-white/5 shadow-2xl transform group-hover:-translate-y-4 transition-transform duration-700">
+                                <div class="flex justify-between mb-4 items-center">
+                                    <span class="text-xs font-mono text-white/40 uppercase">Real-time Processing</span>
+                                    <span class="text-xs font-mono text-[#22D3EE]">LIVE</span>
+                                </div>
+                                <div class="h-24 w-full bg-gradient-to-r from-[#4D7CFF]/20 via-[#A855F7]/20 to-transparent rounded-lg"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2: Risk Engine (Spans 4) -->
+                <div class="md:col-span-4 group">
+                    <a href="https://p.superdesign.dev/draft/982012bb-578b-43e3-a948-2cbf9746620a" id="bento-risk-card-new" class="neon-glass p-10 rounded-[40px] h-[500px] flex flex-col justify-between hover:shadow-[0_0_80px_rgba(168,85,247,0.15)] transition-all duration-500 block">
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-[#A855F7]/10 flex items-center justify-center mb-8">
+                                <iconify-icon icon="lucide:zap" class="text-[#A855F7] text-3xl"></iconify-icon>
+                            </div>
+                            <h3 class="text-3xl font-display font-bold text-white mb-4">Signal Engine</h3>
+                            <p class="text-[#8C97B5] leading-relaxed">Extreme precision anomaly detection that learns with every transaction.</p>
+                        </div>
+                        <div class="bg-[#06070D]/80 rounded-[24px] p-6 border border-white/10">
+                            <div class="flex justify-between items-center mb-6">
+                                <span class="text-[10px] font-mono text-[#8C97B5]">RISK LEVEL</span>
+                                <span class="px-2 py-0.5 bg-red-500/20 text-red-500 text-[10px] rounded uppercase font-bold">High Risk</span>
+                            </div>
+                            <div class="flex items-end gap-2">
+                                <div class="flex-1 h-12 bg-white/5 rounded-md"></div>
+                                <div class="flex-1 h-16 bg-[#A855F7] rounded-md shadow-[0_0_20px_rgba(168,85,247,0.4)]"></div>
+                                <div class="flex-1 h-8 bg-white/5 rounded-md"></div>
+                                <div class="flex-1 h-10 bg-white/5 rounded-md"></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Feature 3: NLP (Spans 12) -->
+                <div class="md:col-span-12 group">
+                    <div class="neon-glass p-12 rounded-[40px] overflow-hidden relative group hover:shadow-[0_0_80px_rgba(34,211,238,0.1)] transition-all duration-500">
+                        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#22D3EE]/5 blur-[120px] pointer-events-none"></div>
+                        <div class="flex flex-col lg:flex-row items-center gap-16 relative z-10">
+                            <div class="flex-1">
+                                <div class="w-14 h-14 rounded-2xl bg-[#22D3EE]/10 flex items-center justify-center mb-8">
+                                    <iconify-icon icon="lucide:terminal" class="text-[#22D3EE] text-3xl"></iconify-icon>
+                                </div>
+                                <h3 class="text-4xl font-display font-bold text-white mb-6">Contextual AI Auditor</h3>
+                                <p class="text-[#8C97B5] text-xl leading-relaxed max-w-xl">Query your entire transaction ledger using natural language. "Show me all accounts linked to the recent cross-border surge in Singapore."</p>
+                            </div>
+                            <div class="flex-1 w-full">
+                                <div class="bg-[#0B0E1A]/80 border border-white/10 rounded-3xl p-8 shadow-2xl">
+                                    <div class="flex gap-4 mb-6 items-start">
+                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#22D3EE] to-[#A855F7] flex-shrink-0"></div>
+                                        <div class="space-y-3">
+                                            <div class="h-3 w-48 bg-white/20 rounded-full"></div>
+                                            <div class="h-3 w-64 bg-white/10 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                    <div class="h-px w-full bg-white/5 my-6"></div>
+                                    <div class="flex justify-between items-center text-[#22D3EE] font-mono text-xs">
+                                        <span>QUERYING DATABASE...</span>
+                                        <span>92% COMPLETE</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- (5) Footer -->
+        <footer class="pt-32 pb-16 px-6 border-t border-white/5">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
+                    <div class="col-span-2 lg:col-span-5">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-10 h-10 bg-gradient-to-tr from-[#4D7CFF] to-[#22D3EE] rounded-xl flex items-center justify-center shadow-lg">
+                                <iconify-icon icon="lucide:shield-check" class="text-white text-2xl"></iconify-icon>
+                            </div>
+                            <span class="font-display text-2xl font-bold tracking-tight text-white">Verita</span>
+                        </div>
+                        <p class="text-[#8C97B5] text-lg leading-relaxed mb-10 max-w-sm font-medium">The world's most advanced compliance operating system. Secure, intelligent, and unyieldingly precise.</p>
+                        <div class="flex gap-6">
+                            <iconify-icon icon="mdi:twitter" class="text-[#8C97B5] hover:text-white cursor-pointer text-2xl transition-colors"></iconify-icon>
+                            <iconify-icon icon="mdi:linkedin" class="text-[#8C97B5] hover:text-white cursor-pointer text-2xl transition-colors"></iconify-icon>
+                            <iconify-icon icon="mdi:github" class="text-[#8C97B5] hover:text-white cursor-pointer text-2xl transition-colors"></iconify-icon>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-1 lg:col-span-2">
+                        <h5 class="text-white font-bold mb-8 text-sm uppercase tracking-widest">Platform</h5>
+                        <ul class="space-y-4">
+                            <li><a href="#" id="f-features" class="text-[#8C97B5] hover:text-white transition-colors">Architecture</a></li>
+                            <li><a href="https://p.superdesign.dev/draft/982012bb-578b-43e3-a948-2cbf9746620a" id="f-engine-new" class="text-[#8C97B5] hover:text-white transition-colors">Risk Engine</a></li>
+                            <li><a href="#" id="f-security" class="text-[#8C97B5] hover:text-white transition-colors">Cyber Security</a></li>
+                            <li><a href="#" id="f-pricing" class="text-[#8C97B5] hover:text-white transition-colors">Enterprise</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-span-1 lg:col-span-2">
+                        <h5 class="text-white font-bold mb-8 text-sm uppercase tracking-widest">Company</h5>
+                        <ul class="space-y-4">
+                            <li><a href="#" id="f-about" class="text-[#8C97B5] hover:text-white transition-colors">Our Mission</a></li>
+                            <li><a href="#" id="f-careers" class="text-[#8C97B5] hover:text-white transition-colors">Join the Team</a></li>
+                            <li><a href="#" id="f-legal" class="text-[#8C97B5] hover:text-white transition-colors">Intelligence Policy</a></li>
+                            <li><a href="#" id="f-contact" class="text-[#8C97B5] hover:text-white transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-span-2 lg:col-span-3">
+                        <div class="neon-glass p-6 rounded-2xl">
+                            <p class="text-[10px] text-[#8C97B5] uppercase font-mono mb-4 tracking-widest">Network Status</p>
+                            <div class="flex items-center gap-3">
+                                <div class="w-3 h-3 rounded-full bg-[#16C784] shadow-[0_0_15px_#16C784]"></div>
+                                <span class="text-xs text-white font-bold">GLOBAL OPS: ONLINE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <p class="text-[#8C97B5] text-xs font-mono uppercase tracking-widest">© 2025 Verita Intelligence. Designed in the Singularity.</p>
+                    <div class="flex items-center gap-10 text-[10px] text-[#8C97B5] font-bold uppercase tracking-widest">
+                        <span class="hover:text-white cursor-pointer">SOC2 Type II Verified</span>
+                        <span class="hover:text-white cursor-pointer">ISO 27001 Certified</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Particle Signal Field Simulation
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+                this.radius = Math.random() * 2 + 1;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+            }
+            update() {
+                // Mouse Interaction
+                if (mouse.x) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    let forceDirectionX = dx / distance;
+                    let forceDirectionY = dy / distance;
+                    let maxDistance = 200;
+                    let force = (maxDistance - distance) / maxDistance;
+                    if (distance < maxDistance) {
+                        this.x -= forceDirectionX * force * this.density;
+                        this.y -= forceDirectionY * force * this.density;
+                    }
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.x % 2 === 0 ? 'rgba(77, 124, 255, 0.4)' : 'rgba(168, 85, 247, 0.4)';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 150; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 180) {
+                        ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 * (1 - dist/180)})`;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+# Phase 8 — Deployment (CD): backend Deployment + Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verita-backend
+  labels: { app: verita-backend }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: verita-backend }
+  template:
+    metadata:
+      labels: { app: verita-backend }
+    spec:
+      containers:
+        - name: backend
+          image: verita-backend:latest
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet: { path: /api/health, port: 8000 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests: { cpu: "250m", memory: "512Mi" }
+            limits: { cpu: "1", memory: "1Gi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: verita-backend
+spec:
+  selector: { app: verita-backend }
+  ports:
+    - port: 8000
+      targetPort: 8000
