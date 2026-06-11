@@ -1,8 +1,14 @@
 import { Suspense } from "react";
 import SignalField from "../components/SignalField";
 import Hero from "../sections/Hero";
+import LedgerSections from "../sections/LedgerSections";
 
-/** Marketing landing — always dark; the heavy 3D scene lives only here. */
+/**
+ * Marketing landing — a two-act scroll story.
+ * Act I (dark): the "black box" world — WebGL signal field, aurora, the hero.
+ * Act II (paper): the Forensic Ledger — scrolling breaks out of the black box into
+ * evidence: exhibits, the pipeline as chain-of-custody, stamps, and a scroll-drawn chain.
+ */
 export default function Landing() {
   return (
     <>
@@ -19,6 +25,7 @@ export default function Landing() {
       <div className="grain" />
       <main style={{ position: "relative", zIndex: 2 }}>
         <Hero />
+        <LedgerSections />
       </main>
     </>
   );
