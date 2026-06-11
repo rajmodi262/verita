@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UploadCloud, FileSpreadsheet, Loader2, GripVertical, X, LayoutGrid, Lightbulb, Share2, Terminal, Globe2, Printer, TrendingUp, ScanSearch } from "lucide-react";
-import RGL, { WidthProvider, type Layout } from "react-grid-layout";
+import RGL, { type Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { API_BASE } from "../config";
@@ -17,7 +17,6 @@ import GeoMap from "../components/studio/GeoMap";
 import WhatChanged from "../components/studio/WhatChanged";
 import TimeMachine from "../components/studio/TimeMachine";
 
-const GridLayout = WidthProvider(RGL);
 
 const SPAN: Record<string, number> = { line: 12, heatmap: 6, bar: 6, pie: 4, histogram: 6 };
 
@@ -209,6 +208,24 @@ export default function Studio() {
   }, [result]);
   const availableTabs = useMemo(() => TABS.filter((t) => t.id !== "map" || !!geoChart), [geoChart]);
 
+  // Measure the grid container ourselves (a ResizeObserver) and feed RGL an explicit width.
+  // WidthProvider's auto-measurement latches onto a near-zero width during the scan transition
+  // and never recovers; this is deterministic and survives responsive reflow.
+  const gridContainerRef = useRef<HTMLDivElement>(null);
+  const [gridWidth, setGridWidth] = useState(0);
+  useEffect(() => {
+    const el = gridContainerRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.getBoundingClientRect().width;
+      if (w > 0) setGridWidth(w);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [phase, tab, visibleCharts.length]);
+
   /* ── upload / scanning states ── */
   if (phase !== "ready") {
     return (
@@ -295,8 +312,8 @@ export default function Studio() {
 
       {/* Tab content */}
       {tab === "dashboard" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 252px", gap: 18, alignItems: "start" }}>
-          <div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 18, alignItems: "flex-start" }}>
+          <div style={{ flex: "1 1 540px", minWidth: 0 }}>
             {/* KPI row */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 14, marginBottom: 16 }}>
               {kpis.map((k, i) => (
@@ -312,7 +329,9 @@ export default function Studio() {
             <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginBottom: 8 }}>
               Drag ⠿ to rearrange · drag a corner to resize · ✕ to remove
             </div>
-            <GridLayout className="layout" layout={gridLayout} onLayoutChange={setGridLayout} cols={12} rowHeight={64} margin={[16, 16]} draggableHandle=".drag-handle" isBounded>
+            <div ref={gridContainerRef}>
+            {gridWidth > 0 && (
+            <RGL className="layout" width={gridWidth} layout={gridLayout} onLayoutChange={setGridLayout} cols={12} rowHeight={64} margin={[16, 16]} draggableHandle=".drag-handle" isBounded>
               {visibleCharts.map((c) => {
                 const isLine = c.chart_type === "line";
                 const showForecast = isLine && forecast.activeId === c.id && forecast.data;
@@ -353,10 +372,14 @@ export default function Studio() {
                   </div>
                 );
               })}
-            </GridLayout>
+            </RGL>
+            )}
+            </div>
           </div>
 
-          <ProfileRail profile={r.profile} quality={r.quality} />
+          <div style={{ flex: "1 1 240px", maxWidth: 320, minWidth: 220 }}>
+            <ProfileRail profile={r.profile} quality={r.quality} />
+          </div>
         </div>
       )}
 
