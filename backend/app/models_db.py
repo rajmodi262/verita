@@ -60,3 +60,26 @@ class QueryLog(Base):
             "elapsed_ms": self.elapsed_ms, "mode": self.mode, "ok": self.ok,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
+
+
+class Investigation(Base):
+    """One row per autonomous compliance investigation (the agent's audit record)."""
+
+    __tablename__ = "investigations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    dataset_id: Mapped[str] = mapped_column(String(32), index=True)
+    goal: Mapped[str] = mapped_column(String(120))
+    risk_level: Mapped[str] = mapped_column(String(12))
+    finding_count: Mapped[int] = mapped_column(Integer, default=0)
+    chain_head: Mapped[str] = mapped_column(String(64))  # SHA-256 head of the reasoning chain
+    memo_mode: Mapped[str] = mapped_column(String(20), default="rule-based")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+    def as_dict(self) -> dict:
+        return {
+            "id": self.id, "dataset_id": self.dataset_id, "goal": self.goal,
+            "risk_level": self.risk_level, "finding_count": self.finding_count,
+            "chain_head": self.chain_head, "memo_mode": self.memo_mode,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }

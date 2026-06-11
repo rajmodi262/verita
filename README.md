@@ -10,13 +10,34 @@ No BI tool to learn, no black boxes.**
 
 `Python · FastAPI · Pandas · scikit-learn · DuckDB` · `React · TypeScript · ECharts · Three.js`
 
-[![CI](https://github.com/rajmodi262/verita/actions/workflows/ci.yml/badge.svg)](https://github.com/rajmodi262/verita/actions/workflows/ci.yml) ![tests](https://img.shields.io/badge/tests-76%20passing-brightgreen) ![backend](https://img.shields.io/badge/backend-66%20pytest-blue) ![frontend](https://img.shields.io/badge/frontend-10%20vitest-blue) ![typecheck](https://img.shields.io/badge/tsc-clean-success) ![license](https://img.shields.io/badge/db-PostgreSQL%20%2B%20DuckDB-336791)
+[![CI](https://github.com/rajmodi262/verita/actions/workflows/ci.yml/badge.svg)](https://github.com/rajmodi262/verita/actions/workflows/ci.yml) ![tests](https://img.shields.io/badge/tests-82%20passing-brightgreen) ![backend](https://img.shields.io/badge/backend-72%20pytest-blue) ![frontend](https://img.shields.io/badge/frontend-10%20vitest-blue) ![typecheck](https://img.shields.io/badge/tsc-clean-success) ![license](https://img.shields.io/badge/db-PostgreSQL%20%2B%20DuckDB-336791)
 
 <br/>
 
 ![Verita Studio — auto-generated dashboard](docs/screenshots/02-studio-dashboard.png)
 
 </div>
+
+---
+
+## ⭐ The flagship: Auditable Compliance Investigator
+
+The novelty isn't a new algorithm — it's a **design thesis**. Agentic AI is unusable in finance if
+it's a black box: a regulator must be able to *reproduce and audit* every decision. Verita's
+Investigator is an **autonomous agent that shows its work**. Click *Run* and it:
+
+1. plans AML/fraud hypotheses from the data's shape,
+2. **tests each one with a real DuckDB query + statistic** (the query is part of the record),
+3. ranks confirmed findings and writes a cited compliance memo, and
+4. **hash-chains the entire reasoning trace** (each step's SHA-256 folds in the previous step's hash) —
+   so the investigation is tamper-evident and reproducible. Doctor any step and the chain breaks.
+
+> *"Most AI analytics tools are black boxes. Verita makes every auto-generated number show its
+> formula and every agent decision show its query — then seals the trace in a tamper-evident chain.
+> Built for FCC, because that's the one domain where you legally can't act on a number you can't
+> defend to a regulator."*
+
+![Auditable Compliance Investigator](docs/screenshots/09-investigator.png)
 
 ---
 

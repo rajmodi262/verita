@@ -35,7 +35,8 @@
 | "predictive and prescriptive models" | Risk engine (predictive) + recommended actions in NLP (File SAR / Investigate) | ✅ |
 | "hypothesis testing" | Welch t-test with p-values surfaced in Key Findings | ✅ |
 | "scenario analysis" | "What changed?" period comparison (first vs second half, biggest movers) + Time Machine playback | ✅ |
-| "data-driven business case development" | Executive summary auto-narrative | ✅ |
+| "data-driven business case development" | Executive summary auto-narrative + **Compliance Investigator memo** | ✅ |
+| "automate decision-making workflows" | **⭐ Auditable Compliance Investigator** — autonomous agent plans hypotheses, tests each with real SQL, writes a cited memo, hash-chains the trace | ✅ |
 
 ### R4. Advanced Analytics & Data Engineering
 | JD keyword / phrase | Verita feature | Status |
@@ -46,8 +47,8 @@
 | "Data Lakes and Datamarts … extraction, transformation" | DuckDB analytical engine + **PostgreSQL audit datamart** (SQLAlchemy; analyses & query log persisted, /api/history) | ✅ |
 | "SQL" | SQL Playground — real DuckDB queries on the upload, read-only guarded | ✅ |
 | "NLP … techniques" | Compliance NLP analyzer: entities, BSA/AML/OFAC/FinCEN matching, risk signals | ✅ |
-| "Generative AI" | NL→SQL translator; auto-generated executive summary & insight narratives | ✅ |
-| "intelligent data processing and automation" | Semantic column inference (measure/dimension/temporal/geo/id/bool) | ✅ |
+| "Generative AI" | NL→SQL translator; auto-generated executive summary & insight narratives; **agentic investigator with LLM-narrated memo** | ✅ |
+| "intelligent data processing and automation" | Semantic column inference + **autonomous agent that investigates without human steering** | ✅ |
 
 ### R5. Cross-Functional Collaboration
 | JD keyword / phrase | Verita feature | Status |

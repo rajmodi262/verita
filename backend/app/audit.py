@@ -32,6 +32,22 @@ def record_analysis(dataset_id: str, filename: str, title: str, row_count: int,
         logger.warning("audit: could not record analysis run: %s", e)
 
 
+def record_investigation(dataset_id: str, goal: str, risk_level: str, finding_count: int,
+                         chain_head: str, memo_mode: str) -> None:
+    try:
+        from .db import SessionLocal
+        from .models_db import Investigation
+
+        with SessionLocal() as session:
+            session.add(Investigation(
+                dataset_id=dataset_id, goal=goal, risk_level=risk_level,
+                finding_count=finding_count, chain_head=chain_head, memo_mode=memo_mode,
+            ))
+            session.commit()
+    except Exception as e:
+        logger.warning("audit: could not record investigation: %s", e)
+
+
 def record_query(dataset_id: str, sql: str, row_count: int, elapsed_ms: float,
                  mode: str = "manual", ok: bool = True) -> None:
     try:
