@@ -66,7 +66,8 @@ async def generate_dashboard(file: UploadFile = File(...)):
 
     intel = generate_insights(df, profile)
     relationships = build_relationship_graph(df, profile)
-    dataset_id = store.put(df, file.filename or "upload.csv")
+    # Cache the profile alongside the data so downstream endpoints never re-profile.
+    dataset_id = store.put(df, file.filename or "upload.csv", profile=profile)
 
     logger.info(
         "Generated dashboard for %s: %d rows, %d cols, %d charts, %d insights",
@@ -90,6 +91,26 @@ async def generate_dashboard(file: UploadFile = File(...)):
 from pydantic import BaseModel, Field
 
 
+def _require_dataset(dataset_id: str):
+    """Return (df, profile) for a dataset id, reusing the cached profile. 404 if unknown."""
+    from ..profiling import store
+
+    df = store.get(dataset_id)
+    if df is None:
+        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
+    profile = store.get_profile(dataset_id)
+    if profile is None:  # rehydrated without a profile (shouldn't happen) — recompute once
+        profile = profile_dataframe(df.copy())
+    return df, profile
+
+
+def _primary_measure(profile) -> str:
+    return next(
+        (m for m in profile.measures if any(h in m.lower() for h in ("amount", "value", "revenue", "cost", "volume", "total"))),
+        profile.measures[0],
+    )
+
+
 class ForecastRequest(BaseModel):
     dataset_id: str
     periods: int = Field(default=14, ge=3, le=60)
@@ -98,17 +119,12 @@ class ForecastRequest(BaseModel):
 @router.post("/forecast")
 def forecast(req: ForecastRequest):
     """Forecast the dataset's primary measure over its primary time column (honest backtest included)."""
-    from ..profiling import store
     from ..profiling.forecast import forecast_series
 
-    df = store.get(req.dataset_id)
-    if df is None:
-        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
-    prof = profile_dataframe(df.copy())
+    df, prof = _require_dataset(req.dataset_id)
     if not prof.temporals or not prof.measures:
         raise HTTPException(status_code=400, detail="Forecast needs a temporal column and a numeric measure")
-    measure = next((m for m in prof.measures if any(h in m.lower() for h in ("amount", "value", "revenue", "cost", "volume", "total"))), prof.measures[0])
-    result = forecast_series(df, prof.temporals[0], measure, req.periods)
+    result = forecast_series(df, prof.temporals[0], _primary_measure(prof), req.periods)
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
     return result
@@ -121,18 +137,12 @@ class CompareRequest(BaseModel):
 @router.post("/compare")
 def compare_periods(req: CompareRequest):
     """'What changed?' — first half vs second half of the time range, with per-dimension deltas."""
-    import numpy as np
-    from ..profiling import store
-
-    df = store.get(req.dataset_id)
-    if df is None:
-        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
-    prof = profile_dataframe(df.copy())
+    df, prof = _require_dataset(req.dataset_id)
     if not prof.temporals or not prof.measures:
         raise HTTPException(status_code=400, detail="Comparison needs a temporal column and a numeric measure")
 
     tcol = prof.temporals[0]
-    measure = next((m for m in prof.measures if any(h in m.lower() for h in ("amount", "value", "revenue", "cost", "volume", "total"))), prof.measures[0])
+    measure = _primary_measure(prof)
     s = df.copy()
     s[tcol] = pd.to_datetime(s[tcol], errors="coerce")
     s[measure] = pd.to_numeric(s[measure], errors="coerce")
@@ -177,17 +187,12 @@ class FramesRequest(BaseModel):
 @router.post("/frames")
 def time_frames(req: FramesRequest):
     """Time Machine — per-month aggregates so the UI can animate the dashboard through time."""
-    from ..profiling import store
-
-    df = store.get(req.dataset_id)
-    if df is None:
-        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
-    prof = profile_dataframe(df.copy())
+    df, prof = _require_dataset(req.dataset_id)
     if not prof.temporals or not prof.measures:
         raise HTTPException(status_code=400, detail="Time frames need a temporal column and a numeric measure")
 
     tcol = prof.temporals[0]
-    measure = next((m for m in prof.measures if any(h in m.lower() for h in ("amount", "value", "revenue", "cost", "volume", "total"))), prof.measures[0])
+    measure = _primary_measure(prof)
     dim = prof.dimensions[0] if prof.dimensions else None
 
     s = df.copy()

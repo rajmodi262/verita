@@ -153,11 +153,64 @@ class RiskEngine:
         return {"data_source": self.dataset.source, "threshold": round(threshold, 3), "alerts": rows}
 
 
+import os
+import threading
+
+_MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "models", "risk_engine.joblib"))
+_train_lock = threading.Lock()
+
+
+def _save(engine: "RiskEngine") -> None:
+    try:
+        import joblib
+
+        os.makedirs(os.path.dirname(_MODEL_PATH), exist_ok=True)
+        joblib.dump(
+            {
+                "clf": engine.clf, "iforest": engine.iforest, "feature_names": engine.feature_names,
+                "X_test": engine.X_test, "y_test": engine.y_test, "y_proba": engine.y_proba,
+                "source": engine.dataset.source, "description": engine.dataset.description,
+                "transactions": engine.dataset.transactions,
+            },
+            _MODEL_PATH,
+        )
+    except Exception as e:
+        logger.warning("Could not persist risk engine: %s", e)
+
+
+def _load() -> "RiskEngine | None":
+    if not os.path.exists(_MODEL_PATH):
+        return None
+    try:
+        import joblib
+
+        d = joblib.load(_MODEL_PATH)
+        eng = RiskEngine(
+            clf=d["clf"], iforest=d["iforest"], feature_names=d["feature_names"],
+            X_test=d["X_test"], y_test=d["y_test"], y_proba=d["y_proba"],
+        )
+        eng.dataset = Dataset(X=None, y=None, source=d["source"], description=d["description"], transactions=d["transactions"])  # type: ignore[arg-type]
+        logger.info("Risk engine loaded from cache (%s)", _MODEL_PATH)
+        return eng
+    except Exception as e:
+        logger.warning("Could not load cached risk engine, will retrain: %s", e)
+        return None
+
+
 def get_engine(app_state) -> RiskEngine:
-    """Return the cached engine, training it on first access."""
+    """Return the cached engine. First access loads from disk, else trains once under a lock."""
     engine = getattr(app_state, "risk_engine", None)
-    if engine is None:
-        engine = RiskEngine()
-        engine.train()
+    if engine is not None:
+        return engine
+    with _train_lock:
+        # Re-check inside the lock — another thread may have finished while we waited.
+        engine = getattr(app_state, "risk_engine", None)
+        if engine is not None:
+            return engine
+        engine = _load()
+        if engine is None:
+            engine = RiskEngine()
+            engine.train()
+            _save(engine)
         app_state.risk_engine = engine
     return engine
