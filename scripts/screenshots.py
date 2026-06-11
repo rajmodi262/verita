@@ -81,8 +81,18 @@ def main():
             pass
         shot(page, "08-nlp.png")
 
+        print("overview...")
+        page.goto(f"{BASE}/overview", wait_until="networkidle")
+        time.sleep(1.5)
+        shot(page, "10-overview.png")
+
+        print("settings...")
+        page.goto(f"{BASE}/settings", wait_until="networkidle")
+        time.sleep(1.2)
+        shot(page, "11-settings.png")
+
         browser.close()
-        print("done →", OUT)
+        print("done", OUT)
 
 
 if __name__ == "__main__":
