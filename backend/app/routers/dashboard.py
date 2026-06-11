@@ -69,6 +69,19 @@ async def generate_dashboard(file: UploadFile = File(...)):
     # Cache the profile alongside the data so downstream endpoints never re-profile.
     dataset_id = store.put(df, file.filename or "upload.csv", profile=profile)
 
+    # Optionally polish the executive summary with an LLM (grounded on computed facts only).
+    from ..genai import provider as genai
+
+    enhanced = genai.enhance_summary(
+        {
+            "rows": profile.row_count, "columns": profile.column_count,
+            "quality_score": intel["quality"]["score"], "grade": intel["quality"]["grade"],
+            "measures": profile.measures, "dimensions": profile.dimensions, "temporals": profile.temporals,
+            "key_findings": [i["text"] for i in intel["insights"][:4]],
+        },
+        intel["executive_summary"],
+    )
+
     logger.info(
         "Generated dashboard for %s: %d rows, %d cols, %d charts, %d insights",
         file.filename, profile.row_count, profile.column_count, len(dashboard), len(intel["insights"]),
@@ -83,7 +96,8 @@ async def generate_dashboard(file: UploadFile = File(...)):
         "dashboard": dashboard,
         "insights": intel["insights"],
         "quality": intel["quality"],
-        "executive_summary": intel["executive_summary"],
+        "executive_summary": enhanced["summary"],
+        "genai_mode": enhanced["mode"],
         "relationships": relationships,
     }
 

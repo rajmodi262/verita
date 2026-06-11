@@ -59,12 +59,15 @@ app.include_router(sql_router, prefix="/api/sql", tags=["SQL Playground"])
 def health():
     import os
 
+    from .genai import provider as genai
+
     return {
         "status": "healthy",
         "service": "verita",
         "version": app.version,
         "auth": "enabled" if os.getenv("VERITA_API_KEY", "").strip() else "open",
         "risk_model": "loaded" if getattr(app.state, "risk_engine", None) else "lazy",
+        "genai": genai.mode(),
     }
 
 

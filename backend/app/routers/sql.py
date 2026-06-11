@@ -148,10 +148,23 @@ def translate(req: TranslateRequest):
     else:
         sql = "SELECT * FROM data LIMIT 50"
 
+    # If an LLM is configured, let it improve on the rule-based SQL (and re-guard the result).
+    from ..genai import provider as genai
+
+    enhanced = genai.translate_to_sql(
+        req.question,
+        {"measures": profile.measures, "dimensions": profile.dimensions, "temporals": profile.temporals},
+        sql,
+    )
+    final_sql = enhanced["sql"]
+    if _FORBIDDEN.search(final_sql) or _COMMENT.search(final_sql) or ";" in final_sql:
+        final_sql, enhanced = sql, {"mode": "rule-based"}  # reject unsafe LLM output, keep rule-based
+
     return {
-        "sql": sql,
+        "sql": final_sql,
+        "mode": enhanced["mode"],
         "interpretation": {
             "aggregate": agg, "measure": measure, "dimension": dim, "limit": limit,
         },
-        "note": "Rule-based translation — review before running.",
+        "note": f"{'LLM-assisted' if enhanced['mode'].startswith('llm') else 'Rule-based'} translation — review before running.",
     }
