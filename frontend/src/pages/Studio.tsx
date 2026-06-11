@@ -310,9 +310,11 @@ export default function Studio() {
                       <span className="drag-handle" style={{ cursor: "move", display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "0.9rem", flex: 1, minWidth: 0 }}>
                         <GripVertical size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
                         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {c.title}{showForecast && forecast.data!.backtest_mape != null && (
-                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "#a855f7", marginLeft: 8 }}>
-                              +14 periods · backtest MAPE {forecast.data!.backtest_mape}%
+                          {c.title}{showForecast && (
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "#a855f7", marginLeft: 8 }}
+                              title={(forecast.data!.tournament || []).map((m) => `${m.model}: ${m.mape == null ? "n/a" : m.mape + "%"}`).join("  ·  ")}>
+                              won: {forecast.data!.method}{forecast.data!.backtest_mape != null && ` · MAPE ${forecast.data!.backtest_mape}%`}
+                              {forecast.data!.tournament && forecast.data!.tournament.length > 1 && ` (beat ${forecast.data!.tournament.length - 1} others)`}
                             </span>
                           )}
                         </span>
