@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 
 from ..ml.risk_engine import get_engine
 
@@ -19,8 +19,11 @@ router = APIRouter()
 
 @router.get("/metrics")
 def risk_metrics(request: Request, threshold: float = Query(0.5, ge=0.0, le=1.0)):
-    engine = get_engine(request.app.state)
-    return engine.metrics(threshold)
+    try:
+        return get_engine(request.app.state).metrics(threshold)
+    except Exception as e:
+        logger.exception("risk metrics failed")
+        raise HTTPException(status_code=500, detail=f"Risk model error: {e}")
 
 
 @router.get("/alerts")
@@ -29,5 +32,8 @@ def risk_alerts(
     threshold: float = Query(0.5, ge=0.0, le=1.0),
     limit: int = Query(25, ge=1, le=100),
 ):
-    engine = get_engine(request.app.state)
-    return engine.alerts(threshold, limit)
+    try:
+        return get_engine(request.app.state).alerts(threshold, limit)
+    except Exception as e:
+        logger.exception("risk alerts failed")
+        raise HTTPException(status_code=500, detail=f"Risk model error: {e}")

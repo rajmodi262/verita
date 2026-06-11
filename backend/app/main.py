@@ -39,6 +39,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Security: global error handler, optional API-key auth, per-IP rate limiting (all env-gated).
+from .middleware import install as install_middleware
+
+install_middleware(app)
+
 from .routers.dashboard import router as dashboard_router
 from .routers.risk import router as risk_router
 from .routers.nlp import router as nlp_router
@@ -52,7 +57,15 @@ app.include_router(sql_router, prefix="/api/sql", tags=["SQL Playground"])
 
 @app.get("/api/health")
 def health():
-    return {"status": "healthy", "service": "verita"}
+    import os
+
+    return {
+        "status": "healthy",
+        "service": "verita",
+        "version": app.version,
+        "auth": "enabled" if os.getenv("VERITA_API_KEY", "").strip() else "open",
+        "risk_model": "loaded" if getattr(app.state, "risk_engine", None) else "lazy",
+    }
 
 
 if __name__ == "__main__":

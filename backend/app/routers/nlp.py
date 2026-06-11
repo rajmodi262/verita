@@ -6,11 +6,14 @@ POST /api/nlp/analyze   { "text": "..." }  → entities, regulatory matches, ris
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+import logging
+
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from ..nlp.analyzer import analyze
 
+logger = logging.getLogger("verita.nlp")
 router = APIRouter()
 
 
@@ -20,4 +23,8 @@ class AnalyzeRequest(BaseModel):
 
 @router.post("/analyze")
 def analyze_text(req: AnalyzeRequest):
-    return analyze(req.text)
+    try:
+        return analyze(req.text)
+    except Exception as e:
+        logger.exception("NLP analysis failed")
+        raise HTTPException(status_code=500, detail=f"Analysis error: {e}")
