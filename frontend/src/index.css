@@ -183,6 +183,27 @@ body {
   }
 }
 
+/* ---- print: only the Verita report ---- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #verita-report,
+  #verita-report * {
+    visibility: visible;
+  }
+  #verita-report {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #fff;
+    color: #111;
+    padding: 24px;
+  }
+}
+
 /* ---- react-grid-layout theming ---- */
 .react-grid-item.react-grid-placeholder {
   background: var(--blue) !important;

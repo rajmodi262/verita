@@ -1,17 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UploadCloud, FileSpreadsheet, Loader2, GripVertical, X, LayoutGrid, Lightbulb, Share2, Terminal } from "lucide-react";
+import { UploadCloud, FileSpreadsheet, Loader2, GripVertical, X, LayoutGrid, Lightbulb, Share2, Terminal, Globe2, Printer, TrendingUp } from "lucide-react";
 import RGL, { WidthProvider, type Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { API_BASE } from "../config";
 import { useTheme } from "../store/themeStore";
 import EChart from "../components/EChart";
-import { specToOption } from "../lib/chartOptions";
+import { specToOption, forecastOption, type ForecastData } from "../lib/chartOptions";
 import InsightsPanel, { type Insight } from "../components/studio/InsightsPanel";
 import ProfileRail from "../components/studio/ProfileRail";
 import RelationshipMap from "../components/studio/RelationshipMap";
 import SqlPlayground from "../components/studio/SqlPlayground";
+import GeoMap from "../components/studio/GeoMap";
+import WhatChanged from "../components/studio/WhatChanged";
+import TimeMachine from "../components/studio/TimeMachine";
 
 const GridLayout = WidthProvider(RGL);
 
@@ -43,12 +46,13 @@ interface Result {
   relationships: { nodes: any[]; edges: any[] };
 }
 
-type Tab = "dashboard" | "insights" | "relationships" | "sql";
+type Tab = "dashboard" | "insights" | "relationships" | "map" | "sql";
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutGrid },
   { id: "insights", label: "Key Findings", icon: Lightbulb },
   { id: "relationships", label: "Relationships", icon: Share2 },
+  { id: "map", label: "Map", icon: Globe2 },
   { id: "sql", label: "SQL", icon: Terminal },
 ];
 
@@ -112,7 +116,40 @@ export default function Studio() {
   const [dragOver, setDragOver] = useState(false);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState<Tab>("dashboard");
+  const [pinned, setPinned] = useState<any[]>([]);
+  const [forecast, setForecast] = useState<{ data: ForecastData | null; active: boolean; loading: boolean }>({ data: null, active: false, loading: false });
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const toggleForecast = useCallback(async (datasetId: string) => {
+    if (forecast.active) { setForecast((f) => ({ ...f, active: false })); return; }
+    if (forecast.data) { setForecast((f) => ({ ...f, active: true })); return; }
+    setForecast({ data: null, active: false, loading: true });
+    try {
+      const res = await fetch(`${API_BASE}/api/dashboard/forecast`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dataset_id: datasetId, periods: 14 }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.detail);
+      setForecast({ data: body, active: true, loading: false });
+    } catch {
+      setForecast({ data: null, active: false, loading: false });
+    }
+  }, [forecast]);
+
+  const pinFromSql = useCallback((result: { columns: string[]; rows: Record<string, any>[] }, sql: string) => {
+    const labelCol = result.columns.find((c) => typeof result.rows[0]?.[c] === "string") || result.columns[0];
+    const valueCol = result.columns.find((c) => typeof result.rows[0]?.[c] === "number" && c !== labelCol);
+    if (!valueCol) return;
+    const id = `pin_${Date.now()}`;
+    setPinned((p) => [...p, {
+      id, chart_type: "bar", priority: 99,
+      title: `${valueCol} by ${labelCol} (SQL)`,
+      sql,
+      data: result.rows.slice(0, 12).map((r) => ({ label: String(r[labelCol]), value: Number(r[valueCol]) })),
+    }]);
+    setTab("dashboard");
+  }, []);
 
   const muted = theme === "dark" ? "#8c97b5" : "#5b6680";
   const grid = theme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(11,16,32,0.08)";
@@ -150,9 +187,15 @@ export default function Studio() {
   }, []);
 
   const kpis = useMemo(() => result?.dashboard.filter((c) => c.chart_type === "kpi") || [], [result]);
-  const charts = useMemo(() => result?.dashboard.filter((c) => c.chart_type !== "kpi") || [], [result]);
+  const charts = useMemo(() => [...(result?.dashboard.filter((c) => c.chart_type !== "kpi") || []), ...pinned], [result, pinned]);
   const visibleCharts = useMemo(() => charts.filter((c) => !hidden.has(c.id)), [charts, hidden]);
   const layout = useMemo(() => buildLayout(visibleCharts), [visibleCharts]);
+  const geoChart = useMemo(() => {
+    if (!result) return null;
+    const geoCols: string[] = result.profile.geos || [];
+    return result.dashboard.find((c) => c.dimension && geoCols.includes(c.dimension)) || null;
+  }, [result]);
+  const availableTabs = useMemo(() => TABS.filter((t) => t.id !== "map" || !!geoChart), [geoChart]);
 
   /* ── upload / scanning states ── */
   if (phase !== "ready") {
@@ -209,12 +252,15 @@ export default function Studio() {
               </span>
             </div>
           </div>
-          <button data-cursor onClick={() => { setResult(null); setPhase("idle"); }} style={ghostBtn}>New file</button>
+          <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
+            <button data-cursor onClick={() => window.print()} style={ghostBtn}><Printer size={14} style={{ marginRight: 6, verticalAlign: -2 }} />Report</button>
+            <button data-cursor onClick={() => { setResult(null); setPinned([]); setForecast({ data: null, active: false, loading: false }); setPhase("idle"); }} style={ghostBtn}>New file</button>
+          </div>
         </div>
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: 6, marginTop: 16, borderBottom: "1px solid var(--border)", paddingBottom: 0 }}>
-          {TABS.map(({ id, label, icon: Icon }) => (
+          {availableTabs.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               data-cursor
@@ -249,27 +295,50 @@ export default function Studio() {
               ))}
             </div>
 
+            <TimeMachine datasetId={r.dataset_id} muted={muted} grid={grid} />
+
             <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginBottom: 8 }}>
               Drag ⠿ to rearrange · drag a corner to resize · ✕ to remove
             </div>
             <GridLayout className="layout" layout={layout} cols={12} rowHeight={64} margin={[16, 16]} draggableHandle=".drag-handle" isBounded>
-              {visibleCharts.map((c) => (
-                <div key={c.id} className="glass" style={{ padding: "10px 14px", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <span className="drag-handle" style={{ cursor: "move", display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "0.9rem", flex: 1, minWidth: 0 }}>
-                      <GripVertical size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
-                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title}</span>
-                    </span>
-                    <button onClick={() => setHidden((h) => new Set(h).add(c.id))} title="Remove panel"
-                      style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 2, flexShrink: 0 }}>
-                      <X size={14} />
-                    </button>
+              {visibleCharts.map((c) => {
+                const isLine = c.chart_type === "line";
+                const showForecast = isLine && forecast.active && forecast.data;
+                return (
+                  <div key={c.id} className="glass" style={{ padding: "10px 14px", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 6 }}>
+                      <span className="drag-handle" style={{ cursor: "move", display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "0.9rem", flex: 1, minWidth: 0 }}>
+                        <GripVertical size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {c.title}{showForecast && forecast.data!.backtest_mape != null && (
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "#a855f7", marginLeft: 8 }}>
+                              +14 periods · backtest MAPE {forecast.data!.backtest_mape}%
+                            </span>
+                          )}
+                        </span>
+                      </span>
+                      {isLine && (
+                        <button data-cursor onClick={() => toggleForecast(r.dataset_id)} title="Toggle forecast overlay"
+                          style={{
+                            display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 7,
+                            fontSize: "0.66rem", fontWeight: 600, border: "1px solid var(--border)", cursor: "pointer", flexShrink: 0,
+                            background: forecast.active ? "linear-gradient(120deg,#6366f1,#a855f7)" : "var(--surface)",
+                            color: forecast.active ? "#fff" : "var(--text-muted)",
+                          }}>
+                          {forecast.loading ? <Loader2 size={11} style={{ animation: "spin 1s linear infinite" }} /> : <TrendingUp size={11} />} Forecast
+                        </button>
+                      )}
+                      <button onClick={() => setHidden((h) => new Set(h).add(c.id))} title="Remove panel"
+                        style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 2, flexShrink: 0 }}>
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <div style={{ flex: 1, minHeight: 0 }}>
+                      <EChart option={showForecast ? forecastOption(forecast.data!, muted, grid) : specToOption(c, muted, grid)} height="100%" />
+                    </div>
                   </div>
-                  <div style={{ flex: 1, minHeight: 0 }}>
-                    <EChart option={specToOption(c, muted, grid)} height="100%" />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </GridLayout>
           </div>
 
@@ -277,11 +346,41 @@ export default function Studio() {
         </div>
       )}
 
-      {tab === "insights" && <InsightsPanel insights={r.insights} summary={r.executive_summary} />}
+      {tab === "insights" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <WhatChanged datasetId={r.dataset_id} />
+          <InsightsPanel insights={r.insights} summary={r.executive_summary} />
+        </div>
+      )}
 
       {tab === "relationships" && <RelationshipMap nodes={r.relationships.nodes} edges={r.relationships.edges} muted={muted} />}
 
-      {tab === "sql" && <SqlPlayground datasetId={r.dataset_id} />}
+      {tab === "map" && geoChart && <GeoMap data={geoChart.data} title={geoChart.title} />}
+
+      {tab === "sql" && <SqlPlayground datasetId={r.dataset_id} onPin={pinFromSql} />}
+
+      {/* ── Print-only report (window.print → clean PDF) ── */}
+      <div id="verita-report" style={{ display: "none" }}>
+        <h1 style={{ fontFamily: "Georgia, serif", fontSize: "26pt", marginBottom: 4 }}>{r.title}</h1>
+        <p style={{ fontSize: "9pt", color: "#555" }}>
+          Verita auto-generated report · {r.filename} · {r.profile.row_count.toLocaleString()} rows × {r.profile.column_count} columns
+          · Data quality {r.quality.score}/100 ({r.quality.grade})
+        </p>
+        <h2 style={{ fontSize: "13pt", marginTop: 18 }}>Executive summary</h2>
+        <p style={{ fontSize: "10.5pt", lineHeight: 1.6 }}>{r.executive_summary}</p>
+        <h2 style={{ fontSize: "13pt", marginTop: 18 }}>Key findings</h2>
+        <ol style={{ fontSize: "10.5pt", lineHeight: 1.7, paddingLeft: 18 }}>
+          {r.insights.map((ins, i) => (
+            <li key={i} style={{ marginBottom: 8 }}>
+              {ins.text}
+              <div style={{ fontSize: "8pt", color: "#777", fontFamily: "monospace", marginTop: 2 }}>evidence: {ins.evidence}</div>
+            </li>
+          ))}
+        </ol>
+        <p style={{ fontSize: "8pt", color: "#999", marginTop: 24 }}>
+          Every figure in this report is computed from the uploaded data at generation time. Verita — Financial Crime & Compliance Intelligence.
+        </p>
+      </div>
     </div>
   );
 }
