@@ -103,20 +103,34 @@ a transparent risk score with the exact signals that drove it + a recommended ac
 
 ## Quickstart
 
+### Windows — one click
+Double-click **[`start.bat`](start.bat)**. On first run it creates a Python virtual environment,
+installs all backend + frontend dependencies, launches both servers, and opens the app in your
+browser. Subsequent runs skip the install and start in seconds. (Zero config — the audit trail uses
+a local SQLite file; no Docker needed.)
+
+### Manual (any OS)
+
 ```bash
 # 1) Backend  (Python 3.10+)
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload          # → http://localhost:8000  (docs at /docs)
 
-# 2) Frontend (Node 20+)
+# 2) Frontend (Node 18+)
 cd frontend
 npm install
-npm run dev                            # → http://localhost:5175
+npm run dev -- --port 5173             # → http://localhost:5173
 ```
 
-Open **http://localhost:5175**, click **Studio**, and drop
-[`data/sample_transactions.csv`](data/sample_transactions.csv).
+### With PostgreSQL + monitoring
+```bash
+docker compose up          # Postgres, backend, frontend, Prometheus, Grafana
+```
+
+Then open the app, click **Studio**, and drop
+[`data/sample_transactions.csv`](data/sample_transactions.csv) — or hit **Investigator** and let
+the agent screen it.
 
 **Or the whole stack in containers** (backend + frontend + Prometheus + Grafana):
 
