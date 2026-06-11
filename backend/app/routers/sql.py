@@ -24,9 +24,17 @@ logger = logging.getLogger("verita.sql")
 router = APIRouter()
 
 _MAX_ROWS = 500
+# DML/DDL + DuckDB file-I/O functions (defense-in-depth; external access is also disabled at the
+# engine level below, which is the real backstop).
 _FORBIDDEN = re.compile(
-    r"\b(insert|update|delete|drop|alter|create|attach|copy|export|install|load|pragma|set)\b", re.I
+    r"\b(insert|update|delete|drop|alter|create|attach|detach|copy|export|import|install|load|pragma|set|call|"
+    r"read_csv|read_csv_auto|read_parquet|read_json|read_json_auto|read_text|read_blob|"
+    r"parquet_scan|csv_scan|glob|sniff_csv|"
+    r"sqlite_master|information_schema|pg_catalog|duckdb_\w+)\b",
+    re.I,
 )
+# Block SQL comments outright — they're a classic guard-bypass vector and never needed here.
+_COMMENT = re.compile(r"(--|/\*|\*/|#)")
 
 
 class QueryRequest(BaseModel):
@@ -48,6 +56,8 @@ def run_query(req: QueryRequest):
     sql = req.sql.strip().rstrip(";")
     if not re.match(r"^\s*(select|with)\b", sql, re.I):
         raise HTTPException(status_code=400, detail="Only SELECT queries are allowed")
+    if _COMMENT.search(sql):
+        raise HTTPException(status_code=400, detail="SQL comments are not allowed")
     if _FORBIDDEN.search(sql):
         raise HTTPException(status_code=400, detail="Only read-only SELECT queries are allowed")
     if ";" in sql:
@@ -57,7 +67,9 @@ def run_query(req: QueryRequest):
 
     try:
         start = time.perf_counter()
-        con = duckdb.connect(":memory:")
+        # enable_external_access=False blocks ALL file/network I/O at the engine level — the
+        # real backstop behind the keyword guard. The connection only ever sees `data`.
+        con = duckdb.connect(":memory:", config={"enable_external_access": False})
         con.register("data", df)
         result = con.execute(f"SELECT * FROM ({sql}) AS q LIMIT {_MAX_ROWS}").fetchdf()
         elapsed_ms = round((time.perf_counter() - start) * 1000, 1)
@@ -102,7 +114,7 @@ def translate(req: TranslateRequest):
     if df is None:
         raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
 
-    profile = profile_dataframe(df.copy())
+    profile = store.get_profile(req.dataset_id) or profile_dataframe(df.copy())
     q = req.question.lower()
 
     agg = next((sql_fn for word, sql_fn in _AGG_WORDS.items() if word in q), None)
