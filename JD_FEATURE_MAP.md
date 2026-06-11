@@ -43,7 +43,7 @@
 | "deep exploratory data analysis (EDA)" | Profile Rail: per-column stats, distributions, missingness, quality score | ✅ |
 | "data mining" | Relationship Map (Pearson + η² discovery across all columns) | ✅ |
 | "statistical analysis on large enterprise datasets" | 200k-row sampling guard; vectorized Pandas/NumPy throughout | ✅ |
-| "Data Lakes and Datamarts … extraction, transformation" | DuckDB analytical engine over uploaded data; semantic type coercion layer | ✅ |
+| "Data Lakes and Datamarts … extraction, transformation" | DuckDB analytical engine + **PostgreSQL audit datamart** (SQLAlchemy; analyses & query log persisted, /api/history) | ✅ |
 | "SQL" | SQL Playground — real DuckDB queries on the upload, read-only guarded | ✅ |
 | "NLP … techniques" | Compliance NLP analyzer: entities, BSA/AML/OFAC/FinCEN matching, risk signals | ✅ |
 | "Generative AI" | NL→SQL translator; auto-generated executive summary & insight narratives | ✅ |
@@ -76,7 +76,7 @@
 | JD keyword | Coverage | Status |
 |---|---|---|
 | "Tableau/Power BI" (named-tool literacy) | Covered by the editable-canvas lookalike; talking point: "I rebuilt the experience, not the license" | ⚠ partial by design |
-| "Data Lakes" (named tech) | DuckDB is the analytical store; the in-memory→disk dataset cache is the "datamart" pattern | ⚠ partial by design |
+| "Data Lakes" (named tech) | **Closed:** real PostgreSQL 16 (docker-compose) persists the audit datamart; DuckDB serves analytics. Verified end-to-end via psql | ✅ |
 
 **Every other keyword in the JD now has a shipped, tested, verified feature behind it.**
 The two partials are *named-tool* literacy, addressed with interview talking points rather than

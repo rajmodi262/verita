@@ -44,15 +44,31 @@ from .middleware import install as install_middleware
 
 install_middleware(app)
 
+# Relational persistence (PostgreSQL via DATABASE_URL; SQLite fallback for zero-config dev).
+@app.on_event("startup")
+def _init_database() -> None:
+    try:
+        from .db import dialect, init_db
+
+        init_db()
+        app.state.db_ready = True
+        logger.info("Audit database ready (dialect=%s)", dialect())
+    except Exception as e:
+        app.state.db_ready = False
+        logger.warning("Audit database unavailable — history disabled: %s", e)
+
+
 from .routers.dashboard import router as dashboard_router
 from .routers.risk import router as risk_router
 from .routers.nlp import router as nlp_router
 from .routers.sql import router as sql_router
+from .routers.history import router as history_router
 
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["Auto-Dashboard Studio"])
 app.include_router(risk_router, prefix="/api/risk", tags=["FCC Risk & Anomaly Engine"])
 app.include_router(nlp_router, prefix="/api/nlp", tags=["NLP Insight"])
 app.include_router(sql_router, prefix="/api/sql", tags=["SQL Playground"])
+app.include_router(history_router, prefix="/api/history", tags=["Audit Trail"])
 
 
 @app.get("/api/health")
@@ -61,6 +77,8 @@ def health():
 
     from .genai import provider as genai
 
+    from .db import dialect
+
     return {
         "status": "healthy",
         "service": "verita",
@@ -68,6 +86,7 @@ def health():
         "auth": "enabled" if os.getenv("VERITA_API_KEY", "").strip() else "open",
         "risk_model": "loaded" if getattr(app.state, "risk_engine", None) else "lazy",
         "genai": genai.mode(),
+        "database": {"dialect": dialect(), "ready": bool(getattr(app.state, "db_ready", False))},
     }
 
 
