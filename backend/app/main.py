@@ -63,12 +63,14 @@ from .routers.risk import router as risk_router
 from .routers.nlp import router as nlp_router
 from .routers.sql import router as sql_router
 from .routers.history import router as history_router
+from .routers.agent import router as agent_router
 
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["Auto-Dashboard Studio"])
 app.include_router(risk_router, prefix="/api/risk", tags=["FCC Risk & Anomaly Engine"])
 app.include_router(nlp_router, prefix="/api/nlp", tags=["NLP Insight"])
 app.include_router(sql_router, prefix="/api/sql", tags=["SQL Playground"])
 app.include_router(history_router, prefix="/api/history", tags=["Audit Trail"])
+app.include_router(agent_router, prefix="/api/agent", tags=["Compliance Investigator"])
 
 
 @app.get("/api/health")

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UploadCloud, FileSpreadsheet, Loader2, GripVertical, X, LayoutGrid, Lightbulb, Share2, Terminal, Globe2, Printer, TrendingUp } from "lucide-react";
+import { UploadCloud, FileSpreadsheet, Loader2, GripVertical, X, LayoutGrid, Lightbulb, Share2, Terminal, Globe2, Printer, TrendingUp, ScanSearch } from "lucide-react";
 import RGL, { WidthProvider, type Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -12,6 +12,7 @@ import InsightsPanel, { type Insight } from "../components/studio/InsightsPanel"
 import ProfileRail from "../components/studio/ProfileRail";
 import RelationshipMap from "../components/studio/RelationshipMap";
 import SqlPlayground from "../components/studio/SqlPlayground";
+import Investigator from "../components/studio/Investigator";
 import GeoMap from "../components/studio/GeoMap";
 import WhatChanged from "../components/studio/WhatChanged";
 import TimeMachine from "../components/studio/TimeMachine";
@@ -46,10 +47,11 @@ interface Result {
   relationships: { nodes: any[]; edges: any[] };
 }
 
-type Tab = "dashboard" | "insights" | "relationships" | "map" | "sql";
+type Tab = "dashboard" | "investigator" | "insights" | "relationships" | "map" | "sql";
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutGrid },
+  { id: "investigator", label: "Investigator", icon: ScanSearch },
   { id: "insights", label: "Key Findings", icon: Lightbulb },
   { id: "relationships", label: "Relationships", icon: Share2 },
   { id: "map", label: "Map", icon: Globe2 },
@@ -368,6 +370,8 @@ export default function Studio() {
       {tab === "relationships" && <RelationshipMap nodes={r.relationships.nodes} edges={r.relationships.edges} muted={muted} />}
 
       {tab === "map" && geoChart && <GeoMap data={geoChart.data} title={geoChart.title} />}
+
+      {tab === "investigator" && <Investigator datasetId={r.dataset_id} />}
 
       {tab === "sql" && <SqlPlayground datasetId={r.dataset_id} onPin={pinFromSql} />}
 

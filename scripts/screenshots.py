@@ -40,6 +40,16 @@ def main():
             page.click(f"button:has-text('{label}')")
             time.sleep(2.2)
 
+        print("investigator…")
+        click_tab("Investigator")
+        try:
+            page.click("button:has-text('Run investigation')")
+            page.wait_for_selector("text=Chain verified", timeout=30000)
+            time.sleep(2.0)
+            shot(page, "09-investigator.png")
+        except Exception as e:
+            print("  investigator skipped:", e)
+
         print("insights…");      click_tab("Key Findings");  shot(page, "03-key-findings.png")
         print("relationships…"); click_tab("Relationships"); time.sleep(1.5); shot(page, "04-relationships.png")
         try:
