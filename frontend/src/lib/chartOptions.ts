@@ -117,3 +117,33 @@ export function specToOption(spec: ChartSpec, muted: string, grid: string): ECha
       return base;
   }
 }
+
+export interface ForecastData {
+  method: string;
+  backtest_mape: number | null;
+  history: { x: string; y: number }[];
+  points: { x: string; y: number; lo: number; hi: number }[];
+}
+
+/** Actual line + dashed forecast + shaded 95% CI band (lo/hi from a real backtest residual). */
+export function forecastOption(fc: ForecastData, muted: string, grid: string): EChartsOption {
+  const xs = [...fc.history.map((p) => p.x), ...fc.points.map((p) => p.x)];
+  const nHist = fc.history.length;
+  const pad = (arr: (number | null)[], before: number, after: number) =>
+    [...Array(before).fill(null), ...arr, ...Array(after).fill(null)];
+
+  return {
+    grid: { left: 56, right: 18, top: 26, bottom: 32 },
+    tooltip: { trigger: "axis", backgroundColor: "rgba(11,14,26,0.92)", borderWidth: 0, textStyle: { color: "#f2f5ff" } },
+    legend: { top: 0, right: 0, textStyle: { color: muted, fontSize: 10 }, icon: "roundRect", data: ["actual", "forecast"] },
+    xAxis: { type: "category", data: xs, boundaryGap: false, axisLine: { lineStyle: { color: grid } }, axisLabel: { color: muted, fontFamily: "JetBrains Mono", fontSize: 9 } },
+    yAxis: { type: "value", axisLabel: { color: muted, fontFamily: "JetBrains Mono", fontSize: 9 }, splitLine: { lineStyle: { color: grid, type: "dashed" } } },
+    series: [
+      { name: "actual", type: "line", smooth: true, symbol: "none", data: pad(fc.history.map((p) => p.y), 0, fc.points.length), lineStyle: { width: 2.5, color: "#4d7cff" } },
+      // CI band: transparent base at lo, stacked (hi - lo) filled on top
+      { name: "ci-lo", type: "line", stack: "ci", symbol: "none", silent: true, data: pad(fc.points.map((p) => p.lo), nHist, 0), lineStyle: { opacity: 0 }, tooltip: { show: false } },
+      { name: "ci-band", type: "line", stack: "ci", symbol: "none", silent: true, data: pad(fc.points.map((p) => p.hi - p.lo), nHist, 0), lineStyle: { opacity: 0 }, areaStyle: { color: "rgba(168,85,247,0.16)" }, tooltip: { show: false } },
+      { name: "forecast", type: "line", smooth: true, symbol: "none", data: pad(fc.points.map((p) => p.y), nHist, 0), lineStyle: { width: 2.5, color: "#a855f7", type: "dashed" } },
+    ],
+  };
+}

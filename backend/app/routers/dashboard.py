@@ -87,6 +87,131 @@ async def generate_dashboard(file: UploadFile = File(...)):
     }
 
 
+from pydantic import BaseModel, Field
+
+
+class ForecastRequest(BaseModel):
+    dataset_id: str
+    periods: int = Field(default=14, ge=3, le=60)
+
+
+@router.post("/forecast")
+def forecast(req: ForecastRequest):
+    """Forecast the dataset's primary measure over its primary time column (honest backtest included)."""
+    from ..profiling import store
+    from ..profiling.forecast import forecast_series
+
+    df = store.get(req.dataset_id)
+    if df is None:
+        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
+    prof = profile_dataframe(df.copy())
+    if not prof.temporals or not prof.measures:
+        raise HTTPException(status_code=400, detail="Forecast needs a temporal column and a numeric measure")
+    measure = next((m for m in prof.measures if any(h in m.lower() for h in ("amount", "value", "revenue", "cost", "volume", "total"))), prof.measures[0])
+    result = forecast_series(df, prof.temporals[0], measure, req.periods)
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
+class CompareRequest(BaseModel):
+    dataset_id: str
+
+
+@router.post("/compare")
+def compare_periods(req: CompareRequest):
+    """'What changed?' — first half vs second half of the time range, with per-dimension deltas."""
+    import numpy as np
+    from ..profiling import store
+
+    df = store.get(req.dataset_id)
+    if df is None:
+        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
+    prof = profile_dataframe(df.copy())
+    if not prof.temporals or not prof.measures:
+        raise HTTPException(status_code=400, detail="Comparison needs a temporal column and a numeric measure")
+
+    tcol = prof.temporals[0]
+    measure = next((m for m in prof.measures if any(h in m.lower() for h in ("amount", "value", "revenue", "cost", "volume", "total"))), prof.measures[0])
+    s = df.copy()
+    s[tcol] = pd.to_datetime(s[tcol], errors="coerce")
+    s[measure] = pd.to_numeric(s[measure], errors="coerce")
+    s = s.dropna(subset=[tcol, measure]).sort_values(tcol)
+    if len(s) < 40:
+        raise HTTPException(status_code=400, detail="Not enough rows to compare periods")
+
+    mid = s[tcol].iloc[len(s) // 2]
+    a, b = s[s[tcol] < mid], s[s[tcol] >= mid]
+
+    def _pct(new: float, old: float) -> float | None:
+        return round((new - old) / abs(old) * 100, 1) if abs(old) > 1e-9 else None
+
+    headline = {
+        "period_a": {"from": str(a[tcol].min().date()), "to": str(a[tcol].max().date()), "rows": int(len(a))},
+        "period_b": {"from": str(b[tcol].min().date()), "to": str(b[tcol].max().date()), "rows": int(len(b))},
+        "volume_change_pct": _pct(len(b), len(a)),
+        "total_change_pct": _pct(float(b[measure].sum()), float(a[measure].sum())),
+        "mean_change_pct": _pct(float(b[measure].mean()), float(a[measure].mean())),
+        "measure": measure,
+    }
+
+    movers = []
+    for dim in prof.dimensions[:3]:
+        ga, gb = a.groupby(dim)[measure].sum(), b.groupby(dim)[measure].sum()
+        for cat in set(ga.index) | set(gb.index):
+            va, vb = float(ga.get(cat, 0.0)), float(gb.get(cat, 0.0))
+            if max(va, vb) < float(s[measure].sum()) * 0.01:
+                continue  # ignore tiny categories
+            change = _pct(vb, va)
+            if change is not None and abs(change) >= 15:
+                movers.append({"dimension": dim, "category": str(cat), "before": round(va, 2), "after": round(vb, 2), "change_pct": change})
+    movers.sort(key=lambda m: -abs(m["change_pct"]))
+
+    return {"headline": headline, "movers": movers[:8]}
+
+
+class FramesRequest(BaseModel):
+    dataset_id: str
+
+
+@router.post("/frames")
+def time_frames(req: FramesRequest):
+    """Time Machine — per-month aggregates so the UI can animate the dashboard through time."""
+    from ..profiling import store
+
+    df = store.get(req.dataset_id)
+    if df is None:
+        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
+    prof = profile_dataframe(df.copy())
+    if not prof.temporals or not prof.measures:
+        raise HTTPException(status_code=400, detail="Time frames need a temporal column and a numeric measure")
+
+    tcol = prof.temporals[0]
+    measure = next((m for m in prof.measures if any(h in m.lower() for h in ("amount", "value", "revenue", "cost", "volume", "total"))), prof.measures[0])
+    dim = prof.dimensions[0] if prof.dimensions else None
+
+    s = df.copy()
+    s[tcol] = pd.to_datetime(s[tcol], errors="coerce")
+    s[measure] = pd.to_numeric(s[measure], errors="coerce")
+    s = s.dropna(subset=[tcol, measure])
+    s["__period"] = s[tcol].dt.to_period("M").astype(str)
+
+    frames = []
+    for period, g in s.groupby("__period"):
+        frame: dict = {
+            "period": period,
+            "rows": int(len(g)),
+            "total": round(float(g[measure].sum()), 2),
+            "mean": round(float(g[measure].mean()), 2),
+        }
+        if dim:
+            top = g.groupby(dim)[measure].sum().sort_values(ascending=False).head(8)
+            frame["by_dimension"] = {"dimension": dim, "data": [{"label": str(k), "value": round(float(v), 2)} for k, v in top.items()]}
+        frames.append(frame)
+    frames.sort(key=lambda f: f["period"])
+    return {"measure": measure, "time_col": tcol, "frames": frames}
+
+
 def _smart_title(filename: str) -> str:
     """'q3_financial-analysis.v2 (1).xlsx' → 'Q3 Financial Analysis'."""
     import re

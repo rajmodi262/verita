@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Sparkles, Loader2, Database } from "lucide-react";
+import { Play, Sparkles, Loader2, Database, Pin } from "lucide-react";
 import { API_BASE } from "../../config";
 
 interface QueryResult {
@@ -15,7 +15,8 @@ interface QueryResult {
  * SQL Playground — real SQL (DuckDB) against the uploaded dataset, registered as table `data`.
  * Includes a plain-English bar that translates to SQL (shown for review, never auto-run blindly).
  */
-export default function SqlPlayground({ datasetId }: { datasetId: string }) {
+export default function SqlPlayground({ datasetId, onPin }: { datasetId: string; onPin?: (result: QueryResult, sql: string) => void }) {
+  const [pinnedMsg, setPinnedMsg] = useState("");
   const [sql, setSql] = useState("SELECT channel, COUNT(*) AS transactions, ROUND(AVG(amount), 2) AS avg_amount\nFROM data\nGROUP BY channel\nORDER BY avg_amount DESC");
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState<QueryResult | null>(null);
@@ -107,8 +108,16 @@ export default function SqlPlayground({ datasetId }: { datasetId: string }) {
       {/* results */}
       {result && (
         <motion.div className="glass" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ padding: 14 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.66rem", color: "var(--text-muted)", marginBottom: 8 }}>
-            {result.row_count} rows{result.truncated ? " (truncated)" : ""} · {result.elapsed_ms} ms
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, gap: 10 }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.66rem", color: "var(--text-muted)" }}>
+              {result.row_count} rows{result.truncated ? " (truncated)" : ""} · {result.elapsed_ms} ms
+            </span>
+            {onPin && result.row_count > 0 && (
+              <button data-cursor onClick={() => { onPin(result, sql); setPinnedMsg("Pinned to dashboard ✓"); setTimeout(() => setPinnedMsg(""), 2500); }}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 8, fontSize: "0.74rem", fontWeight: 600, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)" }}>
+                <Pin size={12} /> {pinnedMsg || "Pin to dashboard"}
+              </button>
+            )}
           </div>
           <div style={{ overflowX: "auto", maxHeight: 420, overflowY: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem" }}>

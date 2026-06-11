@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowUpRight, ShieldCheck, Sparkles } from "lucide-react";
@@ -87,6 +87,30 @@ function FloatingChip({
         {label}
       </div>
     </motion.div>
+  );
+}
+
+/* Typewriter — writes the subtitle in front of the visitor, with a blinking caret. */
+function Typewriter({ text }: { text: string }) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setN(text.length); return; }
+    const start = window.setTimeout(() => {
+      const id = window.setInterval(() => {
+        setN((v) => {
+          if (v >= text.length) { window.clearInterval(id); return v; }
+          return v + 2;
+        });
+      }, 24);
+    }, 900);
+    return () => window.clearTimeout(start);
+  }, [text]);
+  return (
+    <>
+      {text.slice(0, n)}
+      {n < text.length && <span style={{ borderRight: "2px solid var(--cyan, #22d3ee)", marginLeft: 1, animation: "blink 0.8s step-end infinite" }} />}
+      <style>{`@keyframes blink{50%{border-color:transparent}}`}</style>
+    </>
   );
 }
 
@@ -214,10 +238,10 @@ export default function Hero() {
             maxWidth: 620,
             margin: "24px auto 0",
             lineHeight: 1.6,
+            minHeight: "3.2em",
           }}
         >
-          Upload any dataset and get an instant, editable dashboard. Score transactions for risk
-          with real machine learning. No BI tool to learn, no black boxes.
+          <Typewriter text="Upload any dataset and get an instant, editable dashboard. Score transactions for risk with real machine learning. No BI tool to learn, no black boxes." />
         </motion.p>
 
         <motion.div
