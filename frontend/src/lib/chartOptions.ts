@@ -121,6 +121,7 @@ export function specToOption(spec: ChartSpec, muted: string, grid: string): ECha
 export interface ForecastData {
   method: string;
   backtest_mape: number | null;
+  tournament?: { model: string; mape: number | null }[];
   history: { x: string; y: number }[];
   points: { x: string; y: number; lo: number; hi: number }[];
 }
