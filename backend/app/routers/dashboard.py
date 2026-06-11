@@ -87,10 +87,21 @@ async def generate_dashboard(file: UploadFile = File(...)):
         file.filename, profile.row_count, profile.column_count, len(dashboard), len(intel["insights"]),
     )
 
+    # Audit trail (best-effort — never blocks the analysis path).
+    from ..audit import record_analysis
+
+    title = _smart_title(file.filename or "Untitled dataset")
+    record_analysis(
+        dataset_id=dataset_id, filename=file.filename or "upload.csv", title=title,
+        row_count=profile.row_count, column_count=profile.column_count,
+        quality_score=intel["quality"]["score"], quality_grade=intel["quality"]["grade"],
+        insights_count=len(intel["insights"]),
+    )
+
     return {
         "dataset_id": dataset_id,
         "filename": file.filename,
-        "title": _smart_title(file.filename or "Untitled dataset"),
+        "title": title,
         "sampled": sampled,
         "profile": profile.to_dict(),
         "dashboard": dashboard,

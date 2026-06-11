@@ -65,6 +65,8 @@ def run_query(req: QueryRequest):
 
     import duckdb
 
+    from ..audit import record_query
+
     try:
         start = time.perf_counter()
         # enable_external_access=False blocks ALL file/network I/O at the engine level — the
@@ -75,7 +77,10 @@ def run_query(req: QueryRequest):
         elapsed_ms = round((time.perf_counter() - start) * 1000, 1)
         con.close()
     except Exception as e:
+        record_query(req.dataset_id, sql, 0, 0.0, ok=False)
         raise HTTPException(status_code=400, detail=f"SQL error: {e}")
+
+    record_query(req.dataset_id, sql, len(result), elapsed_ms, ok=True)
 
     # JSON-safe conversion
     result = result.astype(object).where(result.notna(), None)
