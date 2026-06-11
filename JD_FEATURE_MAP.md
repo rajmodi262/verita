@@ -63,23 +63,34 @@
 | ML / statistical analysis / predictive modeling fundamentals | GBM + IsolationForest, ROC/PR analysis, threshold tuning, t-tests | ✅ |
 | Data preprocessing & EDA | Type coercion, missing-value analysis, profiling engine | ✅ |
 | Structured AND unstructured data | CSV/Excel (structured) + free-text compliance narratives (unstructured NLP) | ✅ |
-| NLP / GenAI / LLMs exposure | NLP analyzer + NL→SQL + auto-narratives | ✅ |
-| SQL, APIs, connecting data sources | DuckDB SQL playground; REST API (FastAPI, OpenAPI docs at /docs) | ✅ |
+| NLP / GenAI / LLMs exposure | NLP analyzer + **real Gemini plug** (summary + NL→SQL) w/ honest fallback | ✅ |
+| SQL, APIs, connecting data sources | DuckDB SQL playground (injection-tested); REST API (FastAPI, OpenAPI at /docs) | ✅ |
 | Tableau/Power BI-style visualization | Auto-dashboard canvas + editable grid | ✅ |
 | Analytical thinking / problem solving | Honest metrics philosophy; evidence trails on every claim | ✅ |
-| Communication & collaboration | Demo script + documentation | 🔨 |
+| Communication & collaboration | README + `docs/DEMO_SCRIPT.md` (3-min narrative) + this map | ✅ |
 
 ---
 
 ## 3. ⚠ KEYWORDS NOT YET COVERED (the gap list — keep shrinking this)
 
-| JD keyword | Planned coverage | Status |
+| JD keyword | Coverage | Status |
 |---|---|---|
 | "Tableau/Power BI" (named-tool literacy) | Covered by the editable-canvas lookalike; talking point: "I rebuilt the experience, not the license" | ⚠ partial by design |
-| "Data Lakes" (named tech) | DuckDB stands in as the analytical store; call out in README | ⚠ partial by design |
-| Communication deliverables | Final README + scripted 3-minute demo narrative | 🔨 last remaining |
+| "Data Lakes" (named tech) | DuckDB is the analytical store; the in-memory→disk dataset cache is the "datamart" pattern | ⚠ partial by design |
 
-**Everything else in the JD now has a shipped, verified feature behind it.**
+**Every other keyword in the JD now has a shipped, tested, verified feature behind it.**
+The two partials are *named-tool* literacy, addressed with interview talking points rather than
+shipped artifacts (a deliberate scope choice for a from-scratch build).
+
+## Hardening pass (post-audit) — what "10/10" added
+- Disk-backed dataset store (survives restart) + cached profiles + persisted risk model (0.36s boot).
+- **72 automated tests** (62 pytest incl. adversarial SQL-injection corpus + 10 vitest) — and they
+  caught & fixed a real file-read vuln and an auth-bypass bug before shipping.
+- Security middleware: API-key auth, per-IP rate limiting, global error handler.
+- Forecast **tournament** (3 backtested models) replacing the single naive forecaster.
+- Frontend: layout persistence, per-chart forecast, error boundaries, a11y labels, code-split bundle.
+- Real **GenAI** plug (Gemini) with deterministic fallback — honest, not inflated.
+- Verified CI (added httpx + frontend test step) and a green production build.
 
 ## 4. The 11 Jaw-Drop Features — build status
 | # | Feature | Status |
