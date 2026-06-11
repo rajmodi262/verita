@@ -42,10 +42,12 @@ app.add_middleware(
 from .routers.dashboard import router as dashboard_router
 from .routers.risk import router as risk_router
 from .routers.nlp import router as nlp_router
+from .routers.sql import router as sql_router
 
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["Auto-Dashboard Studio"])
 app.include_router(risk_router, prefix="/api/risk", tags=["FCC Risk & Anomaly Engine"])
 app.include_router(nlp_router, prefix="/api/nlp", tags=["NLP Insight"])
+app.include_router(sql_router, prefix="/api/sql", tags=["SQL Playground"])
 
 
 @app.get("/api/health")

@@ -60,14 +60,48 @@ async def generate_dashboard(file: UploadFile = File(...)):
     profile = profile_dataframe(df)
     dashboard = recommend_dashboard(df, profile)
 
+    from ..profiling.insights import generate_insights
+    from ..profiling.relations import build_relationship_graph
+    from ..profiling import store
+
+    intel = generate_insights(df, profile)
+    relationships = build_relationship_graph(df, profile)
+    dataset_id = store.put(df, file.filename or "upload.csv")
+
     logger.info(
-        "Generated dashboard for %s: %d rows, %d cols, %d charts",
-        file.filename, profile.row_count, profile.column_count, len(dashboard),
+        "Generated dashboard for %s: %d rows, %d cols, %d charts, %d insights",
+        file.filename, profile.row_count, profile.column_count, len(dashboard), len(intel["insights"]),
     )
 
     return {
+        "dataset_id": dataset_id,
         "filename": file.filename,
+        "title": _smart_title(file.filename or "Untitled dataset"),
         "sampled": sampled,
         "profile": profile.to_dict(),
         "dashboard": dashboard,
+        "insights": intel["insights"],
+        "quality": intel["quality"],
+        "executive_summary": intel["executive_summary"],
+        "relationships": relationships,
     }
+
+
+def _smart_title(filename: str) -> str:
+    """'q3_financial-analysis.v2 (1).xlsx' → 'Q3 Financial Analysis'."""
+    import re
+
+    name = filename.rsplit(".", 1)[0]
+    name = re.sub(r"\(\d+\)$", "", name)             # trailing copy markers
+    name = re.sub(r"[_\-.]+", " ", name)              # separators → spaces
+    name = re.sub(r"\bv?\d{1,2}\b$", "", name.strip())  # trailing version tokens
+    name = re.sub(r"\s+", " ", name).strip()
+    if not name:
+        return "Untitled dataset"
+    small = {"of", "and", "the", "for", "by", "in", "on", "to", "a", "an"}
+    words = [
+        w.upper() if (len(w) <= 3 and (w.isupper() or re.fullmatch(r"q\d", w, re.I))) else
+        (w if w.lower() in small and i > 0 else w.capitalize())
+        for i, w in enumerate(name.split())
+    ]
+    return " ".join(words)
