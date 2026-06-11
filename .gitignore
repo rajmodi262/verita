@@ -15,3 +15,8 @@ data/*.csv
 backend/.verita_cache/
 backend/models/*.joblib
 backend/models/*.pkl
+
+# SQLite fallback DB + scratch artifacts
+*.db
+data/_*.json
+data/_*.txt
