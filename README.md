@@ -10,9 +10,27 @@ No BI tool to learn, no black boxes.**
 
 `Python · FastAPI · Pandas · scikit-learn · DuckDB` · `React · TypeScript · ECharts · Three.js`
 
-![tests](https://img.shields.io/badge/tests-72%20passing-brightgreen) ![backend](https://img.shields.io/badge/backend-62%20pytest-blue) ![frontend](https://img.shields.io/badge/frontend-10%20vitest-blue) ![typecheck](https://img.shields.io/badge/tsc-clean-success)
+[![CI](https://github.com/rajmodi262/verita/actions/workflows/ci.yml/badge.svg)](https://github.com/rajmodi262/verita/actions/workflows/ci.yml) ![tests](https://img.shields.io/badge/tests-76%20passing-brightgreen) ![backend](https://img.shields.io/badge/backend-66%20pytest-blue) ![frontend](https://img.shields.io/badge/frontend-10%20vitest-blue) ![typecheck](https://img.shields.io/badge/tsc-clean-success) ![license](https://img.shields.io/badge/db-PostgreSQL%20%2B%20DuckDB-336791)
+
+<br/>
+
+![Verita Studio — auto-generated dashboard](docs/screenshots/02-studio-dashboard.png)
 
 </div>
+
+---
+
+## Screenshots
+
+| Auto-Dashboard Studio | Key Findings (with evidence) |
+|---|---|
+| ![dashboard](docs/screenshots/02-studio-dashboard.png) | ![insights](docs/screenshots/03-key-findings.png) |
+| **Relationship map (Pearson + η²)** | **Auto geo-map** |
+| ![relationships](docs/screenshots/04-relationships.png) | ![map](docs/screenshots/05-map.png) |
+| **SQL playground (DuckDB)** | **FCC Risk & Anomaly Engine** |
+| ![sql](docs/screenshots/06-sql.png) | ![risk](docs/screenshots/07-risk-engine.png) |
+| **NLP compliance analyzer** | **Animated landing** |
+| ![nlp](docs/screenshots/08-nlp.png) | ![landing](docs/screenshots/01-landing.png) |
 
 ---
 
