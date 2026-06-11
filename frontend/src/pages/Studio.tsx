@@ -117,13 +117,15 @@ export default function Studio() {
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState<Tab>("dashboard");
   const [pinned, setPinned] = useState<any[]>([]);
-  const [forecast, setForecast] = useState<{ data: ForecastData | null; active: boolean; loading: boolean }>({ data: null, active: false, loading: false });
+  const [gridLayout, setGridLayout] = useState<Layout[]>([]);
+  // Forecast is keyed to the specific chart it's toggled on (not a single global flag).
+  const [forecast, setForecast] = useState<{ data: ForecastData | null; loading: boolean; activeId: string | null }>({ data: null, loading: false, activeId: null });
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const toggleForecast = useCallback(async (datasetId: string) => {
-    if (forecast.active) { setForecast((f) => ({ ...f, active: false })); return; }
-    if (forecast.data) { setForecast((f) => ({ ...f, active: true })); return; }
-    setForecast({ data: null, active: false, loading: true });
+  const toggleForecast = useCallback(async (datasetId: string, chartId: string) => {
+    if (forecast.activeId === chartId) { setForecast((f) => ({ ...f, activeId: null })); return; }
+    if (forecast.data) { setForecast((f) => ({ ...f, activeId: chartId })); return; }
+    setForecast((f) => ({ ...f, loading: true }));
     try {
       const res = await fetch(`${API_BASE}/api/dashboard/forecast`, {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -131,9 +133,9 @@ export default function Studio() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.detail);
-      setForecast({ data: body, active: true, loading: false });
+      setForecast({ data: body, loading: false, activeId: chartId });
     } catch {
-      setForecast({ data: null, active: false, loading: false });
+      setForecast((f) => ({ ...f, loading: false }));
     }
   }, [forecast]);
 
@@ -189,7 +191,15 @@ export default function Studio() {
   const kpis = useMemo(() => result?.dashboard.filter((c) => c.chart_type === "kpi") || [], [result]);
   const charts = useMemo(() => [...(result?.dashboard.filter((c) => c.chart_type !== "kpi") || []), ...pinned], [result, pinned]);
   const visibleCharts = useMemo(() => charts.filter((c) => !hidden.has(c.id)), [charts, hidden]);
-  const layout = useMemo(() => buildLayout(visibleCharts), [visibleCharts]);
+
+  // Reconcile layout when the chart set changes: existing panels KEEP their dragged position,
+  // new panels (e.g. a pinned SQL chart) get a fresh slot. Fixes the "rearrange forgets" bug.
+  useEffect(() => {
+    setGridLayout((prev) => {
+      const byId = Object.fromEntries(prev.map((l) => [l.i, l]));
+      return buildLayout(visibleCharts).map((d) => (byId[d.i] ? { ...byId[d.i], i: d.i } : d));
+    });
+  }, [visibleCharts]);
   const geoChart = useMemo(() => {
     if (!result) return null;
     const geoCols: string[] = result.profile.geos || [];
@@ -254,7 +264,7 @@ export default function Studio() {
           </div>
           <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
             <button data-cursor onClick={() => window.print()} style={ghostBtn}><Printer size={14} style={{ marginRight: 6, verticalAlign: -2 }} />Report</button>
-            <button data-cursor onClick={() => { setResult(null); setPinned([]); setForecast({ data: null, active: false, loading: false }); setPhase("idle"); }} style={ghostBtn}>New file</button>
+            <button data-cursor onClick={() => { setResult(null); setPinned([]); setGridLayout([]); setForecast({ data: null, loading: false, activeId: null }); setPhase("idle"); }} style={ghostBtn}>New file</button>
           </div>
         </div>
 
@@ -300,10 +310,10 @@ export default function Studio() {
             <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginBottom: 8 }}>
               Drag ⠿ to rearrange · drag a corner to resize · ✕ to remove
             </div>
-            <GridLayout className="layout" layout={layout} cols={12} rowHeight={64} margin={[16, 16]} draggableHandle=".drag-handle" isBounded>
+            <GridLayout className="layout" layout={gridLayout} onLayoutChange={setGridLayout} cols={12} rowHeight={64} margin={[16, 16]} draggableHandle=".drag-handle" isBounded>
               {visibleCharts.map((c) => {
                 const isLine = c.chart_type === "line";
-                const showForecast = isLine && forecast.active && forecast.data;
+                const showForecast = isLine && forecast.activeId === c.id && forecast.data;
                 return (
                   <div key={c.id} className="glass" style={{ padding: "10px 14px", display: "flex", flexDirection: "column", overflow: "hidden" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 6 }}>
@@ -320,17 +330,17 @@ export default function Studio() {
                         </span>
                       </span>
                       {isLine && (
-                        <button data-cursor onClick={() => toggleForecast(r.dataset_id)} title="Toggle forecast overlay"
+                        <button data-cursor aria-label="Toggle forecast overlay" onClick={() => toggleForecast(r.dataset_id, c.id)} title="Toggle forecast overlay"
                           style={{
                             display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 7,
                             fontSize: "0.66rem", fontWeight: 600, border: "1px solid var(--border)", cursor: "pointer", flexShrink: 0,
-                            background: forecast.active ? "linear-gradient(120deg,#6366f1,#a855f7)" : "var(--surface)",
-                            color: forecast.active ? "#fff" : "var(--text-muted)",
+                            background: forecast.activeId === c.id ? "linear-gradient(120deg,#6366f1,#a855f7)" : "var(--surface)",
+                            color: forecast.activeId === c.id ? "#fff" : "var(--text-muted)",
                           }}>
                           {forecast.loading ? <Loader2 size={11} style={{ animation: "spin 1s linear infinite" }} /> : <TrendingUp size={11} />} Forecast
                         </button>
                       )}
-                      <button onClick={() => setHidden((h) => new Set(h).add(c.id))} title="Remove panel"
+                      <button aria-label={`Remove ${c.title} panel`} onClick={() => setHidden((h) => new Set(h).add(c.id))} title="Remove panel"
                         style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 2, flexShrink: 0 }}>
                         <X size={14} />
                       </button>
