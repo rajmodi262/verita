@@ -258,6 +258,29 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
+      {/* Scroll cue — the case file opens below */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 0.8 }}
+        style={{
+          position: "absolute", bottom: 64, left: 0, right: 0,
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+          pointerEvents: "none", zIndex: 3,
+        }}
+      >
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--text-muted)" }}>
+          Scroll — the case file opens
+        </span>
+        <motion.span
+          animate={{ y: [0, 7, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          style={{ color: "var(--cyan, #22d3ee)", fontSize: "1rem", lineHeight: 1 }}
+        >
+          ▾
+        </motion.span>
+      </motion.div>
+
       {/* Marquee trust strip */}
       <div
         style={{

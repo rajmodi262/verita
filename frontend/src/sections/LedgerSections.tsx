@@ -5,8 +5,8 @@ import { ArrowUpRight, Github } from "lucide-react";
 
 /* ════════════════════════════════════════════════════════════════════
    FORENSIC LEDGER — the scroll story. The page itself behaves like a
-   hash chain: a thread draws down the spine as you scroll, linking each
-   section ("block"), and every section carries its ledger entry no.
+   hash chain: a thread draws down the spine, and each section is a
+   "block" whose chain-node seals gold as it verifies into view.
    ════════════════════════════════════════════════════════════════════ */
 
 const EXHIBITS = [
@@ -55,6 +55,27 @@ const NUMBERS = [
   { v: "SHA-256", k: "sealing every reasoning trace" },
 ];
 
+const MICROTEXT = Array(14).fill("VERITA · EVERY NUMBER SHOWS ITS WORK ·").join(" ");
+
+/* Rubber stamp that SLAMS in when scrolled into view. */
+function Stamp({ children, green, style }: { children: React.ReactNode; green?: boolean; style?: React.CSSProperties }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  return (
+    <motion.span
+      ref={ref}
+      className={`stamp ${green ? "stamp--green" : ""}`}
+      style={{ display: "inline-block", ...style }}
+      initial={{ opacity: 0, scale: 2.6, rotate: green ? 14 : -16 }}
+      animate={inView ? { opacity: 1, scale: 1, rotate: green ? 3 : -4 } : {}}
+      transition={{ type: "spring", stiffness: 420, damping: 16, mass: 0.9 }}
+    >
+      {children}
+    </motion.span>
+  );
+}
+
+/* A ledger entry = one "block" in the chain; its node seals gold when verified. */
 function Entry({ no, children }: { no: string; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
@@ -62,7 +83,10 @@ function Entry({ no, children }: { no: string; children: React.ReactNode }) {
     <motion.div ref={ref} initial={{ opacity: 0, y: 36 }} animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       style={{ position: "relative", padding: "84px 24px", maxWidth: 1080, margin: "0 auto" }}>
-      <div className="ledger-label" style={{ marginBottom: 18 }}>LEDGER ENTRY {no} · VERIFIED</div>
+      <div className={`chain-node ${inView ? "sealed" : ""}`} aria-hidden />
+      <div className="ledger-label" style={{ marginBottom: 18 }}>
+        LEDGER ENTRY {no} · {inView ? "VERIFIED ✓" : "PENDING"}
+      </div>
       {children}
     </motion.div>
   );
@@ -74,6 +98,20 @@ function Redacted({ children }: { children: string }) {
   return <span ref={ref} className={`redact ${inView ? "lifted" : ""}`}>{children}</span>;
 }
 
+/* Faint fingerprint watermark (concentric arcs). */
+function Fingerprint() {
+  return (
+    <svg className="fingerprint" width="380" height="380" viewBox="0 0 380 380" aria-hidden>
+      {Array.from({ length: 13 }, (_, i) => (
+        <ellipse key={i} cx="190" cy="190" rx={20 + i * 13} ry={26 + i * 12}
+          fill="none" stroke="var(--ink)" strokeWidth="3.5"
+          strokeDasharray={`${40 + i * 22} ${12 + (i % 4) * 9}`}
+          transform={`rotate(${i * 7} 190 190)`} />
+      ))}
+    </svg>
+  );
+}
+
 export default function LedgerSections() {
   const navigate = useNavigate();
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -81,19 +119,21 @@ export default function LedgerSections() {
   const thread = useSpring(scrollYProgress, { stiffness: 90, damping: 26 });
 
   return (
-    <div ref={wrapRef} className="ledger" style={{ position: "relative", zIndex: 3 }}>
+    <div ref={wrapRef} className="ledger torn-edge" style={{ position: "relative", zIndex: 3 }}>
       <div className="guilloche" />
 
       {/* the chain thread — draws down the spine as you scroll */}
       <motion.div aria-hidden style={{
-        position: "absolute", left: "50%", top: 0, bottom: 0, width: 2, transformOrigin: "top",
-        scaleY: thread, background: "linear-gradient(180deg, var(--foil-gold), var(--seal-green))", opacity: 0.55,
+        position: "absolute", left: "50%", top: 0, bottom: 0, width: 3, transformOrigin: "top",
+        scaleY: thread, marginLeft: -1.5,
+        background: "linear-gradient(180deg, var(--foil-gold), var(--seal-green))",
+        boxShadow: "0 0 14px rgba(168,132,44,0.5)", opacity: 0.7,
       }} />
 
       {/* §1 THE PROBLEM */}
       <Entry no="0001">
         <div style={{ textAlign: "center" }}>
-          <span className="stamp" style={{ fontSize: "0.7rem" }}>CASE FILE · VERITA</span>
+          <Stamp style={{ fontSize: "0.7rem" }}>CASE FILE · VERITA</Stamp>
           <h2 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "clamp(2.2rem, 5.4vw, 4.4rem)", lineHeight: 1.12, marginTop: 26 }}>
             AI you can't <Redacted>audit</Redacted><br />is AI you can't <Redacted>use</Redacted>.
           </h2>
@@ -105,18 +145,21 @@ export default function LedgerSections() {
         </div>
       </Entry>
 
+      <div className="microtext">{MICROTEXT}</div>
+
       {/* §2 THE MANIFESTO */}
       <Entry no="0002">
-        <div style={{ borderTop: "3px solid var(--ink)", borderBottom: "3px solid var(--ink)", padding: "56px 8px", textAlign: "center" }}>
+        <div style={{ position: "relative", overflow: "hidden", borderTop: "3px solid var(--ink)", borderBottom: "3px solid var(--ink)", padding: "56px 8px", textAlign: "center" }}>
+          <Fingerprint />
           <div className="ledger-label" style={{ marginBottom: 16 }}>THE GLASS-BOX PRINCIPLE</div>
-          <h2 style={{ fontFamily: "var(--font-serif)", fontWeight: 700, fontStyle: "italic", fontSize: "clamp(1.6rem, 3.6vw, 2.7rem)", lineHeight: 1.35, maxWidth: 880, margin: "0 auto" }}>
+          <h2 style={{ fontFamily: "var(--font-serif)", fontWeight: 700, fontStyle: "italic", fontSize: "clamp(1.6rem, 3.6vw, 2.7rem)", lineHeight: 1.35, maxWidth: 880, margin: "0 auto", position: "relative" }}>
             "Every number shows its formula. Every forecast shows its backtest.
             Every agent decision shows its query — and the whole trace is sealed
             in a tamper-evident chain."
           </h2>
           <div style={{ marginTop: 28, display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-            <span className="stamp stamp--green" style={{ fontSize: "0.66rem" }}>NO BLACK BOXES</span>
-            <span className="stamp" style={{ fontSize: "0.66rem" }}>NO FABRICATED METRICS</span>
+            <Stamp green style={{ fontSize: "0.66rem" }}>NO BLACK BOXES</Stamp>
+            <Stamp style={{ fontSize: "0.66rem" }}>NO FABRICATED METRICS</Stamp>
           </div>
         </div>
       </Entry>
@@ -125,14 +168,15 @@ export default function LedgerSections() {
       {EXHIBITS.map((ex, i) => (
         <Entry key={ex.tag} no={`000${i + 3}`}>
           <div style={{ display: "flex", gap: 44, alignItems: "center", flexWrap: "wrap", flexDirection: i % 2 ? "row-reverse" : "row" }}>
-            <div className="exhibit-frame" style={{ flex: "1 1 440px", minWidth: 300, transform: `rotate(${i % 2 ? 1.2 : -1.2}deg)` }}>
+            <motion.div whileHover={{ rotate: 0, scale: 1.015 }} className="exhibit-frame"
+              style={{ flex: "1 1 440px", minWidth: 300, rotate: i % 2 ? 1.2 : -1.2 }}>
               <img src={ex.img} alt={ex.title} loading="lazy" />
               <div className="ledger-label" style={{ paddingTop: 9, display: "flex", justifyContent: "space-between" }}>
                 <span>{ex.tag}</span><span>VERITA / {String(i + 1).padStart(2, "0")}</span>
               </div>
-            </div>
+            </motion.div>
             <div style={{ flex: "1 1 340px", minWidth: 280 }}>
-              <span className={`stamp ${ex.green ? "stamp--green" : ""}`} style={{ fontSize: "0.62rem" }}>{ex.stamp}</span>
+              <Stamp green={ex.green} style={{ fontSize: "0.62rem" }}>{ex.stamp}</Stamp>
               <h3 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "clamp(1.7rem, 3vw, 2.4rem)", lineHeight: 1.15, margin: "16px 0 14px" }}>{ex.title}</h3>
               <p style={{ fontSize: "1rem", lineHeight: 1.75, color: "var(--ink-soft)" }}>{ex.body}</p>
             </div>
@@ -140,10 +184,12 @@ export default function LedgerSections() {
         </Entry>
       ))}
 
+      <div className="microtext">{MICROTEXT}</div>
+
       {/* §4 THE PIPELINE */}
       <Entry no="0008">
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <span className="stamp stamp--green" style={{ fontSize: "0.66rem" }}>CHAIN OF CUSTODY</span>
+          <Stamp green style={{ fontSize: "0.66rem" }}>CHAIN OF CUSTODY</Stamp>
           <h2 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "clamp(2rem, 4.4vw, 3.4rem)", marginTop: 18 }}>
             How a file becomes evidence
           </h2>
@@ -174,9 +220,14 @@ export default function LedgerSections() {
         </div>
       </Entry>
 
-      {/* §6 CLOSING / CTA */}
+      {/* §6 CLOSING / CTA — sealed in wax */}
       <Entry no="0010">
         <div style={{ textAlign: "center", paddingBottom: 30 }}>
+          <motion.div initial={{ opacity: 0, scale: 2.2 }} whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-60px" }} transition={{ type: "spring", stiffness: 320, damping: 18 }}
+            className="wax-seal" style={{ marginBottom: 30 }}>
+            V
+          </motion.div>
           <h2 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "clamp(2rem, 4.6vw, 3.6rem)", lineHeight: 1.15 }}>
             The case is open.<br />Bring your own data.
           </h2>

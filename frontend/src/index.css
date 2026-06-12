@@ -259,6 +259,84 @@ body {
   color: var(--ink-soft);
 }
 
+/* torn-paper top edge — the dark world rips open into the ledger */
+.torn-edge {
+  clip-path: polygon(
+    0 18px, 3% 6px, 7% 16px, 11% 4px, 16% 14px, 21% 2px, 26% 12px, 31% 5px,
+    36% 15px, 41% 3px, 46% 13px, 51% 6px, 56% 16px, 61% 2px, 66% 11px, 71% 4px,
+    76% 14px, 81% 3px, 86% 12px, 91% 5px, 96% 15px, 100% 8px,
+    100% 100%, 0 100%
+  );
+  margin-top: -18px;
+}
+
+/* banknote microtext security strip */
+.microtext {
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.32em;
+  color: var(--foil-gold);
+  opacity: 0.65;
+  user-select: none;
+  text-align: center;
+  padding: 6px 0;
+  border-top: 1px solid rgba(168, 132, 44, 0.35);
+  border-bottom: 1px solid rgba(168, 132, 44, 0.35);
+}
+
+/* chain link node on the spine — seals gold when its entry verifies */
+.chain-node {
+  position: absolute;
+  left: 50%;
+  top: 88px;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid var(--ledger-line);
+  background: var(--paper);
+  z-index: 2;
+  transition: border-color 0.6s, box-shadow 0.6s;
+}
+.chain-node.sealed {
+  border-color: var(--foil-gold);
+  box-shadow: 0 0 0 4px rgba(168, 132, 44, 0.18), 0 0 18px rgba(168, 132, 44, 0.45);
+}
+
+/* wax seal (closing section) */
+.wax-seal {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 32% 28%, #e0573f, #b03020 55%, #7e1f13 100%);
+  box-shadow:
+    inset 0 3px 8px rgba(255, 255, 255, 0.28),
+    inset 0 -5px 10px rgba(0, 0, 0, 0.35),
+    0 6px 18px rgba(126, 31, 19, 0.45);
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: 2.1rem;
+  color: rgba(255, 240, 230, 0.92);
+  text-shadow: 0 -1px 2px rgba(0, 0, 0, 0.4);
+  border: 4px double rgba(126, 31, 19, 0.65);
+}
+
+/* fingerprint watermark (manifesto backdrop) */
+.fingerprint {
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%) rotate(12deg);
+  opacity: 0.07;
+  pointer-events: none;
+}
+
 /* exhibit photo frame (evidence photograph) */
 .exhibit-frame {
   background: #fffdf6;
