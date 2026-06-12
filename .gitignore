@@ -20,3 +20,7 @@ backend/models/*.pkl
 *.db
 data/_*.json
 data/_*.txt
+
+# large local datasets (root-level) — never commit
+*.csv
+!data/sample_*.csv

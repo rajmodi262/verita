@@ -453,6 +453,58 @@ body {
   width: 150px;
 }
 
+/* ── flip-card evidence: click to see the back of the photo ── */
+.flip-wrap { perspective: 1400px; }
+.flip-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.flip-wrap.flipped .flip-inner { transform: rotateY(180deg); }
+.flip-front, .flip-back { backface-visibility: hidden; }
+.flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(20,18,11,0.12) 27px 28px),
+    #f6f1e3;
+  padding: 26px 28px;
+  overflow: hidden;
+}
+.handwriting {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.02rem;
+  line-height: 1.9;
+  color: #2b3a8c; /* archival blue ink */
+  transform: rotate(-1.2deg);
+}
+
+/* ── examiner's signature pad ── */
+.sig-pad {
+  background: #fffdf6;
+  border: 2px solid var(--ink);
+  box-shadow: 5px 5px 0 rgba(20, 18, 11, 0.2);
+  touch-action: none;
+  cursor: crosshair;
+  display: block;
+}
+.ledger.uv .sig-pad { background: #221a4a; border-color: #7df9ff; }
+.sig-btn {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  padding: 8px 14px;
+  border: 2px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.sig-btn--primary { background: var(--ink); color: var(--paper); }
+.ledger.uv .sig-btn { border-color: #7df9ff; color: #7df9ff; }
+.ledger.uv .sig-btn--primary { background: #7df9ff; color: #14120b; }
+
 /* exhibit photo frame (evidence photograph) */
 .exhibit-frame {
   background: #fffdf6;
