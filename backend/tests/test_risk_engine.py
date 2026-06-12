@@ -37,10 +37,13 @@ def test_curves_and_confusion_consistent(engine):
     assert m["roc_curve"][0]["x"] <= 0.05 and m["roc_curve"][-1]["x"] >= 0.95
 
 
-def test_feature_importance_sums_and_ranks(engine):
+def test_feature_importance_ranked_and_nonneg(engine):
+    # Permutation importance (mean ROC-AUC drop) — does not sum to 1, must be ranked & non-negative.
     fi = engine.metrics(0.5)["feature_importance"]
-    assert abs(sum(f["importance"] for f in fi) - 1.0) < 0.05  # GBM importances ~ sum to 1
+    assert len(fi) == len(engine.feature_names)
+    assert all(f["importance"] >= 0 for f in fi)
     assert fi == sorted(fi, key=lambda f: -f["importance"])     # already ranked
+    assert sum(f["importance"] for f in fi) > 0                 # the model learned *something*
 
 
 def test_alerts_rank_and_map_back(engine):

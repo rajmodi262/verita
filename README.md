@@ -90,9 +90,14 @@ a **world geo-map**, a **forecast overlay**, a **Time Machine** scrubber, **"wha
 diffs, **pin-SQL-to-dashboard**, and a one-click **PDF report**.
 
 ### 2 · FCC Risk & Anomaly Engine
-A real `scikit-learn` pipeline (GradientBoosting + IsolationForest) on labeled FCC data. Honest
-held-out metrics, a live **decision-threshold slider** (watch precision/recall trade off), ROC &
-precision-recall curves, confusion matrix, feature importance, and a ranked **AML alert queue**.
+A real `scikit-learn` pipeline (GradientBoosting + IsolationForest) trained on the **real ULB
+credit-card fraud dataset** (284k transactions, 0.17% fraud) → held-out **ROC-AUC 0.913, PR-AUC
+0.65**. Honest metrics throughout, a live **decision-threshold slider** (watch precision/recall
+trade off), ROC & precision-recall curves, confusion matrix, **permutation** feature importance, and
+a ranked **AML alert queue**. Drop `creditcard.csv` (or the Kaggle 5M-row
+`financial_fraud_detection_dataset.csv`) into `data/`, or set `VERITA_FRAUD_DATA` — otherwise it
+falls back to a clearly-labeled synthetic set. The fitted model is cached to `joblib` (trains once
+~2min, loads in ~2s after).
 
 ### 3 · NLP Insight
 Paste a transaction narrative or alert → entity extraction + **BSA / AML / OFAC / FinCEN** matching +

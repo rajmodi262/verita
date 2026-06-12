@@ -113,8 +113,15 @@ def _generate_synthetic(n: int = 24000, seed: int = 42) -> Dataset:
     )
 
 
+_ULB_SAMPLE = int(os.getenv("VERITA_ULB_SAMPLE", "150000"))
+
+
 def _load_ulb() -> Dataset:
     df = pd.read_csv(REAL_DATASET_PATH)
+    total = len(df)
+    # Seeded sample keeps GBM training time reasonable; the natural fraud rate is preserved.
+    if total > _ULB_SAMPLE:
+        df = df.sample(_ULB_SAMPLE, random_state=42).reset_index(drop=True)
     y = df["Class"].astype(int).rename("is_fraud")
     X = df.drop(columns=["Class"])
     return Dataset(
@@ -122,13 +129,94 @@ def _load_ulb() -> Dataset:
         y=y,
         source="ulb_creditcard",
         description=(
-            f"ULB credit-card fraud dataset ({len(df):,} transactions, {y.mean():.2%} fraud) — "
-            "real anonymized European card transactions."
+            f"ULB credit-card fraud dataset — REAL anonymized European card transactions: "
+            f"seeded sample of {len(df):,} of {total:,} ({y.mean():.3%} fraud)."
         ),
     )
 
 
+# Kaggle "Financial Fraud Detection" — 5M labeled transactions. Looked up at the repo root
+# or data/, or wherever VERITA_FRAUD_DATA points.
+_ROOT = os.path.abspath(os.path.join(_DATA_DIR, ".."))
+KAGGLE_CANDIDATES = [
+    os.getenv("VERITA_FRAUD_DATA", "").strip(),
+    os.path.join(_ROOT, "financial_fraud_detection_dataset.csv"),
+    os.path.join(_DATA_DIR, "financial_fraud_detection_dataset.csv"),
+]
+
+_KAGGLE_SAMPLE = int(os.getenv("VERITA_FRAUD_SAMPLE", "150000"))
+
+
+def _kaggle_path() -> str | None:
+    return next((p for p in KAGGLE_CANDIDATES if p and os.path.exists(p)), None)
+
+
+def _load_kaggle_fraud(path: str) -> Dataset:
+    """Reservoir-sample the 5M-row Kaggle fraud set via DuckDB and engineer honest features."""
+    import duckdb
+
+    con = duckdb.connect()
+    total = con.execute(f"SELECT COUNT(*) FROM read_csv_auto('{path}')").fetchone()[0]
+    df = con.execute(
+        f"SELECT transaction_id, timestamp, amount, transaction_type, merchant_category, "
+        f"location, device_used, payment_channel, time_since_last_transaction, "
+        f"spending_deviation_score, velocity_score, geo_anomaly_score, is_fraud "
+        f"FROM read_csv_auto('{path}') USING SAMPLE reservoir({_KAGGLE_SAMPLE} ROWS) REPEATABLE (42)"
+    ).fetchdf()
+    con.close()
+
+    y = df["is_fraud"].astype(int).rename("is_fraud")
+
+    X = pd.DataFrame(index=df.index)
+    X["amount_log"] = np.log1p(df["amount"].clip(lower=0))
+    X["hour_of_day"] = pd.to_datetime(df["timestamp"], errors="coerce").dt.hour.fillna(12).astype(float)
+    X["velocity_score"] = pd.to_numeric(df["velocity_score"], errors="coerce").fillna(0.0)
+    X["geo_anomaly_score"] = pd.to_numeric(df["geo_anomaly_score"], errors="coerce").fillna(0.0)
+    X["spending_deviation"] = pd.to_numeric(df["spending_deviation_score"], errors="coerce").fillna(0.0)
+    X["mins_since_last_tx"] = pd.to_numeric(df["time_since_last_transaction"], errors="coerce").fillna(0.0)
+
+    # Low-cardinality categoricals → one-hot; city → frequency encoding (hundreds of values).
+    for col in ("payment_channel", "transaction_type", "device_used"):
+        dummies = pd.get_dummies(df[col].astype(str), prefix=col, dtype=float)
+        X = pd.concat([X, dummies], axis=1)
+    for col in ("merchant_category", "location"):
+        freq = df[col].astype(str).map(df[col].astype(str).value_counts(normalize=True))
+        X[f"{col}_freq"] = freq.fillna(0.0)
+
+    tx = pd.DataFrame({
+        "transaction_id": df["transaction_id"].astype(str),
+        "amount": pd.to_numeric(df["amount"], errors="coerce").fillna(0.0).round(2),
+        "channel": df["payment_channel"].astype(str),
+        "country": df["location"].astype(str),
+    }, index=df.index)
+
+    return Dataset(
+        X=X, y=y, source="kaggle_financial_fraud",
+        description=(
+            f"Kaggle Financial Fraud Detection dataset — real labeled data: trained on a seeded "
+            f"reservoir sample of {len(df):,} of {total:,} transactions ({y.mean():.2%} fraud)."
+        ),
+        transactions=tx,
+    )
+
+
+def expected_source() -> str:
+    """Which source load_dataset() would pick right now — cheap, no data loading."""
+    if os.getenv("VERITA_FORCE_SYNTHETIC", "").strip() == "1":
+        return "synthetic_fcc"
+    if os.path.exists(REAL_DATASET_PATH):
+        return "ulb_creditcard"
+    if _kaggle_path():
+        return "kaggle_financial_fraud"
+    return "synthetic_fcc"
+
+
 def load_dataset() -> Dataset:
+    if os.getenv("VERITA_FORCE_SYNTHETIC", "").strip() == "1":
+        return _generate_synthetic()
     if os.path.exists(REAL_DATASET_PATH):
         return _load_ulb()
+    kp = _kaggle_path()
+    if kp:
+        return _load_kaggle_fraud(kp)
     return _generate_synthetic()

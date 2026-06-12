@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-12T00:00:00Z",
+  "title": "Design System: Verita",
+  "extensions": {
+    "colorMeta": {
+      "vermilion-stamp": { "role": "primary", "displayName": "Vermilion Stamp", "canonical": "#c2331f", "tonalRamp": ["#2e0a06", "#511107", "#7a1d10", "#a02817", "#c2331f", "#d95f43", "#eb9078", "#f8c9bc"] },
+      "registrar-green": { "role": "secondary", "displayName": "Registrar Green", "canonical": "#1c6e4a", "tonalRamp": ["#06150e", "#0c2c1e", "#124a31", "#1c6e4a", "#2f8f63", "#57ad84", "#8ccbab", "#c8e8d8"] },
+      "gold-foil": { "role": "tertiary", "displayName": "Gold Foil", "canonical": "#a8842c", "tonalRamp": ["#1f180a", "#3c2f11", "#5e4a19", "#836622", "#a8842c", "#c2a352", "#dcc488", "#f0e3c2"] },
+      "ledger-cream": { "role": "neutral", "displayName": "Ledger Cream", "canonical": "#f3eee2", "tonalRamp": ["#262217", "#4a4434", "#6e664f", "#938a6e", "#b7ae92", "#d6cfb8", "#ece5d3", "#f9f6ed"] },
+      "iron-gall-ink": { "role": "neutral", "displayName": "Iron-Gall Ink", "canonical": "#14120b", "tonalRamp": ["#14120b", "#2b2718", "#433d28", "#5d553a", "#78704f", "#958c6b", "#b3ab8f", "#d3cdb8"] },
+      "uv-security-cyan": { "role": "special", "displayName": "UV Security Cyan", "canonical": "#7df9ff", "tonalRamp": ["#0a2a2e", "#0f4a52", "#156d78", "#1d93a2", "#2cbacb", "#4fd9e9", "#7df9ff", "#c2fcff"] },
+      "electric-blue": { "role": "legacy", "displayName": "Electric Blue (legacy aurora)", "canonical": "#4d7cff", "tonalRamp": ["#0a1233", "#122158", "#1d3a8f", "#2f55c4", "#4d7cff", "#7a9dff", "#a8bfff", "#d6e1ff"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (Fraunces 900)", "purpose": "Landing hero only — one per page (the One Exhibit Rule)." },
+      "headline": { "displayName": "Headline (Fraunces 900)", "purpose": "Ledger section headings; italic 700 variant for pull-quotes." },
+      "title": { "displayName": "Title (Space Grotesk 700)", "purpose": "App workspace page headings." },
+      "body": { "displayName": "Body (Inter 400)", "purpose": "Prose and UI copy, 65–75ch measure." },
+      "label": { "displayName": "Ledger Label (JetBrains Mono)", "purpose": "Evidentiary micro-labels: exhibit numbers, hashes, field names, KPI captions." }
+    },
+    "shadows": [
+      { "name": "desk-object", "value": "6px 6px 0 rgba(20,18,11,0.22)", "purpose": "Hard offset shadow for paper terminals and interactive objects on the page." },
+      { "name": "desk-object-sm", "value": "5px 5px 0 rgba(20,18,11,0.2)", "purpose": "Compact desk widgets (signature pad, small panels)." },
+      { "name": "exhibit-photo", "value": "0 1px 2px rgba(20,18,11,0.18), 0 14px 34px -12px rgba(20,18,11,0.38)", "purpose": "The one soft shadow — photographic evidence frames only." },
+      { "name": "sealed-node", "value": "0 0 0 4px rgba(168,132,44,0.18), 0 0 18px rgba(168,132,44,0.45)", "purpose": "Gold verification glow, exclusively for chain nodes at the moment they seal." }
+    ],
+    "motion": [
+      { "name": "ease-evidence", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Default ease-out for reveals: redaction lifts, evidence flips (0.8–0.9s)." },
+      { "name": "spring-magnetic", "value": "spring(stiffness: 300, damping: 18)", "purpose": "framer-motion spring for magnetic buttons (legacy hero)." },
+      { "name": "seal-transition", "value": "border-color 0.6s, box-shadow 0.6s", "purpose": "Chain node sealing." }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled, square, mono-labeled — the examiner's decisive action.",
+      "html": "<button class=\"ds-btn-primary\">Seal Record</button>",
+      "css": ".ds-btn-primary { background: var(--ink, #14120b); color: var(--paper, #f3eee2); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 14px; border: 2px solid var(--ink, #14120b); border-radius: 0; cursor: pointer; transition: background 0.15s, color 0.15s; } .ds-btn-primary:hover { background: #2b2718; } .ds-btn-primary:focus-visible { outline: 2px solid var(--foil-gold, #a8842c); outline-offset: 2px; } .ds-btn-primary:active { transform: translate(1px, 1px); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Transparent with a hard ink border; secondary actions on paper.",
+      "html": "<button class=\"ds-btn-ghost\">Clear Pad</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: var(--ink, #14120b); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 14px; border: 2px solid var(--ink, #14120b); border-radius: 0; cursor: pointer; transition: background 0.15s; } .ds-btn-ghost:hover { background: rgba(20,18,11,0.08); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--foil-gold, #a8842c); outline-offset: 2px; }"
+    },
+    {
+      "name": "Rubber Stamp",
+      "kind": "chip",
+      "refersTo": "stamp",
+      "description": "A rotated, double-ruled certification mark — VERIFIED, FLAGGED, SEALED. Declarations only, never neutral tags.",
+      "html": "<span class=\"ds-stamp\">Verified</span>",
+      "css": ".ds-stamp { display: inline-block; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stamp-red, #c2331f); border: 3px double var(--stamp-red, #c2331f); border-radius: 6px; padding: 6px 14px; transform: rotate(-4deg); }"
+    },
+    {
+      "name": "Ledger Label",
+      "kind": "chip",
+      "refersTo": "ledger-label",
+      "description": "The evidentiary micro-label that captions every exhibit, hash, and field.",
+      "html": "<span class=\"ds-ledger-label\">Exhibit A — TX 4471</span>",
+      "css": ".ds-ledger-label { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-soft, #4a4434); }"
+    },
+    {
+      "name": "Paper Terminal",
+      "kind": "card",
+      "description": "Machine output rendered on paper — live agent traces, SQL, hashes. Hard desk-object shadow.",
+      "html": "<div class=\"ds-paper-terminal\">$ hypothesis 3/5 — structuring<br/>SELECT count(*) FROM tx WHERE amt BETWEEN 9000 AND 9999;<br/>→ 47 rows · p=0.0021 · CONFIRMED<br/>sha256: 8f1c…e2a9 ✓ chained</div>",
+      "css": ".ds-paper-terminal { background: #fffdf6; border: 2px solid var(--ink, #14120b); box-shadow: 6px 6px 0 rgba(20,18,11,0.22); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82rem; line-height: 1.9; padding: 22px 26px; color: var(--ink, #14120b); }"
+    },
+    {
+      "name": "Exhibit Frame",
+      "kind": "card",
+      "description": "Photographic-evidence mat: the one soft shadow in the system.",
+      "html": "<figure class=\"ds-exhibit\"><div class=\"ds-exhibit-img\"></div><figcaption class=\"ds-exhibit-cap\">Exhibit B — Studio Dashboard</figcaption></figure>",
+      "css": ".ds-exhibit { background: #fffdf6; padding: 10px 10px 14px; border: 1px solid rgba(20,18,11,0.25); box-shadow: 0 1px 2px rgba(20,18,11,0.18), 0 14px 34px -12px rgba(20,18,11,0.38); margin: 0; max-width: 280px; } .ds-exhibit-img { height: 140px; background: repeating-linear-gradient(0deg, #ece5d3 0 31px, rgba(20,18,11,0.14) 31px 32px); border: 1px solid rgba(20,18,11,0.18); } .ds-exhibit-cap { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft, #4a4434); padding-top: 10px; }"
+    },
+    {
+      "name": "Sealing Chain Node",
+      "kind": "custom",
+      "description": "The signature component: a spine ring that seals gold when its ledger entry verifies.",
+      "html": "<div class=\"ds-chain\"><span class=\"ds-chain-node\"></span><span class=\"ds-chain-node ds-sealed\"></span><span class=\"ds-chain-node ds-sealed\"></span></div>",
+      "css": ".ds-chain { display: flex; gap: 28px; align-items: center; padding: 8px; } .ds-chain-node { width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid rgba(20,18,11,0.14); background: var(--paper, #f3eee2); transition: border-color 0.6s, box-shadow 0.6s; } .ds-chain-node.ds-sealed { border-color: var(--foil-gold, #a8842c); box-shadow: 0 0 0 4px rgba(168,132,44,0.18), 0 0 18px rgba(168,132,44,0.45); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Forensic Ledger",
+    "overview": "Verita's interface is a registrar's book: paper that remembers, ink that cannot be quietly changed, stamps that certify, a chain of seals running down the spine. The visual language is evidentiary, not decorative — surfaces are physical objects on an examiner's desk. The system explicitly rejects its own legacy, the generic dark-AI-SaaS template (aurora glows, glassmorphism, gradient text), which is documented as migrating, not canonical.",
+    "keyCharacteristics": [
+      "Paper, ink, and stamps as the primary material vocabulary",
+      "Hard offset shadows — objects sit on the desk, nothing floats in glow",
+      "Fraunces 900 serif headlines against JetBrains Mono evidentiary micro-labels",
+      "Certainty rendered as ritual: stamps slam, seals set, chains verify, hashes tick",
+      "WCAG AAA contrast: text is ink, never gray"
+    ],
+    "rules": [
+      { "name": "The Iron-Gall Rule", "body": "Text on paper is ink — #14120b or #4a4434, nothing lighter. Gray body text is forbidden; AAA (7:1) is the floor, not the target.", "section": "colors" },
+      { "name": "The Ceremony Rule", "body": "Vermilion, green, and gold are stamps, not paint. If an accent covers more than a stamp's worth of area, it has lost its authority.", "section": "colors" },
+      { "name": "The Mono Witness Rule", "body": "Every figure that testifies — hash, transaction ID, score, timestamp, SQL — is set in JetBrains Mono.", "section": "typography" },
+      { "name": "The One Exhibit Rule", "body": "One Display-size element per page. Headlines argue; they don't shout over each other.", "section": "typography" },
+      { "name": "The Hard Shadow Rule", "body": "Shadows are offset and opaque-edged (6px 6px 0), never ambient blur. If a shadow is blurry, it's either a photograph or a mistake.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep text at WCAG AAA (7:1) — Iron-Gall Ink or Faded Ink on paper; fix Dimmed Starlight (#8c97b5 → ≈#98a3c0) wherever legacy dark surfaces are touched.",
+      "Do use hard offset shadows (6px 6px 0) and 2px ink borders for every new elevated surface, in both worlds.",
+      "Do set every hash, ID, score, and timestamp in JetBrains Mono (the Mono Witness Rule).",
+      "Do render certainty as ritual: stamp slams, chain seals, signature strokes — each with a prefers-reduced-motion crossfade fallback, always.",
+      "Do keep ceremonial accents (Vermilion, Registrar Green, Gold Foil) at stamp scale (the Ceremony Rule)."
+    ],
+    "donts": [
+      "Don't extend the generic dark-AI-SaaS template — no new aurora/mesh gradient glows, no new glassmorphism panels, no gradient text (.gradient-text is legacy; never apply it to new elements).",
+      "Don't use blur-glow elevation on new work; if a shadow is blurry and it isn't a photograph, it's wrong (the Hard Shadow Rule).",
+      "Don't let the ledger become a costume: no fake leather, no parchment JPEG textures, no skeuomorphic chrome. The forensic feel is carried by type, rule lines, stamps, and shadow — all CSS.",
+      "Don't put gray text on paper. #8c97b5-style muted grays are a dark-world token; on cream, the only secondary text color is Faded Ink (#4a4434).",
+      "Don't round corners on ledger components. Square is certain; 14–28px radii are legacy glass.",
+      "Don't animate without a reduced-motion alternative — the custom cursor, magnetic buttons, and stamp choreography must all degrade to instant/crossfade."
+    ]
+  }
+}
