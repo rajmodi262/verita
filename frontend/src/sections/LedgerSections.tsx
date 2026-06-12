@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useScroll, useSpring } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ArrowUpRight, Github } from "lucide-react";
+import { ArrowUpRight, Github, Lamp } from "lucide-react";
 
 /* ════════════════════════════════════════════════════════════════════
    FORENSIC LEDGER — the scroll story. The page itself behaves like a
@@ -98,6 +98,99 @@ function Redacted({ children }: { children: string }) {
   return <span ref={ref} className={`redact ${inView ? "lifted" : ""}`}>{children}</span>;
 }
 
+/* Live SHA-256 ticker — the heartbeat of the seal. */
+function HashTicker() {
+  const [hex, setHex] = useState("");
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setHex("9f3ac17be204d6f1a8c35e92b07d44e1c6a98f02d3b15c7e4f80a261d9e5b3c0");
+      return;
+    }
+    const roll = () => setHex(Array.from({ length: 64 }, () => "0123456789abcdef"[(Math.random() * 16) | 0]).join(""));
+    roll();
+    const id = window.setInterval(roll, 90);
+    return () => window.clearInterval(id);
+  }, []);
+  return <div className="hash-ticker">SEAL ▸ sha256:{hex}</div>;
+}
+
+/* The Investigator's rehearsal — a self-playing paper terminal. */
+const REHEARSAL: string[] = [
+  "> HYPOTHESIS 1 — geographic risk concentration",
+  "  RUNNING  SELECT country, AVG(is_fraud) FROM data GROUP BY country",
+  "  RESULT   RU = 7.7%  ·  baseline = 4.1%  ·  1.9x over-index",
+  "  VERDICT  [CONFIRMED]  severity = MEDIUM",
+  "  SEALING  ████████  9f3ac1…e5b3c0  ✓ chained",
+  "",
+  "> HYPOTHESIS 2 — structuring near $10,000 threshold",
+  "  RUNNING  COUNT(amount BETWEEN 9000 AND 9999) vs (10000..11000)",
+  "  RESULT   no abnormal clustering below the threshold",
+  "  VERDICT  [CLEARED] — and a cleared test is logged too",
+  "  SEALING  ████████  41d7f8…a2c9e1  ✓ chained",
+];
+
+function Rehearsal() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!inView) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setN(9999); return; }
+    const total = REHEARSAL.join("\n").length;
+    const id = window.setInterval(() => {
+      setN((v) => {
+        if (v >= total + 30) return 0;       // loop: clear and replay
+        return v + 2;
+      });
+    }, 28);
+    return () => window.clearInterval(id);
+  }, [inView]);
+  const text = REHEARSAL.join("\n").slice(0, n);
+  return (
+    <div ref={ref}>
+      <div className="ledger-label" style={{ marginBottom: 10 }}>LIVE REHEARSAL · THE INVESTIGATOR AT WORK · LOOPS FOREVER</div>
+      <div className="paper-terminal">
+        {text}
+        <span style={{ opacity: 0.7 }}>▌</span>
+      </div>
+    </div>
+  );
+}
+
+/* Evidence photo with a detective's loupe that follows the cursor. */
+function ExhibitPhoto({ ex, i }: { ex: (typeof EXHIBITS)[number]; i: number }) {
+  const [lens, setLens] = useState<{ x: number; y: number } | null>(null);
+  const imgWrap = useRef<HTMLDivElement>(null);
+  return (
+    <motion.div whileHover={{ rotate: 0, scale: 1.015 }} className="exhibit-frame"
+      style={{ flex: "1 1 440px", minWidth: 300, rotate: i % 2 ? 1.2 : -1.2 }}>
+      <div className="tape tape--tl" aria-hidden />
+      <div className="tape tape--tr" aria-hidden />
+      <div
+        ref={imgWrap}
+        style={{ position: "relative" }}
+        onMouseMove={(e) => {
+          const r = imgWrap.current!.getBoundingClientRect();
+          setLens({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+        }}
+        onMouseLeave={() => setLens(null)}
+      >
+        <img src={ex.img} alt={ex.title} loading="lazy" />
+        {lens && (
+          <div className="loupe" style={{
+            left: `calc(${lens.x}% - 75px)`, top: `calc(${lens.y}% - 75px)`,
+            backgroundImage: `url(${ex.img})`, backgroundSize: "260% auto",
+            backgroundPosition: `${lens.x}% ${lens.y}%`,
+          }} />
+        )}
+      </div>
+      <div className="ledger-label" style={{ paddingTop: 9, display: "flex", justifyContent: "space-between" }}>
+        <span>{ex.tag} · HOVER TO INSPECT</span><span>VERITA / {String(i + 1).padStart(2, "0")}</span>
+      </div>
+    </motion.div>
+  );
+}
+
 /* Faint fingerprint watermark (concentric arcs). */
 function Fingerprint() {
   return (
@@ -114,13 +207,33 @@ function Fingerprint() {
 
 export default function LedgerSections() {
   const navigate = useNavigate();
+  const [uv, setUv] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start 0.8", "end end"] });
   const thread = useSpring(scrollYProgress, { stiffness: 90, damping: 26 });
 
   return (
-    <div ref={wrapRef} className="ledger torn-edge" style={{ position: "relative", zIndex: 3 }}>
+    <div ref={wrapRef} className={`ledger torn-edge ${uv ? "uv" : ""}`} style={{ position: "relative", zIndex: 3 }}>
       <div className="guilloche" />
+
+      {/* UV lamp — reveals the hidden security ink (like checking a banknote) */}
+      <button data-cursor className="uv-toggle" onClick={() => setUv((v) => !v)}
+        aria-pressed={uv} title="Toggle ultraviolet inspection lamp">
+        <Lamp size={12} style={{ verticalAlign: -2, marginRight: 6 }} />
+        {uv ? "UV LAMP · ON" : "UV LAMP"}
+      </button>
+
+      <HashTicker />
+
+      {/* case-file metadata */}
+      <div style={{ maxWidth: 1080, margin: "26px auto 0", padding: "0 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, border: "2px solid var(--ink)", padding: "14px 20px", background: "rgba(255,253,246,0.5)" }}>
+          <div className="ledger-label">CASE NO. <strong style={{ color: "inherit" }}>WK-2026-0612</strong></div>
+          <div className="ledger-label">SUBJECT: BLACK-BOX ANALYTICS</div>
+          <div className="ledger-label">EXAMINER: R. MODI</div>
+          <div className="barcode" aria-hidden />
+        </div>
+      </div>
 
       {/* the chain thread — draws down the spine as you scroll */}
       <motion.div aria-hidden style={{
@@ -132,6 +245,7 @@ export default function LedgerSections() {
 
       {/* §1 THE PROBLEM */}
       <Entry no="0001">
+        <span className="uv-ink" style={{ top: 30, left: "8%", fontSize: "0.7rem" }}>ULTRAVIOLET SECURITY LAYER · GENUINE DOCUMENT</span>
         <div style={{ textAlign: "center" }}>
           <Stamp style={{ fontSize: "0.7rem" }}>CASE FILE · VERITA</Stamp>
           <h2 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "clamp(2.2rem, 5.4vw, 4.4rem)", lineHeight: 1.12, marginTop: 26 }}>
@@ -161,6 +275,12 @@ export default function LedgerSections() {
             <Stamp green style={{ fontSize: "0.66rem" }}>NO BLACK BOXES</Stamp>
             <Stamp style={{ fontSize: "0.66rem" }}>NO FABRICATED METRICS</Stamp>
           </div>
+          <span className="uv-ink" style={{ bottom: 14, right: "6%", fontSize: "1.6rem", transform: "rotate(-8deg)", fontWeight: 700 }}>AUTHENTIC</span>
+        </div>
+
+        {/* the agent rehearses, live, on paper */}
+        <div style={{ marginTop: 56 }}>
+          <Rehearsal />
         </div>
       </Entry>
 
@@ -168,13 +288,7 @@ export default function LedgerSections() {
       {EXHIBITS.map((ex, i) => (
         <Entry key={ex.tag} no={`000${i + 3}`}>
           <div style={{ display: "flex", gap: 44, alignItems: "center", flexWrap: "wrap", flexDirection: i % 2 ? "row-reverse" : "row" }}>
-            <motion.div whileHover={{ rotate: 0, scale: 1.015 }} className="exhibit-frame"
-              style={{ flex: "1 1 440px", minWidth: 300, rotate: i % 2 ? 1.2 : -1.2 }}>
-              <img src={ex.img} alt={ex.title} loading="lazy" />
-              <div className="ledger-label" style={{ paddingTop: 9, display: "flex", justifyContent: "space-between" }}>
-                <span>{ex.tag}</span><span>VERITA / {String(i + 1).padStart(2, "0")}</span>
-              </div>
-            </motion.div>
+            <ExhibitPhoto ex={ex} i={i} />
             <div style={{ flex: "1 1 340px", minWidth: 280 }}>
               <Stamp green={ex.green} style={{ fontSize: "0.62rem" }}>{ex.stamp}</Stamp>
               <h3 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "clamp(1.7rem, 3vw, 2.4rem)", lineHeight: 1.15, margin: "16px 0 14px" }}>{ex.title}</h3>
@@ -188,6 +302,7 @@ export default function LedgerSections() {
 
       {/* §4 THE PIPELINE */}
       <Entry no="0008">
+        <div className="coffee-ring" style={{ top: 26, right: "10%", transform: "rotate(12deg)" }} aria-hidden />
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <Stamp green style={{ fontSize: "0.66rem" }}>CHAIN OF CUSTODY</Stamp>
           <h2 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "clamp(2rem, 4.4vw, 3.4rem)", marginTop: 18 }}>
@@ -244,9 +359,13 @@ export default function LedgerSections() {
           <div className="ledger-label" style={{ marginTop: 44 }}>
             VERITA · FINANCIAL CRIME &amp; COMPLIANCE INTELLIGENCE · EVERY NUMBER SHOWS ITS WORK
           </div>
+          <span className="uv-ink" style={{ bottom: 4, left: "50%", transform: "translateX(-50%)", fontSize: "0.66rem" }}>
+            SECURITY THREAD VERIFIED · YOU FOUND THE HIDDEN LAYER
+          </span>
         </div>
       </Entry>
 
+      <HashTicker />
       <div className="guilloche" />
     </div>
   );
