@@ -22,7 +22,7 @@
 ### R2. Predictive Modeling & Forecasting
 | JD keyword / phrase | Verita feature | Status |
 |---|---|---|
-| "machine learning … models" | GradientBoosting fraud classifier (scikit-learn), honest held-out ROC-AUC 0.865 | ✅ |
+| "machine learning … models" | GradientBoosting fraud classifier (scikit-learn) on the **real ULB credit-card dataset (284k txns)** — held-out ROC-AUC **0.913**, PR-AUC 0.65; auto-falls back to labeled synthetic if no real data present | ✅ |
 | "time-series forecasting models for Revenue, Volume, Cost" | Forecast overlay: trend + weekly seasonality, 14-period projection w/ CI | ✅ |
 | "statistical modeling" | Welch t-tests, Pearson r, eta², skew/outlier analytics in insights | ✅ |
 | "feature engineering" | 8-feature risk pipeline (amount_log, velocity, channel/geo/kyc risk, …) | ✅ |

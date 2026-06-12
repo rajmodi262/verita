@@ -4,6 +4,9 @@ import io
 import os
 import sys
 
+# Tests always train on the fast synthetic set — never multi-GB local datasets.
+os.environ["VERITA_FORCE_SYNTHETIC"] = "1"
+
 import numpy as np
 import pandas as pd
 import pytest
