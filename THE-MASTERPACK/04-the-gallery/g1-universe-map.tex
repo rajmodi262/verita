@@ -1,0 +1,146 @@
+% ══════════════════════════════════════════════════════════════════
+%  G1 — THE VERITA UNIVERSE  (architecture as an astronomical chart)
+%  Compile: xelatex, from this directory.  A4 portrait, full bleed.
+% ══════════════════════════════════════════════════════════════════
+\documentclass[10pt]{article}
+\usepackage[a4paper, margin=0cm]{geometry}
+\input{../00-design-system/masterpack-preamble.tex}
+\input{../00-design-system/palette.tex}
+\input{../00-design-system/identity.tex}
+\input{../00-design-system/typography.tex}
+\input{../00-design-system/components.tex}
+\input{../00-design-system/backgrounds.tex}
+\pagestyle{empty}
+
+\begin{document}
+\begin{tikzpicture}[remember picture, overlay, shift={(current page.south west)}]
+
+% ── deep space ──
+\fill[MidnightNavy] (0,0) rectangle (21,29.7);
+\stardust{0.5}
+
+% ── ornamental astronomical border ──
+\draw[GoldLeaf, line width=1.6pt] (0.7,0.7) rectangle (20.3,29.0);
+\draw[GoldLeaf!60!MidnightNavy, line width=0.5pt] (0.95,0.95) rectangle (20.05,28.75);
+\foreach \x/\y in {0.7/0.7, 20.3/0.7, 0.7/29.0, 20.3/29.0}{
+  \fill[GoldLeaf] (\x,\y) circle (2.2pt);
+  \draw[GoldLeaf, line width=0.6pt] (\x,\y) circle (4.5pt);
+}
+% compass rose, top-right
+\begin{scope}[shift={(18.6,27.3)}]
+  \foreach \a in {0,45,...,315} \draw[GoldLeaf!80, line width=0.4pt] (0,0) -- (\a:0.42);
+  \draw[GoldLeaf] (0,0) circle (0.14); \node[GoldLeaf, font=\ttfamily\fontsize{5pt}{5pt}\selectfont] at (0,0.62) {N};
+\end{scope}
+
+% ── title scroll ──
+\fill[IceWhite!92!GoldLeaf, rounded corners=2pt] (4.6,27.0) rectangle (16.4,28.6);
+\draw[GoldLeaf, line width=1pt] (4.6,27.0) rectangle (16.4,28.6);
+\fill[GoldLeaf] (4.6,27.0) -- (4.1,27.8) -- (4.6,28.6) -- cycle;
+\fill[GoldLeaf] (16.4,27.0) -- (16.9,27.8) -- (16.4,28.6) -- cycle;
+\node[text=CarbonInk, font={\DisplayFont\fontsize{16pt}{18pt}\selectfont}] at (10.5,28.05)
+  {COSMOGRAPHIA VERITAE};
+\node[text=StormBlue, font={\AccentFont\fontsize{8pt}{9pt}\selectfont}] at (10.5,27.38)
+  {A complete chart of the known system · surveyed \TodayYear\ · cartographer: \MyName};
+
+% ── region rings (dashed orbits) ──
+\coordinate (CTR) at (10.5,15.6);
+\draw[IceWhite!28, dashed, line width=0.5pt] (CTR) circle (3.1);
+\draw[IceWhite!22, dashed, line width=0.5pt] (CTR) circle (5.6);
+\draw[IceWhite!16, dashed, line width=0.5pt] (CTR) circle (8.2);
+\node[text=IceWhite!45, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, rotate=12]
+  at ($(CTR)+(105:3.1)$) {THE INNER WORLDS};
+\node[text=IceWhite!45, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, rotate=-32]
+  at ($(CTR)+(238:5.6)$) {THE MIDDLE BELT};
+\node[text=IceWhite!40, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, rotate=12]
+  at ($(CTR)+(52:8.2)$) {THE OUTER REALMS};
+
+% ── celestial body macro: {pos}{radius}{color}{name}{latin caption} ──
+\newcommand{\body}[5]{%
+  \fill[#3!30, opacity=0.45] #1 circle ({#2+0.13});
+  \fill[#3] #1 circle (#2);
+  \node[text=IceWhite, font={\AccentFont\bfseries\fontsize{8pt}{9pt}\selectfont},
+    anchor=north] at ($#1+(0,{-#2-0.08})$) {#4};
+  \node[text=IceWhite!55, font={\itshape\fontsize{6.5pt}{7pt}\selectfont},
+    anchor=north] at ($#1+(0,{-#2-0.46})$) {#5};
+}
+
+% ── THE INNER WORLDS (core logic) — gold = UI, blue = data ──
+\body{(CTR)}{0.62}{ElectricBlue}{FASTAPI CORE}{Sol — omnia circumvolvunt}
+\body{($(CTR)+(160:2.3)$)}{0.42}{StormBlue!60!ElectricBlue}{PROFILER}{semantica columnarum}
+\body{($(CTR)+(22:2.5)$)}{0.38}{StormBlue!60!ElectricBlue}{THE STORE}{memoria diski}
+
+% ── THE MIDDLE BELT: three constellations ──
+% The Intelligence Cluster (violet, upper right)
+\coordinate (ML) at ($(CTR)+(55:4.9)$);
+\coordinate (NLP) at ($(CTR)+(33:5.3)$);
+\coordinate (AGT) at ($(CTR)+(74:5.5)$);
+\draw[VioletDream!70, line width=0.55pt] (ML) -- (NLP) (ML) -- (AGT);
+\body{(ML)}{0.40}{VioletDream}{RISK MODEL}{GBM + IsolationForest}
+\body{(NLP)}{0.34}{VioletDream}{NLP MATCHER}{BSA · AML · OFAC}
+\body{(AGT)}{0.46}{VioletDream}{INVESTIGATOR $\star$}{catena probationis}
+\node[text=VioletDream!85, font={\itshape\fontsize{7.5pt}{8pt}\selectfont}]
+  at ($(CTR)+(54:6.9)$) {The Intelligence Cluster};
+
+% The Data Nebula (blue, left)
+\coordinate (DK) at ($(CTR)+(178:5.0)$);
+\coordinate (PG) at ($(CTR)+(208:5.4)$);
+\coordinate (PD) at ($(CTR)+(152:5.2)$);
+\draw[NeonCyan!60, line width=0.55pt] (DK) -- (PG) (DK) -- (PD);
+\body{(DK)}{0.40}{NeonCyan!70!ElectricBlue}{DUCKDB}{quaesitor velox}
+\body{(PG)}{0.38}{NeonCyan!70!ElectricBlue}{POSTGRES}{tabularium auditi}
+\body{(PD)}{0.34}{NeonCyan!70!ElectricBlue}{PANDAS}{flumen datorum}
+\node[text=NeonCyan!80, font={\itshape\fontsize{7.5pt}{8pt}\selectfont}]
+  at ($(CTR)+(184:7.1)$) {The Data Nebula};
+
+% The User Gateway (gold, lower)
+\coordinate (RC) at ($(CTR)+(285:4.8)$);
+\coordinate (EC) at ($(CTR)+(258:5.3)$);
+\coordinate (CV) at ($(CTR)+(310:5.4)$);
+\draw[GoldLeaf!75, line width=0.55pt] (RC) -- (EC) (RC) -- (CV);
+\body{(RC)}{0.42}{GoldLeaf}{REACT + TS}{porta usoris}
+\body{(EC)}{0.36}{GoldLeaf}{ECHARTS}{lumina figurarum}
+\body{(CV)}{0.36}{GoldLeaf}{STUDIO CANVAS}{tabula mutabilis}
+\node[text=GoldLeaf!90, font={\itshape\fontsize{7.5pt}{8pt}\selectfont}]
+  at ($(CTR)+(283:6.8)$) {The User Gateway};
+
+% inner connections to the core
+\foreach \p in {(ML),(NLP),(AGT),(DK),(PG),(PD),(RC),(EC),(CV)}
+  \draw[IceWhite!14, line width=0.35pt] (CTR) -- \p;
+
+% ── THE OUTER REALMS (green = infra, violet = external AI) ──
+\body{($(CTR)+(128:7.9)$)}{0.34}{NeonMint!70!RegistrarGreen}{DOCKER}{navis quinque machinarum}
+\body{($(CTR)+(95:8.3)$)}{0.30}{NeonMint!70!RegistrarGreen}{CI ACTIONS}{custos LXXXII probationum}
+\body{($(CTR)+(8:8.1)$)}{0.30}{NeonMint!70!RegistrarGreen}{PROMETHEUS}{speculator metricarum}
+\body{($(CTR)+(338:7.9)$)}{0.34}{VioletDream}{GEMINI (opt.)}{narrator, numquam calculator}
+
+% ── THE VOID (bottom band) ──
+\node[text=IceWhite!50, font={\AccentFont\fontsize{8pt}{9pt}\selectfont}] at (10.5,5.9)
+  {THE VOID — terrae nondum aedificatae};
+\node[text=IceWhite!38, font={\itshape\fontsize{7.5pt}{9pt}\selectfont}, align=center]
+  at (10.5,5.2)
+  {streaming ingestion · multi-tenancy · SHAP explanations (engines already aboard, awaiting orders)};
+\node[text=GoldLeaf!85, font={\itshape\fontsize{9pt}{10pt}\selectfont}] at (10.5,4.4)
+  {“Here be dragons — and a written roadmap for hunting them.”};
+
+% ── legend (bottom-left) ──
+\begin{scope}[shift={(1.6,2.0)}]
+  \node[text=IceWhite!70, font={\AccentFont\fontsize{7pt}{8pt}\selectfont}, anchor=west] at (0,1.5) {LEGENDA};
+  \fill[VioletDream] (0.12,1.0) circle (0.11); \node[text=IceWhite!75, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, anchor=west] at (0.38,1.0) {AI / intelligence};
+  \fill[NeonCyan!70!ElectricBlue] (0.12,0.55) circle (0.11); \node[text=IceWhite!75, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, anchor=west] at (0.38,0.55) {data};
+  \fill[GoldLeaf] (0.12,0.1) circle (0.11); \node[text=IceWhite!75, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, anchor=west] at (0.38,0.1) {interface};
+  \fill[NeonMint!70!RegistrarGreen] (3.1,1.0) circle (0.11); \node[text=IceWhite!75, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, anchor=west] at (3.36,1.0) {infrastructure};
+  \node[text=IceWhite!75, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, anchor=west] at (3.1,0.55) {size $=$ importance};
+  \node[text=IceWhite!75, font=\ttfamily\fontsize{6.5pt}{7pt}\selectfont, anchor=west] at (3.1,0.1) {$\star$ = the flagship};
+\end{scope}
+
+% ── survey stamp (bottom-right) ──
+\node[rotate=-5, text=GoldLeaf, draw=GoldLeaf, double, double distance=1pt,
+  line width=0.8pt, rounded corners=1.5mm, inner xsep=7pt, inner ysep=4pt,
+  font=\ttfamily\bfseries\fontsize{8pt}{9pt}\selectfont, align=center]
+  at (17.2,2.2) {SURVEYED \&\\VERIFIED};
+
+\node[text=IceWhite!40, font=\ttfamily\fontsize{6pt}{7pt}\selectfont] at (10.5,1.1)
+  {\ProjectName\ · \ProjectTagline\ · every number shows its work};
+
+\end{tikzpicture}
+\end{document}

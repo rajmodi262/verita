@@ -1,0 +1,108 @@
+% ══════════════════════════════════════════════════════════════════
+%  THE UNIVERSAL ONE-PAGER — the page that stays on their desk.
+%  One A4, both audiences, zero dependencies on other PDFs.
+% ══════════════════════════════════════════════════════════════════
+\documentclass[10pt]{article}
+\usepackage[a4paper, margin=0cm]{geometry}
+\input{../../00-design-system/masterpack-preamble.tex}
+\input{../../00-design-system/palette.tex}
+\input{../../00-design-system/identity.tex}
+\input{../../00-design-system/typography.tex}
+\input{../../00-design-system/components.tex}
+\input{../../00-design-system/backgrounds.tex}
+\pagestyle{empty}
+
+\begin{document}
+\begin{tikzpicture}[remember picture, overlay, shift={(current page.south west)}]
+\fill[PaperWhite] (0,0) rectangle (21,29.7);
+\fill[ElectricBlue] (0,0) rectangle (0.42,29.7);
+\fill[GoldLeaf] (0,26.2) rectangle (0.42,29.7);
+
+% ── header ──
+\node[anchor=west, text=CarbonInk, font={\DisplayFont\fontsize{36pt}{38pt}\selectfont}] at (1.5,27.8) {VERITA};
+\node[anchor=west, text=FogGray, font={\AccentFont\lsstyle\fontsize{8pt}{9pt}\selectfont}] at (1.55,26.7)
+  {\MakeUppercase{\ProjectTagline\ · built for \TheCompany\ by \MyName}};
+\node[anchor=east, text=CarbonInk, font=\ttfamily\fontsize{7pt}{10pt}\selectfont, align=right] at (19.6,27.6)
+  {\MyEmail\\\MyGithub};
+
+\draw[CarbonInk, line width=1pt] (1.5,26.1) -- (19.6,26.1);
+
+% ── the one sentence ──
+\node[anchor=west, text=CarbonInk, font={\itshape\fontsize{11.5pt}{14pt}\selectfont}, text width=17.6cm] at (1.5,25.2)
+  {Upload any financial dataset $\rightarrow$ an instant, editable, BI-grade dashboard.
+   Real ML fraud scoring with honest metrics. An autonomous investigator that seals its
+   reasoning in a tamper-evident chain. \textbf{Every number shows its work.}};
+
+% ── three pillars ──
+\foreach \x/\t/\c/\a/\b in {
+  1.5/{AUTO-DASHBOARD STUDIO}/ElectricBlue/{file drop $\rightarrow$ profiled, editable dashboard in seconds}/{quality grading · key findings with p-values · forecasts with backtest MAPE · SQL console · geo-map · PDF report},
+  7.7/{FCC RISK ENGINE}/VioletDream/{GradientBoosting + IsolationForest, \StatTxns\ real txns}/{held-out ROC-AUC \StatRocAuc\ · PR-AUC \StatPrAuc\ · live threshold slider · ranked AML alert queue · honest under 0.17\% imbalance},
+  13.9/{THE INVESTIGATOR $\star$}/GoldLeaf/{autonomous agent that shows its work}/{plans hypotheses · tests each with real SQL · writes a cited memo · SHA-256 chains every step — doctor one, the chain snaps}}{
+  \begin{scope}[shift={(\x,18.6)}]
+    \fill[\c!7!PaperWhite, rounded corners=2.5pt] (0,0) rectangle (5.7,4.9);
+    \draw[\c, line width=1.2pt, rounded corners=2.5pt] (0,0) rectangle (5.7,4.9);
+    \node[anchor=north west, text=\c!85!CarbonInk, font={\AccentFont\bfseries\fontsize{8.5pt}{9.5pt}\selectfont}] at (0.25,4.6) {\t};
+    \node[anchor=north west, text=CarbonInk, font={\itshape\fontsize{7.4pt}{8.8pt}\selectfont}, text width=5.2cm] at (0.25,3.95) {\a};
+    \node[anchor=north west, text=CarbonInk!80, font=\fontsize{7.2pt}{9.6pt}\selectfont, text width=5.2cm] at (0.25,2.95) {\b};
+  \end{scope}
+}
+
+% ── the honest numbers strip ──
+\fill[CarbonInk] (1.5,15.6) rectangle (19.6,17.8);
+\foreach \x/\v/\l in {3.3/\StatTests/{tests in CI}, 6.6/\StatRocAuc/{held-out AUC},
+  9.9/\StatJawDrop/{flagship features}, 13.2/\StatBootSec s/{model boot},
+  16.5/\StatFabricated/{fabricated metrics}}{
+  \node[text=GoldLeaf, font={\DisplayFont\fontsize{16pt}{17pt}\selectfont}] at (\x,17.0) {\v};
+  \node[text=IceWhite!75, font=\ttfamily\fontsize{6.4pt}{7pt}\selectfont] at (\x,16.2) {\l};
+}
+
+% ── why it matters (left) + stack (right) ──
+\node[anchor=north west, text=CarbonInk, font={\AccentFont\bfseries\lsstyle\fontsize{8.5pt}{9.5pt}\selectfont}] at (1.5,14.9) {WHY IT MATTERS};
+\node[anchor=north west, text=CarbonInk, font=\fontsize{8pt}{11.4pt}\selectfont, text width=10.6cm] at (1.5,14.3)
+  {In financial crime \& compliance, an AI that can't explain itself isn't a tool —
+   it's a liability. Regulators don't accept “the algorithm said so.” Verita is built
+   for that constraint: every metric carries its formula, every model reports honest
+   held-out error, and the AI investigation arrives sealed — re-runnable by anyone,
+   tamper-evident to everyone. Auditability isn't a feature here. It's the architecture.\\[2.5mm]
+   \textbf{And it maps to your JD line by line} — dashboards, forecasting, hypothesis
+   testing, NLP, GenAI, SQL, datamarts: every keyword has a shipped feature behind it
+   (\texttt{JD\_FEATURE\_MAP.md} in the repo).};
+
+\node[anchor=north west, text=CarbonInk, font={\AccentFont\bfseries\lsstyle\fontsize{8.5pt}{9.5pt}\selectfont}] at (13.2,14.9) {THE STACK};
+\node[anchor=north west, text=CarbonInk, font=\ttfamily\fontsize{7.2pt}{11.2pt}\selectfont, text width=6.3cm] at (13.2,14.3)
+  {Python · FastAPI · pandas\\
+   scikit-learn · SciPy · DuckDB\\
+   PostgreSQL · Docker · CI/CD\\
+   React 18 · TypeScript · ECharts\\
+   Three.js · Prometheus · Grafana\\
+   GenAI: Gemini w/ honest fallback};
+
+% ── the chain (visual signature) ──
+\foreach \x in {1.9,3.4,...,19.0}{\fill[GoldLeaf] (\x,8.6) circle (0.12);}
+\foreach \x in {2.65,4.15,...,18.4}{\draw[GoldLeaf, line width=0.9pt] ({\x-0.55},8.6) -- ({\x+0.55},8.6);}
+\node[text=FoilGold!80!CarbonInk, font=\ttfamily\fontsize{6.4pt}{7pt}\selectfont] at (10.5,8.1)
+  {sha256 chain: each step's hash folds in the last — the signature move, and the thesis};
+
+% ── try it + the close ──
+\fill[IceWhite, rounded corners=3pt] (1.5,4.6) rectangle (12.4,7.4);
+\draw[CarbonInk, line width=0.9pt, rounded corners=3pt] (1.5,4.6) rectangle (12.4,7.4);
+\node[anchor=north west, text=CarbonInk, font={\AccentFont\bfseries\fontsize{8pt}{9pt}\selectfont}] at (1.8,7.1) {TRY IT IN 60 SECONDS};
+\node[anchor=north west, text=CarbonInk, font=\ttfamily\fontsize{7.4pt}{11pt}\selectfont,
+  align=left, text width=10.1cm] at (1.8,6.55)
+  {\$ git clone \MyGithub\\
+   \$ start.bat\ \ \#\ one click: both servers, zero config\\
+   then drop ANY csv — including one of yours};
+
+\fill[GoldLeaf!15, rounded corners=3pt] (13.0,4.6) rectangle (19.6,7.4);
+\draw[GoldLeaf, line width=1.1pt, rounded corners=3pt] (13.0,4.6) rectangle (19.6,7.4);
+\node[text=CarbonInk, font={\itshape\fontsize{8.6pt}{11pt}\selectfont}, align=center, text width=6.0cm] at (16.3,6.0)
+  {“Others promised.\\I shipped — for you, specifically.”};
+
+\node[text=FogGray, font=\ttfamily\fontsize{6.4pt}{7.5pt}\selectfont] at (10.5,3.4)
+  {this page is yours to keep · every claim on it is verifiable from the repo · corrections welcomed, genuinely};
+
+\node[text=CarbonInk, font={\DisplayFont\fontsize{10pt}{11pt}\selectfont}] at (10.5,2.2)
+  {EVERY NUMBER SHOWS ITS WORK.};
+
+\end{tikzpicture}
+\end{document}

@@ -186,8 +186,9 @@ export default function Hero() {
 
       {/* Floating stat chips */}
       <FloatingChip label="transactions analyzed" value="284K" delay={0.6} style={{ top: 104, left: 40 }} />
-      <FloatingChip label="ROC-AUC" value="0.97" delay={1.1} style={{ top: 150, right: 48 }} />
-      <FloatingChip label="fraud caught" value="0.17%" delay={1.5} style={{ bottom: 120, right: 56 }} />
+      <FloatingChip label="ROC-AUC · held-out" value="0.913" delay={1.1} style={{ top: 150, right: 48 }} />
+      <FloatingChip label="PR-AUC · imbalanced" value="0.65" delay={1.5} style={{ bottom: 170, left: 52 }} />
+      <FloatingChip label="fraud prevalence" value="0.17%" delay={1.9} style={{ bottom: 120, right: 56 }} />
 
       {/* Headline block */}
       <motion.div

@@ -55,6 +55,9 @@ class RiskEngine:
     y_proba: np.ndarray | None = None
     feature_names: list[str] = field(default_factory=list)
     importances: list[dict[str, Any]] = field(default_factory=list)
+    # SHAP — TreeExplainer (exact for GBM, no approximation)
+    shap_importances: list[dict[str, Any]] = field(default_factory=list)
+    shap_sample: dict[str, Any] = field(default_factory=dict)
 
     def train(self) -> None:
         ds = load_dataset()
@@ -100,6 +103,47 @@ class RiskEngine:
             ds.source, roc_auc_score(self.y_test, self.y_proba),
         )
 
+        # —— SHAP: TreeExplainer gives exact attributions for GBM (no kernel approximation) ——
+        # Computed once at train time; stored in the joblib cache so subsequent boots pay no
+        # extra cost. Closes the 'black box at the model layer' gap in the product thesis.
+        try:
+            import shap  # pip install shap>=0.46
+            shap_cap = min(len(X_te), 2000)  # SHAP is O(samples × n_tree_nodes) — cap is safe
+            Xi_shap = X_te.iloc[:shap_cap]
+            explainer = shap.TreeExplainer(self.clf)
+            shap_values = explainer.shap_values(Xi_shap)  # ndarray (n_samples, n_features)
+            # Global explanation: mean |SHAP| per feature, sorted descending
+            self.shap_importances = sorted(
+                [
+                    {
+                        "feature": f,
+                        "mean_abs_shap": round(float(np.abs(shap_values[:, i]).mean()), 5),
+                    }
+                    for i, f in enumerate(self.feature_names)
+                ],
+                key=lambda x: x["mean_abs_shap"],
+                reverse=True,
+            )
+            # Sample explanation: first 20 rows for waterfall charts in the UI
+            n_sample = min(20, shap_cap)
+            self.shap_sample = {
+                "values": shap_values[:n_sample].tolist(),
+                # expected_value may be an ndarray in some shap versions — extract scalar safely
+                "base_value": float(np.asarray(explainer.expected_value).flat[0]),
+                "feature_names": self.feature_names,
+                "data": Xi_shap.iloc[:n_sample].values.tolist(),
+            }
+            logger.info(
+                "SHAP TreeExplainer computed for %d features (top: %s = %.4f)",
+                len(self.feature_names),
+                self.shap_importances[0]["feature"] if self.shap_importances else "?",
+                self.shap_importances[0]["mean_abs_shap"] if self.shap_importances else 0,
+            )
+        except ImportError:
+            logger.warning("shap not installed — SHAP explanations unavailable. Run: pip install shap>=0.46")
+        except Exception as e:
+            logger.warning("SHAP computation failed: %s", e)
+
     # ── metrics ──────────────────────────────────────────────────────────────
     def metrics(self, threshold: float = 0.5) -> dict[str, Any]:
         assert self.y_test is not None and self.y_proba is not None
@@ -129,10 +173,60 @@ class RiskEngine:
             "roc_curve": _downsample_curve(fpr, tpr),
             "pr_curve": _downsample_curve(rec, prec),
             "feature_importance": self._feature_importance(),
+            # SHAP — empty lists/dict if shap is not installed; UI handles gracefully
+            "shap_importances": self.shap_importances,
+            "shap_available": bool(self.shap_importances),
         }
 
     def _feature_importance(self) -> list[dict[str, Any]]:
         return self.importances or [{"feature": f, "importance": 0.0} for f in self.feature_names]
+
+    def cross_validate(self) -> dict[str, Any]:
+        """
+        5-fold stratified cross-validation on the full dataset.
+        Each fold has the same class ratio (stratify=y). Returns per-fold ROC-AUC,
+        mean ± std, and an interpretation string.
+
+        This is the honest stability test — a single train/test split could be a
+        lucky partition. If mean ± std is consistent with the held-out 0.913,
+        the score is credible. If they diverge, that's an honest finding too.
+        """
+        from sklearn.model_selection import StratifiedKFold, cross_val_score
+
+        ds = load_dataset()
+        # Fresh classifier — same hyperparams as production but trained from scratch each fold.
+        # Using self.clf would leak test data into the fold estimates.
+        clf_fresh = GradientBoostingClassifier(
+            n_estimators=120, max_depth=3, learning_rate=0.12, subsample=0.85, random_state=42
+        )
+        kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        scores = cross_val_score(
+            clf_fresh, ds.X, ds.y, cv=kf, scoring="roc_auc", n_jobs=-1
+        )
+        held_out = round(float(roc_auc_score(self.y_test.to_numpy(), self.y_proba)), 4) if self.y_test is not None else None
+        mean_cv = round(float(scores.mean()), 4)
+        std_cv = round(float(scores.std()), 4)
+        consistent = held_out is None or abs(held_out - mean_cv) <= 2 * std_cv
+        return {
+            "method": "5-fold stratified cross-validation",
+            "metric": "ROC-AUC",
+            "n_folds": 5,
+            "scores": [round(float(s), 4) for s in scores],
+            "mean": mean_cv,
+            "std": std_cv,
+            "held_out_score": held_out,
+            "consistent_with_held_out": consistent,
+            "interpretation": (
+                f"Model is stable: {mean_cv:.3f} ± {std_cv:.3f} across 5 folds. "
+                + (
+                    f"The held-out score ({held_out}) is "
+                    + ("consistent with" if consistent else "outside")
+                    + f" the CV range [{mean_cv - 2*std_cv:.3f}, {mean_cv + 2*std_cv:.3f}]."
+                    if held_out is not None
+                    else ""
+                )
+            ),
+        }
 
     # ── alert queue ──────────────────────────────────────────────────────────
     def alerts(self, threshold: float = 0.5, limit: int = 25) -> dict[str, Any]:
@@ -187,6 +281,8 @@ def _save(engine: "RiskEngine") -> None:
                 "clf": engine.clf, "iforest": engine.iforest, "feature_names": engine.feature_names,
                 "X_test": engine.X_test, "y_test": engine.y_test, "y_proba": engine.y_proba,
                 "importances": engine.importances,
+                "shap_importances": engine.shap_importances,  # global SHAP summary
+                "shap_sample": engine.shap_sample,            # per-row waterfall data
                 "source": engine.dataset.source, "description": engine.dataset.description,
                 "transactions": engine.dataset.transactions,
             },
@@ -207,6 +303,8 @@ def _load() -> "RiskEngine | None":
             clf=d["clf"], iforest=d["iforest"], feature_names=d["feature_names"],
             X_test=d["X_test"], y_test=d["y_test"], y_proba=d["y_proba"],
             importances=d.get("importances", []),
+            shap_importances=d.get("shap_importances", []),  # graceful fallback for old caches
+            shap_sample=d.get("shap_sample", {}),
         )
         eng.dataset = Dataset(X=None, y=None, source=d["source"], description=d["description"], transactions=d["transactions"])  # type: ignore[arg-type]
         logger.info("Risk engine loaded from cache (%s)", _MODEL_PATH)

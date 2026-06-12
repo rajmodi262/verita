@@ -1,0 +1,86 @@
+% ══════════════════════════════════════════════════════════════════
+%  THE OFFER LETTER — the comedic closing move.
+%  The candidate "offers" Wolters Kluwer the position of employer.
+%  Deploy ONLY if the room has laughed at least twice. A4.
+% ══════════════════════════════════════════════════════════════════
+\documentclass[11pt]{article}
+\usepackage[a4paper, margin=2.6cm, top=3.2cm]{geometry}
+\input{../00-design-system/masterpack-preamble.tex}
+\input{../00-design-system/palette.tex}
+\input{../00-design-system/identity.tex}
+\input{../00-design-system/typography.tex}
+\input{../00-design-system/components.tex}
+\input{../00-design-system/backgrounds.tex}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3mm}
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{tikzpicture}[remember picture, overlay]
+  \fill[GoldLeaf] (current page.north west) rectangle ($(current page.north east)+(0,-0.42)$);
+  \node[anchor=north east, text=FogGray, font=\ttfamily\fontsize{7pt}{9pt}\selectfont]
+    at ($(current page.north east)+(-2.6,-1.1)$) {STRICTLY UNOFFICIAL · DEPLOY WITH A SMILE};
+\end{tikzpicture}
+
+{\DisplayFont\SizeTitle{OFFER OF EMPLOYMENT}}\\[-1mm]
+{\AccentFont\lsstyle\SizeMicro{\MakeUppercase{from the office of \MyName, dept.\ of optimistic paperwork}}}
+
+\vspace{6mm}
+
+Dear \TheCompany,
+
+After a rigorous interview process (today), careful review of your qualifications
+(market leader in trust-critical software, excellent taste in job descriptions),
+and consultation with my advisory board (one AI assistant; it concurred), I am
+delighted to extend to you the position of:
+
+\begin{center}
+{\DisplayFont\SizeHeadline{MY EMPLOYER}}\\[1mm]
+{\AccentFont\lsstyle\SizeMicro{FULL-TIME · EFFECTIVE IMMEDIATELY · FCC DATA SCIENCE DIVISION}}
+\end{center}
+
+\textbf{Your responsibilities will include:}
+\begin{itemize}[leftmargin=6mm, itemsep=1.2mm]
+  \item Providing one (1) desk, within reasonable distance of the data
+  \item Supplying problems significantly harder than the ones I could invent alone
+  \item Conducting code reviews of a thoroughness I have so far only simulated
+  \item Tolerating an intern who brings printed documents to everything
+\end{itemize}
+
+\textbf{In exchange, you will receive:}
+\begin{itemize}[leftmargin=6mm, itemsep=1.2mm]
+  \item One pre-trained intern (warm-boot time: \StatBootSec\ seconds, like the model)
+  \item A working FCC analytics platform's worth of demonstrated judgment
+  \item \StatTests\ tests' worth of paranoia, applied to your benefit
+  \item The phrase “every number shows its work,” installed in your building
+\end{itemize}
+
+\textbf{Compensation:} you already know what interns cost. I am asking for the
+internship, mentorship, and the hard problems. The leverage in this deal is
+entirely, embarrassingly, yours.
+
+This offer expires: never. But the candidate's availability might.
+
+\vspace{5mm}
+To accept, simply say the words every candidate dreams of:
+\emph{“When can you start?”}
+
+\vspace{8mm}
+Sincerely, and only half-joking,
+
+\vspace{7mm}
+{\DisplayFont\SizeLead{\MyName}}\\
+{\AccentFont\SizeMicro{\MakeUppercase{chief executive of exactly one candidacy}}}
+
+\vfill
+\begin{tikzpicture}
+  \node[rotate=-6, text=VermilionStamp, draw=VermilionStamp, double, double distance=1.2pt,
+    line width=1pt, rounded corners=2mm, inner xsep=10pt, inner ysep=6pt,
+    font=\ttfamily\bfseries\fontsize{11pt}{12pt}\selectfont] at (3.2,0) {PRE-APPROVED};
+  \node[anchor=west, text=FogGray, font=\ttfamily\fontsize{6.5pt}{8.5pt}\selectfont, align=left] at (6.4,0)
+    {HR note: this document is a bit. The candidacy is not.\\
+     All actual terms yours to define. The enthusiasm is binding.};
+\end{tikzpicture}
+
+\end{document}
