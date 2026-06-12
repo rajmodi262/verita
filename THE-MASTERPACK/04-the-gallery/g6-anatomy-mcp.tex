@@ -1,0 +1,117 @@
+% ══════════════════════════════════════════════════════════════════
+%  G6 — ANATOMY OF AN AI-ASSISTED BUILD  (biology-textbook plate)
+%  The MCP/tool anatomy, dissected and labeled. A4 portrait.
+% ══════════════════════════════════════════════════════════════════
+\documentclass[10pt]{article}
+\usepackage[a4paper, margin=0cm]{geometry}
+\input{../00-design-system/masterpack-preamble.tex}
+\input{../00-design-system/palette.tex}
+\input{../00-design-system/identity.tex}
+\input{../00-design-system/typography.tex}
+\input{../00-design-system/components.tex}
+\input{../00-design-system/backgrounds.tex}
+\pagestyle{empty}
+
+\begin{document}
+\begin{tikzpicture}[remember picture, overlay, shift={(current page.south west)}]
+\fill[PaperWhite] (0,0) rectangle (21,29.7);
+\begin{scope}[opacity=0.3]\topography{0.4}\end{scope}
+
+% textbook plate header
+\node[text=CarbonInk, font={\DisplayFont\fontsize{16pt}{18pt}\selectfont}] at (10.5,28.5)
+  {PLATE VII — ANATOMY OF THE AI-ASSISTED BUILD};
+\node[text=FogGray, font={\itshape\fontsize{8.5pt}{9.5pt}\selectfont}] at (10.5,27.85)
+  {Fig. 1. The organism in cross-section, with the Model Context Protocol dissected};
+\draw[CarbonInk, line width=0.7pt] (2.4,27.5) -- (18.6,27.5);
+
+% ── CLASSIFICATION box (top right, science-nerd funny) ──
+\begin{scope}[shift={(13.6,21.6)}]
+  \fill[IceWhite] (0,0) rectangle (5.6,5.4);
+  \draw[CarbonInk, line width=0.9pt] (0,0) rectangle (5.6,5.4);
+  \node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{7.5pt}{8pt}\selectfont, anchor=west] at (0.25,5.0) {CLASSIFICATION};
+  \draw[CarbonInk, line width=0.5pt] (0.25,4.75) -- (5.35,4.75);
+  \node[text=CarbonInk, font=\ttfamily\fontsize{6.8pt}{10.6pt}\selectfont, anchor=north west, align=left] at (0.25,4.55)
+    {Kingdom\ \ \ Software\\
+     Phylum\ \ \ \ API Protocols\\
+     Class\ \ \ \ \ \ Model Context Protocols\\
+     Order\ \ \ \ \ \ Claude Integrations\\
+     Family\ \ \ \ \ Build Toolchains\\
+     Species\ \ \ \ \textit{verita assistentia}\\
+     Discovered\ \MyName, \TodayYear};
+\end{scope}
+
+% ── the organism: developer + AI + project as a body ──
+% the brain (developer judgment)
+\coordinate (BRAIN) at (7.0,23.6);
+\fill[GoldLeaf!25] (BRAIN) ellipse (2.1 and 1.5);
+\draw[CarbonInk, line width=1.1pt] (BRAIN) ellipse (2.1 and 1.5);
+\draw[CarbonInk, line width=0.6pt] (5.7,24.25) .. controls (6.4,24.85) and (7.6,24.8) .. (8.3,24.15);
+\draw[CarbonInk, line width=0.6pt] (6.0,24.55) .. controls (6.6,25.0) and (7.4,25.0) .. (8.0,24.5);
+\node[text=CarbonInk, font={\AccentFont\bfseries\fontsize{8pt}{9pt}\selectfont}, align=center]
+  at (BRAIN) {THE BRAIN\\\SizeMicro{(human judgment)}};
+
+% the heart (claude code)
+\coordinate (HEART) at (7.0,18.8);
+\fill[VioletDream!22] (HEART) circle (1.5);
+\draw[CarbonInk, line width=1.1pt] (HEART) circle (1.5);
+\draw[VioletDream, line width=1pt] (6.0,18.8) -- (6.5,18.8) -- (6.75,19.35) -- (7.2,18.25) -- (7.45,18.8) -- (8.0,18.8);
+\node[text=CarbonInk, font={\AccentFont\bfseries\fontsize{8pt}{9pt}\selectfont}, align=center]
+  at ($(HEART)+(0,-0.55)$) {THE HEART\\\SizeMicro{(Claude Code)}};
+
+% the hands (tools/MCPs) — three appendages
+\coordinate (H1) at (3.0,14.6);
+\coordinate (H2) at (7.0,13.9);
+\coordinate (H3) at (11.0,14.6);
+\foreach \h/\t/\sub in {H1/{FILE TOOLS}/{reads · writes · refactors},
+  H2/{TERMINAL}/{runs tests · git · servers}, H3/{BROWSER MCP}/{sees the rendered truth}}{
+  \fill[NeonCyan!14] (\h) ellipse (1.45 and 0.95);
+  \draw[CarbonInk, line width=1pt] (\h) ellipse (1.45 and 0.95);
+  \node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.8pt}{7.5pt}\selectfont] at ($(\h)+(0,0.18)$) {\t};
+  \node[text=FogGray, font={\itshape\fontsize{6pt}{6.6pt}\selectfont}] at ($(\h)+(0,-0.28)$) {\sub};
+}
+
+% circulation: brain <-> heart <-> hands
+\draw[-{Stealth}, GoldLeaf!70!CarbonInk, line width=1.3pt] ($(BRAIN)+(0,-1.55)$) -- ($(HEART)+(0,1.55)$);
+\draw[-{Stealth}, VioletDream, line width=1.3pt] ($(HEART)+(0.35,1.5)$) -- ($(BRAIN)+(0.35,-1.45)$);
+\node[text=CarbonInk, font={\itshape\fontsize{6.3pt}{7pt}\selectfont}, anchor=west] at (7.55,21.2) {intent $\downarrow$ · drafts $\uparrow$};
+\foreach \h in {H1,H2,H3}
+  \draw[{Stealth}-{Stealth}, NeonCyan!60!CarbonInk, line width=1pt] ($(HEART)+(0,-1.5)$) -- ($(\h)+(0,0.95)$);
+
+% the immune system (tests) — antibodies around everything
+\foreach \p/\r in {(2.2,20.5)/0, (12.0,21.6)/15, (11.6,17.4)/-10, (2.6,17.0)/8, (12.4,19.6)/5}{
+  \node[text=RegistrarGreen, rotate=\r, font=\fontsize{10pt}{10pt}\selectfont] at \p {\faShieldVirus};
+}
+\node[text=RegistrarGreen, font={\itshape\fontsize{6.8pt}{7.5pt}\selectfont}, align=center] at (2.4,19.6)
+  {immune system:\\82 antibodies (tests)\\attacks its own organs\\on every commit};
+
+% ── dissection labels with leader lines (the textbook look) ──
+\newcommand{\leaderlabel}[4]{ % from, to, align side (west/east), text
+  \draw[CarbonInk, line width=0.5pt] #1 -- #2;
+  \fill[CarbonInk] #1 circle (1.2pt);
+  \node[text=CarbonInk, font={\itshape\fontsize{7pt}{8.2pt}\selectfont}, anchor=#3, align=left] at #2 {#4};
+}
+\leaderlabel{(8.6,25.0)}{(10.3,26.3)}{south west}{Fig. 1a — judgment lobe.\\Decides WHAT and WHY.\\Cannot be delegated.}
+\leaderlabel{(5.7,18.0)}{(3.3,17.5)}{north east}{Fig. 1b — the amplifier.\\Trusted exactly as far as\\the immune system allows.}
+
+% ── how it was used HERE (the 5 bullets, project-specific) ──
+\fill[IceWhite, rounded corners=3pt] (2.2,6.6) rectangle (18.8,12.2);
+\draw[CarbonInk, line width=0.9pt, rounded corners=3pt] (2.2,6.6) rectangle (18.8,12.2);
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{8pt}{9pt}\selectfont, anchor=west] at (2.6,11.75)
+  {FIELD NOTES — OBSERVED BEHAVIOR IN THE VERITA BUILD};
+\draw[CarbonInk, line width=0.5pt] (2.6,11.5) -- (18.4,11.5);
+\node[text=CarbonInk, font=\fontsize{7.8pt}{12.4pt}\selectfont, anchor=north west, text width=15.7cm, align=left] at (2.6,11.25)
+  {\textbf{1.} Subject drafted the FastAPI scaffolding and ECharts option generators; human reviewed and reshaped every module boundary.\\
+   \textbf{2.} Subject was ordered to \emph{attack} the SQL guard; the resulting adversarial corpus caught a real file-read vulnerability. Symbiosis at its finest.\\
+   \textbf{3.} Subject proposed a metric "fix" that quietly evaluated on training data. Human immune response: rejected, documented, turned into a war story.\\
+   \textbf{4.} Subject explained unfamiliar organs (joblib persistence, additive blending, Welch's correction) until the human could re-derive them unaided.\\
+   \textbf{5.} Every output passed through the review gate: nothing ships that the human cannot explain line-by-line. The brain remains in charge of the body.};
+
+% specimen footer
+\node[text=FogGray, font={\itshape\fontsize{7pt}{8pt}\selectfont}] at (10.5,5.6)
+  {Specimen collected in the wild, \TodayYear. No black boxes were harmed — none were permitted to exist.};
+
+\node[text=FogGray, font=\ttfamily\fontsize{6pt}{7pt}\selectfont] at (10.5,1.3)
+  {\ProjectName\ · natural history of a transparent build · plate drawn from life};
+
+\end{tikzpicture}
+\end{document}

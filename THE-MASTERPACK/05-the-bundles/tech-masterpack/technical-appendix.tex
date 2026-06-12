@@ -1,0 +1,114 @@
+% ══════════════════════════════════════════════════════════════════
+%  TECHNICAL APPENDIX — the deep-dive addendum. Hand it over ONLY
+%  when a technical interviewer goes past page 10. 4 pages, dense.
+% ══════════════════════════════════════════════════════════════════
+\documentclass[10pt]{article}
+\usepackage[a4paper, margin=1.9cm, bottom=2.2cm]{geometry}
+\input{../../00-design-system/masterpack-preamble.tex}
+\input{../../00-design-system/palette.tex}
+\input{../../00-design-system/identity.tex}
+\input{../../00-design-system/typography.tex}
+\input{../../00-design-system/components.tex}
+\input{../../00-design-system/backgrounds.tex}
+\setlength{\parindent}{0pt}
+\pagestyle{fancy}
+\bundlefooter{\MyName\ · \ProjectName}{TECHNICAL APPENDIX}
+
+\begin{document}
+
+\begin{center}
+{\DisplayFont\SizeHeadline{TECHNICAL APPENDIX}}\\[1mm]
+{\AccentFont\lsstyle\textcolor{FogGray}{FOR THE INTERVIEWER WHO WENT PAST PAGE 10. RESPECT.}}
+\end{center}
+\vspace{4mm}
+
+% ── A. The hash chain, precisely ──
+\masterterm{A. The hash chain, precisely}{construction, properties, and honest limits}
+\masterterminal{agent/trace.py — the construction}{%
+step\_record = \{hypothesis, sql, statistic, verdict, ts\}\\
+canonical\ \ \ = json.dumps(step\_record, sort\_keys=True)\\
+step\_hash\ \ \ = sha256(prev\_hash + canonical).hexdigest()\\
+chain.append(\{**step\_record, "hash": step\_hash\})\\
+\# verify: replay the fold; any edit $\Rightarrow$ every later hash mismatches}
+\vspace{2mm}
+\SizeBody{\textbf{Guarantees:} integrity after sealing (tamper-evidence) and
+\emph{reproducibility} — each step embeds its literal SQL and statistics, so a
+verifier can re-run every query against the same dataset and reproduce the verdicts.\\
+\textbf{Non-guarantees, stated before you ask:} execution attestation (mitigated by
+re-runnability), author authentication (production answer: signing keys), and
+storage-level rewrite of the entire chain plus root (production answer: anchor the
+root hash externally). Tamper tests in CI attempt forgery on every commit.}
+
+\vspace{4mm}
+% ── B. Model card ──
+\masterterm{B. Risk model card}{the honest one-pager regulators wish every model had}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily}p{4.6cm} X@{}}
+\rowcolor{IceWhite} data & ULB credit-card fraud, \StatTxns\ transactions, 0.17\% positive class; synthetic-but-labeled fallback when absent (reported in UI) \\
+algorithm & GradientBoostingClassifier + IsolationForest (anomaly stream) \\
+\rowcolor{IceWhite} features & 8 engineered: amount\_log, hour, velocity, channel/geo/kyc risk encodings, account age \\
+split & stratified hold-out; \textbf{no metric is ever reported on training data} \\
+\rowcolor{IceWhite} metrics & ROC-AUC \StatRocAuc\ · PR-AUC \StatPrAuc\ (the honest one under imbalance) \\
+threshold & user-tunable, live precision/recall trade-off; a policy choice, deliberately not hardcoded \\
+\rowcolor{IceWhite} persistence & joblib artifact + metadata; warm boot \StatBootSec s (vs 21\,s retrain) \\
+known limits & global (not per-tenant) model; no drift monitoring yet; temporal split is the named V2 upgrade for production realism \\
+\end{tabularx}
+
+\vspace{4mm}
+% ── C. SQL sandbox, attack-tree style ──
+\masterterm{C. SQL sandbox defense map}{four layers, one scar}
+\SizeBody{%
+\textbf{L1 — engine:} DuckDB \texttt{enable\_external\_access=False} — filesystem
+unreachable even if all other layers fail. The load-bearing wall.\\
+\textbf{L2 — guard:} SELECT-only allowlist · comment rejection (smuggling vector) ·
+catalog/schema-probe denial · table-function blocklist (\texttt{read\_csv} et al.).\\
+\textbf{L3 — resources:} result-row cap, execution timeout, per-IP rate limit upstream.\\
+\textbf{L4 — verification:} adversarial corpus in CI; grew by one entry the day it
+caught a real file-read vulnerability in my own guard. The attack is now a permanent
+regression test. Enumerating badness fails; removing capability works.}
+
+\clearpage
+
+% ── D. Performance ledger ──
+\masterterm{D. Performance ledger}{measured, not vibes}
+\masterprogress{model warm boot — 0.36s (was 21s retrain)}{98}{NeonMint!70!RegistrarGreen}
+\masterprogress{profile, 200k-row sample guard — interactive}{90}{ElectricBlue}
+\masterprogress{DuckDB query, typical analyst SQL — milliseconds}{95}{NeonCyan!70!ElectricBlue}
+\masterprogress{dashboard re-render on drag (one panel, not twelve)}{88}{GoldLeaf}
+\masterprogress{3D hero: lazy chunk, never blocks first paint}{92}{VioletDream}
+\vspace{1mm}
+\SizeBody{Known ceilings, in failure order under load: synchronous profiling
+$\rightarrow$ dataset-cache memory $\rightarrow$ DuckDB concurrency. Fix order:
+async job queue $\rightarrow$ LRU + spill $\rightarrow$ per-user query caps.
+Postgres yawns at 10x. Full reasoning: war-room Q41–Q48.}
+
+\vspace{4mm}
+% ── E. Test inventory ──
+\masterterm{E. Test inventory (\StatTests\ total)}{where the paranoia concentrates}
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily}p{5.2cm} X@{}}
+\rowcolor{IceWhite} api contracts (pytest) & every endpoint: shape, status, unhappy paths, auth, rate limits \\
+profiling edge cases & mixed-format dates, numeric IDs, constant columns, all-null columns \\
+\rowcolor{IceWhite} adversarial SQL corpus & injection museum: comments, catalogs, file functions, stacked queries — 1 real catch \\
+hash-chain tamper suite & forge a step, reorder steps, truncate chain — all must be detected \\
+\rowcolor{IceWhite} metrics discipline & asserts held-out evaluation; the test that would catch a training-set swap \\
+frontend (vitest) & chart options logic, error boundaries, insight panel rendering \\
+\end{tabularx}
+
+\vspace{4mm}
+% ── F. The roadmap with receipts ──
+\masterterm{F. V2, with receipts}{already in requirements.txt, not in slides}
+\SizeBody{%
+\textbf{SHAP} per-prediction explanations — completes show-your-work at the model
+layer; waterfall panel designed for the Risk page.\\
+\textbf{XGBoost + LightGBM + Optuna} — the model tournament: same honest backtest
+selection as forecasting, stronger competitors, tuned not hand-set.\\
+\textbf{Async ingestion} — queue + progress events; kills the file-size ceiling.\\
+\textbf{Hypothesis} (property-based testing) — fuzz the profiler and the SQL guard
+with generated adversaries; paranoia, industrialized.}
+
+\vspace{5mm}
+\masterinsight{Standing offer: pick any subsystem on these four pages and ask for the
+whiteboard version. The appendix exists because “can you go deeper?” deserves
+“yes” in writing.}
+
+\end{document}

@@ -1,0 +1,90 @@
+% ══════════════════════════════════════════════════════════════════
+%  G8 — THE DECISION FIGHTS  (architecture choices as boxing posters)
+%  Four bouts, one undercard table. A4 portrait.
+% ══════════════════════════════════════════════════════════════════
+\documentclass[10pt]{article}
+\usepackage[a4paper, margin=0cm]{geometry}
+\input{../00-design-system/masterpack-preamble.tex}
+\input{../00-design-system/palette.tex}
+\input{../00-design-system/identity.tex}
+\input{../00-design-system/typography.tex}
+\input{../00-design-system/components.tex}
+\input{../00-design-system/backgrounds.tex}
+\pagestyle{empty}
+
+\begin{document}
+\begin{tikzpicture}[remember picture, overlay, shift={(current page.south west)}]
+\fill[CarbonInk] (0,0) rectangle (21,29.7);
+
+\node[text=GoldLeaf, font={\DisplayFont\fontsize{24pt}{26pt}\selectfont}] at (10.5,28.3)
+  {FIGHT NIGHT};
+\node[text=IceWhite!70, font={\AccentFont\fontsize{8pt}{9pt}\selectfont}] at (10.5,27.55)
+  {EVERY ARCHITECTURE DECISION SETTLED IN THE RING · JUDGED BY EVIDENCE ONLY};
+
+% ── bout poster macro ──
+% {x}{y} lower-left of 8.9 × 8.0 poster, {title}{blue corner}{red corner}{winner side: B/R}{verdict 5 words}{note}
+\newcommand{\bout}[8]{%
+\begin{scope}[shift={(#1,#2)}]
+  \fill[MidnightNavy, rounded corners=3pt] (0,0) rectangle (8.9,8.0);
+  \draw[GoldLeaf, line width=1.1pt, rounded corners=3pt] (0,0) rectangle (8.9,8.0);
+  % marquee title
+  \fill[GoldLeaf] (0.45,6.9) rectangle (8.45,7.6);
+  \node[text=CarbonInk, font={\DisplayFont\fontsize{9pt}{10pt}\selectfont}] at (4.45,7.25) {#3};
+  % the ring (ropes)
+  \draw[IceWhite!35, line width=0.7pt] (1.1,2.6) rectangle (7.8,5.9);
+  \draw[IceWhite!22, line width=0.7pt] (1.3,2.8) rectangle (7.6,5.7);
+  \foreach \cx/\cy in {1.1/2.6, 7.8/2.6, 1.1/5.9, 7.8/5.9} \fill[GoldLeaf] (\cx,\cy) circle (2pt);
+  % corners
+  \node[text=NeonCyan, font=\ttfamily\bfseries\fontsize{6.4pt}{7.2pt}\selectfont, align=center]
+    at (2.6,5.15) {BLUE CORNER\\[1pt]\fontsize{8.5pt}{9.5pt}\selectfont #4};
+  \node[text=CoralEmber, font=\ttfamily\bfseries\fontsize{6.4pt}{7.2pt}\selectfont, align=center]
+    at (6.3,5.15) {RED CORNER\\[1pt]\fontsize{8.5pt}{9.5pt}\selectfont #5};
+  \node[text=IceWhite!60, font={\DisplayFont\fontsize{10pt}{10pt}\selectfont}] at (4.45,4.9) {VS};
+  % winner + belt
+  \node[text=GoldLeaf, font=\ttfamily\bfseries\fontsize{7.5pt}{8.5pt}\selectfont] at (4.45,3.8) {WINNER: #6};
+  % championship belt
+  \fill[GoldLeaf] (3.45,3.0) rectangle (5.45,3.35);
+  \fill[GoldLeaf!60!CarbonInk] (4.45,3.17) circle (0.30);
+  \node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{5.5pt}{6pt}\selectfont] at (4.45,3.17) {\faTrophy};
+  \node[text=IceWhite!85, font=\ttfamily\fontsize{6.6pt}{7.4pt}\selectfont] at (4.45,2.15) {BY DECISION: #7};
+  \node[text=IceWhite!50, font={\itshape\fontsize{6.2pt}{7.4pt}\selectfont}, align=center, text width=8.0cm]
+    at (4.45,1.15) {#8};
+\end{scope}}
+
+\bout{1.2}{18.4}{MAIN EVENT: THE SQL ENGINE}{DUCKDB}{SQLITE}{DUCKDB}
+  {columnar speed, engine sandbox}
+  {SQLite is a fine champion of a different weight class. Analytics wants
+   columns; compliance wants \texttt{enable\_external\_access=False}. Unanimous cards.}
+
+\bout{10.9}{18.4}{CO-MAIN: THE AGENT'S SOUL}{DETERMINISTIC}{LLM-DRIVEN}{DETERMINISTIC}
+  {regulators replay plans, not vibes}
+  {The crowd wanted the flashy southpaw. The judges wanted a trace they could
+   re-run in court. Flash sells tickets; evidence wins titles.}
+
+\bout{1.2}{9.6}{THE METRICS BOUT}{HELD-OUT 0.913}{TRAINING 0.99}{HELD-OUT}
+  {the other guy was doping}
+  {Training-set scores test positive for data leakage every time.
+   Stripped of the belt before the first bell. This poster is a warning.}
+
+\bout{10.9}{9.6}{THE FRAMEWORK OPENER}{FASTAPI}{DJANGO / FLASK}{FASTAPI}
+  {typed contracts, free documentation}
+  {Django brought an ORM nobody ordered; Flask forgot its validation gloves.
+   Pydantic contracts landed clean all night.}
+
+% ── undercard: five more decisions, settled on paper ──
+\fill[IceWhite!8!CarbonInk, rounded corners=3pt] (1.2,2.6) rectangle (19.8,8.6);
+\draw[GoldLeaf!60, line width=0.8pt, rounded corners=3pt] (1.2,2.6) rectangle (19.8,8.6);
+\node[text=GoldLeaf, font=\ttfamily\bfseries\fontsize{8.5pt}{9.5pt}\selectfont, anchor=west] at (1.7,8.1) {THE UNDERCARD};
+\node[text=IceWhite!90, font=\ttfamily\fontsize{6.9pt}{11.5pt}\selectfont, anchor=north west, text width=17.6cm, align=left]
+  at (1.7,7.65)
+  {ECHARTS def.\ RECHARTS \hfill canvas survives 10k points; declarative specs let the backend compose charts\\
+   REACT-GRID-LAYOUT def.\ HAND-ROLLED DRAG \hfill bought physics, spent the week on features instead of collision bugs\\
+   POSTGRES def.\ MONGODB \hfill audit trails need schemas like courts need transcripts\\
+   3-MODEL TOURNAMENT def.\ PROPHET (no-show) \hfill honest selection beat heavyweight sophistication; rematch offered in V2\\
+   GEMINI-OPTIONAL def.\ GEMINI-REQUIRED \hfill no hidden dependencies; the fallback fights every CI night and never loses};
+
+\node[text=IceWhite!45, font=\ttfamily\fontsize{6pt}{7pt}\selectfont] at (10.5,1.5)
+  {\ProjectName\ promotions · all bouts scored by measurement · no decision left unexplained · tickets free, receipts included};
+
+\end{tikzpicture}
+\end{document}

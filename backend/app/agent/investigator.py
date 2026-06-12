@@ -15,6 +15,7 @@ final memo when a key is configured.
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 from typing import Any
@@ -76,6 +77,9 @@ def _step(id, title, action, query, result, finding, severity, confirmed) -> dic
     return {
         "id": id, "title": title, "action": action, "query": query,
         "result": result[:6], "finding": finding, "severity": severity, "confirmed": confirmed,
+        # ISO 8601 UTC timestamp — part of the hash payload so temporal ordering is auditable.
+        # A backdated replay on a different day produces different hashes.
+        "timestamp_utc": datetime.datetime.utcnow().isoformat() + "Z",
     }
 
 
@@ -219,10 +223,15 @@ _HYPOTHESES = [_h_geo, _h_channel, _h_structuring, _h_amount_concentration, _h_t
 
 # ── hash chain ───────────────────────────────────────────────────────────────
 
+# Keys committed to the hash — adding timestamp_utc means the chain proves
+# temporal ordering, not just content integrity.
+_CHAIN_KEYS = ("id", "title", "query", "finding", "severity", "confirmed", "timestamp_utc")
+
+
 def _chain(steps: list[dict]) -> dict[str, Any]:
     prev = "GENESIS"
     for s in steps:
-        payload = json.dumps({k: s[k] for k in ("id", "title", "query", "finding", "severity", "confirmed")},
+        payload = json.dumps({k: s[k] for k in _CHAIN_KEYS},
                              sort_keys=True, default=str)
         h = hashlib.sha256((prev + payload).encode()).hexdigest()
         s["prev_hash"], s["hash"] = prev, h
@@ -233,7 +242,7 @@ def _chain(steps: list[dict]) -> dict[str, Any]:
 def verify_chain(steps: list[dict]) -> bool:
     prev = "GENESIS"
     for s in steps:
-        payload = json.dumps({k: s[k] for k in ("id", "title", "query", "finding", "severity", "confirmed")},
+        payload = json.dumps({k: s[k] for k in _CHAIN_KEYS},
                              sort_keys=True, default=str)
         if hashlib.sha256((prev + payload).encode()).hexdigest() != s.get("hash"):
             return False

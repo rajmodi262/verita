@@ -1,0 +1,82 @@
+% ══════════════════════════════════════════════════════════════════
+%  COVER LETTER INSERT — one physical page, slid inside the HR bundle.
+%  A letter, not a form. Compile: xelatex, from this directory.
+% ══════════════════════════════════════════════════════════════════
+\documentclass[11pt]{article}
+\usepackage[a4paper, margin=2.6cm, top=3.0cm]{geometry}
+\input{../../00-design-system/masterpack-preamble.tex}
+\input{../../00-design-system/palette.tex}
+\input{../../00-design-system/identity.tex}
+\input{../../00-design-system/typography.tex}
+\input{../../00-design-system/components.tex}
+\input{../../00-design-system/backgrounds.tex}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3.2mm}
+\pagestyle{empty}
+
+\begin{document}
+
+% letterhead
+\begin{tikzpicture}[remember picture, overlay]
+  \fill[ElectricBlue] (current page.north west) rectangle ($(current page.north east)+(0,-0.42)$);
+  \node[anchor=north east, text=FogGray, font=\ttfamily\fontsize{7pt}{9pt}\selectfont, align=right]
+    at ($(current page.north east)+(-2.6,-1.2)$)
+    {\MyEmail\\\MyGithub\\\InterviewDate};
+\end{tikzpicture}
+
+{\DisplayFont\SizeTitle{\MyName}}\\[-1.5mm]
+{\AccentFont\lsstyle\SizeMicro{\MakeUppercase{re: \TheRole\ · \TheTeam}}}
+
+\vspace{6mm}
+
+Dear \TheCompany\ team,
+
+Most cover letters describe what the candidate would do if hired. I'd rather show
+you what I already did because you might hire me.
+
+When I read your posting for the \TheTeam\ internship, one phrase under the surface
+of every bullet caught me: your users must \emph{defend} their numbers — to auditors,
+to regulators, to courts. Every company is adding AI right now. Almost nobody is
+building the version a compliance officer could take into that room.
+
+So I spent \BuildWeeks\ weeks building it. \textbf{\ProjectName} turns any dataset
+into an editable, BI-grade dashboard in seconds; scores transactions with a fraud
+model whose metrics are honestly held-out (ROC-AUC \StatRocAuc\ on \StatTxns\ real
+transactions — and it tells you so on screen); and runs an autonomous investigator
+whose every step — hypothesis, SQL query, statistical verdict — is sealed into a
+SHA-256 chain. Alter one step afterward and the chain visibly breaks. Every number
+in the product can show its formula. There are exactly \StatFabricated\ fabricated
+metrics in it, enforced by \StatTests\ automated tests in CI.
+
+I built it with AI tooling, openly — reviewed line by line, verified claim by
+claim, with the division of labor documented in the technical bundle. I believe
+that's not a caveat but a preview: your industry's next decade is AI adoption
+without trust erosion, and I've been practicing exactly that discipline, alone, on
+purpose, for you.
+
+What I want from this internship is the part I can't self-teach: production scale,
+real institutional data, and the standards of people who've defended models to
+regulators. What you get is someone who arrives already running — and who treats
+“show your work” as a way of life, not a feature.
+
+The full evidence is attached: a working product, its documentation, and the
+presentation materials you're holding. I'd welcome the chance to be interrogated
+about any of it, at any depth.
+
+\vspace{4mm}
+With respect and a working demo,
+
+\vspace{8mm}
+{\DisplayFont\SizeLead{\MyName}}\\
+{\AccentFont\SizeMicro{\MakeUppercase{builder of \ProjectName\ · every number shows its work}}}
+
+\vfill
+\begin{center}
+\begin{tikzpicture}
+  \foreach \x in {0,1.1,...,7.7}{\fill[GoldLeaf] (\x,0) circle (0.075);}
+  \foreach \x in {0.55,1.65,...,7.2}{\draw[GoldLeaf, line width=0.6pt] ({\x-0.36},0) -- ({\x+0.36},0);}
+\end{tikzpicture}\\[1mm]
+{\color{FogGray}\ttfamily\fontsize{6.5pt}{8pt}\selectfont this letter is page zero of a sealed chain · the rest is verifiable}
+\end{center}
+
+\end{document}

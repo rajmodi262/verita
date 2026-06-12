@@ -1,0 +1,164 @@
+% ══════════════════════════════════════════════════════════════════
+%  G4 — THE PROCESSING WORKS  (the data pipeline as a Wonka factory)
+%  A4 landscape-feel on portrait: conveyor snake, whimsical machines.
+% ══════════════════════════════════════════════════════════════════
+\documentclass[10pt]{article}
+\usepackage[a4paper, margin=0cm]{geometry}
+\input{../00-design-system/masterpack-preamble.tex}
+\input{../00-design-system/palette.tex}
+\input{../00-design-system/identity.tex}
+\input{../00-design-system/typography.tex}
+\input{../00-design-system/components.tex}
+\input{../00-design-system/backgrounds.tex}
+\pagestyle{empty}
+
+\begin{document}
+\begin{tikzpicture}[remember picture, overlay, shift={(current page.south west)}]
+\fill[IceWhite] (0,0) rectangle (21,29.7);
+\begin{scope}[opacity=0.35]\topography{0.5}\end{scope}
+
+% factory sign
+\fill[CarbonInk, rounded corners=4pt] (3.0,27.0) rectangle (18.0,28.9);
+\node[text=GoldLeaf, font={\DisplayFont\fontsize{16pt}{18pt}\selectfont}] at (10.5,28.25)
+  {VERITA PROCESSING WORKS};
+\node[text=IceWhite!75, font={\AccentFont\fontsize{7.5pt}{8.5pt}\selectfont}] at (10.5,27.5)
+  {EST.\ \TodayYear\ · DATA GOES IN, EVIDENCE COMES OUT · VISITORS WELCOME};
+
+% hanging banners (ribbons on strings)
+\foreach \x/\t/\c in {4.6/QUALITY ASSURED/RegistrarGreen, 10.5/AI POWERED/VioletDream,
+  16.4/ZERO FABRICATION/CoralEmber}{
+  \draw[CarbonInk, line width=0.6pt] ({\x-1.3},26.98) -- ({\x-1.3},26.62) ({\x+1.3},26.98) -- ({\x+1.3},26.62);
+  \fill[\c!14!IceWhite] ({\x-1.55},26.18) rectangle ({\x+1.55},26.66);
+  \draw[\c, line width=0.9pt] ({\x-1.55},26.18) rectangle ({\x+1.55},26.66);
+  \node[text=\c!75!CarbonInk, font=\ttfamily\bfseries\fontsize{6pt}{6.5pt}\selectfont] at (\x,26.42) {\t};
+}
+
+% ── worker macro: hard-hat stick figure with tool label ──
+\newcommand{\worker}[3]{ % position, hat color, label
+  \fill[#2] #1 ++(-0.21,0.72) arc (180:0:0.21) -- cycle;          % hard hat
+  \fill[#2] #1 ++(-0.26,0.70) rectangle ++(0.52,0.07);
+  \draw[CarbonInk, line width=1.1pt] #1 ++(0,0.52) circle (0.17);
+  \draw[CarbonInk, line width=1.1pt] #1 ++(0,0.35) -- ++(0,-0.55);
+  \draw[CarbonInk, line width=1.1pt] #1 ++(0,0.25) -- ++(-0.27,-0.2);
+  \draw[CarbonInk, line width=1.1pt] #1 ++(0,0.25) -- ++(0.27,-0.2);
+  \draw[CarbonInk, line width=1.1pt] #1 ++(0,-0.2) -- ++(-0.2,-0.42);
+  \draw[CarbonInk, line width=1.1pt] #1 ++(0,-0.2) -- ++(0.2,-0.42);
+  \node[text=CarbonInk, fill=IceWhite, fill opacity=0.85, text opacity=1, inner sep=1.4pt,
+    font=\ttfamily\bfseries\fontsize{5.5pt}{6pt}\selectfont] at ($#1+(0,1.12)$) {#3};
+}
+
+% ── conveyor path (S-snake, 3 rows) ──
+\newcommand{\beltrow}[2]{ % y, direction (1 = LTR, -1 = RTL)
+  \fill[FogGray!30] (1.6,#1) rectangle (19.4,{#1+0.5});
+  \draw[CarbonInk, line width=1pt] (1.6,#1) rectangle (19.4,{#1+0.5});
+  \foreach \x in {2.2,3.4,...,19.0} \draw[CarbonInk, line width=0.7pt] (\x,{#1+0.06}) circle (0.16);
+}
+\beltrow{22.6}{1}
+\beltrow{16.2}{-1}
+\beltrow{9.8}{1}
+% belt connectors
+\draw[CarbonInk, line width=1pt] (19.4,22.6) arc (90:-90:1.6 and 2.95);
+\draw[CarbonInk, line width=1pt] (1.6,16.2) arc (90:270:1.6 and 2.95);
+
+% ── machines on row 1 ──
+% intake hopper
+\fill[ElectricBlue!15!IceWhite] (2.0,23.3) -- (4.2,23.3) -- (3.7,24.9) -- (2.5,24.9) -- cycle;
+\draw[CarbonInk, line width=1.2pt] (2.0,23.3) -- (4.2,23.3) -- (3.7,24.9) -- (2.5,24.9) -- cycle;
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.5pt}{7pt}\selectfont] at (3.1,24.05) {INTAKE};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.8pt}{6.5pt}\selectfont] at (3.1,23.6) {CSV · XLSX};
+\node[text=CarbonInk, font={\ComicFont\fontsize{6.5pt}{7pt}\selectfont}] at (3.1,25.35) {“any file, no appointment”};
+\worker{(5.2,23.6)}{ElectricBlue}{FastAPI}
+
+% x-ray scanner
+\fill[StormBlue!12!IceWhite, rounded corners=3pt] (7.0,23.25) rectangle (10.2,25.4);
+\draw[CarbonInk, line width=1.2pt, rounded corners=3pt] (7.0,23.25) rectangle (10.2,25.4);
+\draw[NeonCyan, line width=1pt] (7.35,23.5) -- (9.85,25.1);
+\draw[NeonCyan!60, line width=1pt] (7.35,24.1) -- (9.85,25.4);
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.5pt}{7pt}\selectfont] at (8.6,25.0) {X-RAY BAY};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.8pt}{6.5pt}\selectfont, align=center] at (8.6,23.95)
+  {semantic types\\quality grade};
+\worker{(11.2,23.6)}{StormBlue}{pandas}
+
+% the chart-o-matic
+\fill[GoldLeaf!18!IceWhite, rounded corners=3pt] (13.0,23.25) rectangle (16.6,25.5);
+\draw[CarbonInk, line width=1.2pt, rounded corners=3pt] (13.0,23.25) rectangle (16.6,25.5);
+\foreach \x/\h/\c in {13.5/0.5/ElectricBlue, 14.0/0.9/GoldLeaf, 14.5/0.65/VioletDream, 15.0/1.1/NeonCyan}{
+  \fill[\c] (\x,23.6) rectangle ++(0.32,\h);
+}
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.5pt}{7pt}\selectfont] at (14.8,25.15) {CHART-O-MATIC};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.8pt}{6.5pt}\selectfont] at (15.8,23.45) {12 lines};
+\worker{(17.6,23.6)}{GoldLeaf}{ECharts}
+
+% ── machines on row 2 (right to left) ──
+% insight kettle
+\fill[VioletDream!12!IceWhite] (16.4,16.9) circle (1.15);
+\draw[CarbonInk, line width=1.2pt] (16.4,16.9) circle (1.15);
+\draw[CarbonInk, line width=1pt] (15.7,17.85) .. controls (16.0,18.35) and (16.8,18.35) .. (17.1,17.85);
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.2pt}{7pt}\selectfont, align=center]
+  at (16.4,17.05) {INSIGHT\\KETTLE};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.6pt}{6.2pt}\selectfont] at (16.4,16.45) {brews p-values};
+\worker{(14.6,16.5)}{VioletDream}{SciPy}
+
+% fraud sniffer
+\fill[CoralEmber!10!IceWhite, rounded corners=3pt] (10.4,16.85) rectangle (13.2,18.6);
+\draw[CarbonInk, line width=1.2pt, rounded corners=3pt] (10.4,16.85) rectangle (13.2,18.6);
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.5pt}{7pt}\selectfont] at (11.8,18.2) {FRAUD SNIFFER};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.8pt}{6.5pt}\selectfont, align=center] at (11.8,17.45)
+  {GBM nose · 0.913 held-out\\sniffs, never bites};
+\worker{(9.3,16.5)}{CoralEmber}{sklearn}
+
+% sql tap room
+\fill[NeonCyan!12!IceWhite, rounded corners=3pt] (4.6,16.85) rectangle (7.6,18.55);
+\draw[CarbonInk, line width=1.2pt, rounded corners=3pt] (4.6,16.85) rectangle (7.6,18.55);
+\draw[CarbonInk, line width=1pt] (5.0,16.85) -- (5.0,16.35);
+\fill[NeonCyan!60!ElectricBlue] (4.9,16.35) rectangle (5.1,16.1);
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.5pt}{7pt}\selectfont] at (6.1,18.15) {SQL TAP ROOM};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.8pt}{6.5pt}\selectfont, align=center] at (6.1,17.4)
+  {SELECT-only on tap\\bouncer checks every query};
+\worker{(3.2,16.5)}{NeonCyan!70!ElectricBlue}{DuckDB}
+
+% ── machines on row 3 ──
+% the investigator's office
+\fill[VioletDream!10!IceWhite, rounded corners=3pt] (2.4,10.5) rectangle (6.4,12.6);
+\draw[CarbonInk, line width=1.2pt, rounded corners=3pt] (2.4,10.5) rectangle (6.4,12.6);
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.5pt}{7pt}\selectfont] at (4.4,12.25) {INVESTIGATION SUITE};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.8pt}{6.5pt}\selectfont, align=center] at (4.4,11.4)
+  {6 hypotheses · real SQL\\memo, citations included};
+\worker{(7.3,11.1)}{VioletDream}{Agent}
+
+% the sealing press
+\fill[GoldLeaf!20!IceWhite, rounded corners=3pt] (9.4,10.5) rectangle (12.8,12.7);
+\draw[CarbonInk, line width=1.2pt, rounded corners=3pt] (9.4,10.5) rectangle (12.8,12.7);
+\fill[CarbonInk] (10.7,12.7) rectangle (11.5,13.15);
+\draw[CarbonInk, line width=1.4pt] (11.1,13.15) -- (11.1,13.55);
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.5pt}{7pt}\selectfont] at (11.1,12.3) {SEALING PRESS};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.8pt}{6.5pt}\selectfont, align=center] at (11.1,11.45)
+  {SHA-256 per step\\links fold in links};
+\worker{(13.8,11.1)}{GoldLeaf}{hashlib}
+
+% the archive vault
+\fill[RegistrarGreen!12!IceWhite, rounded corners=3pt] (15.4,10.5) rectangle (19.0,12.7);
+\draw[CarbonInk, line width=1.2pt, rounded corners=3pt] (15.4,10.5) rectangle (19.0,12.7);
+\draw[CarbonInk, line width=1.1pt] (17.2,11.6) circle (0.42);
+\draw[CarbonInk, line width=1.1pt] (17.2,11.6) -- ++(50:0.42);
+\node[text=CarbonInk, font=\ttfamily\bfseries\fontsize{6.5pt}{7pt}\selectfont] at (17.2,12.35) {ARCHIVE VAULT};
+\node[text=CarbonInk!72, font=\ttfamily\fontsize{5.8pt}{6.5pt}\selectfont] at (17.2,10.85) {PostgreSQL · forever};
+
+% ── shipping dock ──
+\fill[CarbonInk, rounded corners=3pt] (5.4,5.6) rectangle (15.6,8.6);
+\node[text=GoldLeaf, font={\DisplayFont\fontsize{12pt}{13pt}\selectfont}] at (10.5,7.75) {SHIPPING DOCK};
+\node[text=IceWhite!80, font=\ttfamily\fontsize{7pt}{10pt}\selectfont, align=center] at (10.5,6.6)
+  {OUT TODAY: 1 editable dashboard · 1 ranked alert queue\\
+   1 cited compliance memo · 1 tamper-evident chain · 0 black boxes};
+\draw[-{Stealth[length=3.5mm]}, CarbonInk, line width=1.6pt] (10.5,9.7) -- (10.5,8.75);
+
+% inspection note
+\node[text=CarbonInk, font={\ComicFont\fontsize{8pt}{10pt}\selectfont}, align=center] at (10.5,4.6)
+  {Factory inspection note: every machine shows its work order on request.\\
+   The inspector is welcome any day. The inspector is the point.};
+
+\node[text=FogGray, font=\ttfamily\fontsize{6pt}{7pt}\selectfont] at (10.5,1.2)
+  {\ProjectName\ Processing Works · est.\ \TodayYear\ · zero fabricated metrics since opening day};
+
+\end{tikzpicture}
+\end{document}
