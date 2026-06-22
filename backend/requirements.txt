@@ -24,10 +24,13 @@ openpyxl==3.1.5
 prometheus-fastapi-instrumentator==7.0.0
 
 # ─── Model training & explainability (heavy engines) ───
-xgboost==3.2.0
+xgboost==2.0.3   # pinned to 2.x: shap 0.49's TreeExplainer can't parse xgboost 3.x's array base_score
 lightgbm==4.6.0
 optuna==4.9.0
 shap==0.49.1
+
+# ── Production ASGI server ──
+gunicorn==23.0.0
 
 # ─── Utilities ───
 python-dotenv==1.0.1
