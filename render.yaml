@@ -1,0 +1,30 @@
+# Render Blueprint — one-click deploy for the Verita backend.
+# https://render.com/docs/blueprint-spec
+#
+# Usage: connect your GitHub repo on Render and it auto-detects this file.
+# Set the env vars marked "sync: false" manually in the Render dashboard.
+
+services:
+  - type: web
+    name: verita-backend
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: |
+      cd backend && pip install -r requirements.txt
+    startCommand: |
+      cd backend && gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: DATABASE_URL
+        sync: false          # paste your Neon connection string in the dashboard
+      - key: VERITA_CORS
+        sync: false          # paste your Vercel frontend URL
+      - key: VERITA_CORS_REGEX
+        value: "^https://verita(-[a-z0-9]+)?\\.vercel\\.app$"
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+    healthCheckPath: /api/health

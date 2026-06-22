@@ -17,7 +17,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # postgresql+psycopg2://user:pass@host:5432/db  — or default to a local SQLite file.
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./verita.db")
+# Neon / Render emit "postgres://" or "postgresql://" — normalise for SQLAlchemy.
+_raw_url = os.getenv("DATABASE_URL", "sqlite:///./verita.db")
+if _raw_url.startswith("postgres://"):
+    _raw_url = _raw_url.replace("postgres://", "postgresql+psycopg2://", 1)
+elif _raw_url.startswith("postgresql://"):
+    _raw_url = _raw_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+DATABASE_URL = _raw_url
 
 _connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 engine = create_engine(DATABASE_URL, connect_args=_connect_args, pool_pre_ping=True, future=True)
