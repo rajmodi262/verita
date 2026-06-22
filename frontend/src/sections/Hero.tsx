@@ -95,15 +95,19 @@ function Typewriter({ text }: { text: string }) {
   const [n, setN] = useState(0);
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setN(text.length); return; }
+    let id: any;
     const start = window.setTimeout(() => {
-      const id = window.setInterval(() => {
+      id = window.setInterval(() => {
         setN((v) => {
           if (v >= text.length) { window.clearInterval(id); return v; }
           return v + 2;
         });
       }, 24);
     }, 900);
-    return () => window.clearTimeout(start);
+    return () => {
+      window.clearTimeout(start);
+      if (id !== undefined) window.clearInterval(id);
+    };
   }, [text]);
   return (
     <>

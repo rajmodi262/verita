@@ -90,10 +90,14 @@ a **world geo-map**, a **forecast overlay**, a **Time Machine** scrubber, **"wha
 diffs, **pin-SQL-to-dashboard**, and a one-click **PDF report**.
 
 ### 2 · FCC Risk & Anomaly Engine
-A real `scikit-learn` pipeline (GradientBoosting + IsolationForest) trained on the **real ULB
-credit-card fraud dataset** (284k transactions, 0.17% fraud) → held-out **ROC-AUC 0.913, PR-AUC
-0.65**. Honest metrics throughout, a live **decision-threshold slider** (watch precision/recall
-trade off), ROC & precision-recall curves, confusion matrix, **permutation** feature importance, and
+A real ML pipeline (**XGBoost** classifier + IsolationForest) trained on the **real ULB
+credit-card fraud dataset** (284k transactions, 0.17% fraud) → held-out **ROC-AUC ≈ 0.99, PR-AUC
+≈ 0.88** on the default 150k-row seeded sample (set `VERITA_ULB_SAMPLE` higher to train on more).
+XGBoost uses `scale_pos_weight` to handle the 0.17% imbalance directly in the loss.
+Honest metrics throughout, a live **decision-threshold slider** (watch precision/recall trade off),
+plus a **cost-optimal threshold** that minimises expected dollar loss (`/api/risk/optimal-threshold`),
+**per-case SHAP reason codes** (`/api/risk/explain/{idx}` → `model_explainer.py`), a **PSI drift
+monitor**, ROC & precision-recall curves, confusion matrix, **permutation** feature importance, and
 a ranked **AML alert queue**. Drop `creditcard.csv` (or the Kaggle 5M-row
 `financial_fraud_detection_dataset.csv`) into `data/`, or set `VERITA_FRAUD_DATA` — otherwise it
 falls back to a clearly-labeled synthetic set. The fitted model is cached to `joblib` (trains once
@@ -161,7 +165,8 @@ cd frontend && npm run test            # 10 tests
    FastAPI  ──  middleware: API-key auth · rate limit · global error handler
      │
      ├─ profiling/   semantic typing · quality score · insights (scipy) · relationships · forecast tournament
-     ├─ ml/          GradientBoosting + IsolationForest (held-out metrics, joblib-persisted)
+     ├─ ml/          XGBoost + IsolationForest (held-out metrics, joblib-persisted)
+     │               + model_explainer: SHAP reason codes · cost-optimal threshold · PSI drift
      ├─ nlp/         BSA/AML/OFAC/FinCEN matcher · entity extraction · risk scoring
      ├─ genai/       optional Gemini (summary + NL→SQL) with rule-based fallback
      └─ store        disk-backed dataset cache (survives restart) + DuckDB SQL engine
@@ -176,7 +181,7 @@ guard (covered by an adversarial injection test corpus).
 
 | Layer | Tech |
 |---|---|
-| Backend | FastAPI · Pandas · NumPy · scikit-learn · SciPy · DuckDB · joblib |
+| Backend | FastAPI · Pandas · NumPy · scikit-learn · XGBoost · SHAP · SciPy · DuckDB · joblib |
 | Frontend | React 18 · TypeScript · Vite · ECharts · Three.js · framer-motion · react-grid-layout · zustand |
 | GenAI | Google Gemini (optional) with deterministic fallback |
 | Infra | Docker · docker-compose · GitHub Actions · Prometheus · Grafana |
@@ -203,3 +208,11 @@ verita/
 ```
 
 See **[`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)** for the 3-minute walkthrough.
+
+### For interviewers / reviewers
+
+- **[`BUSINESS_CASE.md`](BUSINESS_CASE.md)** — why a bank should run this, ROI math, vs rule-based systems.
+- **[`INTERVIEW_PREP.md`](INTERVIEW_PREP.md)** — 150 Q&A, each mapped to the exact code that backs it.
+- **Report figures:** `cd backend && python scripts/generate_report_figures.py` renders the confusion
+  matrix, ROC/PR curves, feature importance, SHAP summary, and the cost-vs-threshold curve to
+  `backend/reports/*.png` — all from the trained model, nothing hardcoded.

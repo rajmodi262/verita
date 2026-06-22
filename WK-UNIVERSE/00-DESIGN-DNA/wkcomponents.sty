@@ -1,0 +1,80 @@
+% =====================================================================
+%  wkcomponents.sty  —  WK-UNIVERSE reusable components
+%  Requires (loaded by wkdna.sty before this): xcolor+wkpalette, tikz,
+%  tcolorbox(+most), fontawesome5.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{wkcomponents}[2026/06/14 WK-UNIVERSE components]
+
+% ---- KEYWORD HIGHLIGHTS --------------------------------------------
+% \jdterm — JD / technical keyword.  Tasteful: bold + accent, used on
+% first or meaningful occurrence (NOT every instance — that reads as
+% keyword-stuffing and kills the typography).
+\newcommand{\jdterm}[1]{\textbf{\textcolor{ElectricBlue}{#1}}}
+% \jdtermlight — for use on dark backgrounds (mint reads better than blue)
+\newcommand{\jdtermlight}[1]{\textbf{\textcolor{NeonMint}{#1}}}
+% \achieve — achievement / impact word (gold)
+\newcommand{\achieve}[1]{\textbf{\textcolor{GoldLeaf}{#1}}}
+
+% ---- STAT BOX (big number + label) ---------------------------------
+\newcommand{\wkstat}[3]{% {number}{label}{accentcolor}
+  \begin{tcolorbox}[enhanced,colback=#3!8,colframe=#3,boxrule=1.5pt,
+    arc=7pt,width=0.315\linewidth,halign=center,valign=center,height=2.9cm,
+    left=2pt,right=2pt,nobeforeafter,box align=top]
+    \resizebox{0.9\linewidth}{!}{\bfseries\textcolor{#3}{#1}}\\[4pt]
+    {\footnotesize\bfseries\textcolor{FogGray}{\MakeUppercase{#2}}}
+  \end{tcolorbox}%
+}
+
+% ---- BADGE (pill label) --------------------------------------------
+\newcommand{\wkbadge}[3]{% {text}{backcolor}{textcolor}
+  \tcbox[on line,colback=#2,coltext=#3,boxrule=0pt,arc=8pt,
+    left=6pt,right=6pt,top=2pt,bottom=2pt,nobeforeafter]%
+    {\small\bfseries #1}%
+}
+
+% ---- QUOTE BOX (gold left bar) -------------------------------------
+\newcommand{\wkquote}[2]{% {quote}{attribution}
+  \begin{tcolorbox}[enhanced,colback=GoldPale,colframe=GoldLeaf,
+    leftrule=4pt,rightrule=0pt,toprule=0pt,bottomrule=0pt,arc=0pt,
+    left=12pt,boxsep=4pt]
+    \itshape ``#1''\par\smallskip
+    \normalfont\footnotesize\textcolor{SlateText}{--- #2}
+  \end{tcolorbox}%
+}
+
+% ---- INSIGHT / NOTE boxes ------------------------------------------
+\newcommand{\wkinsight}[1]{%
+  \begin{tcolorbox}[enhanced,colback=GoldPale,colframe=GoldLeaf,
+    boxrule=1.2pt,arc=5pt,left=8pt]
+    \faLightbulb[regular]~\textbf{\textcolor{WarmBrown}{Insight:}}\quad #1
+  \end{tcolorbox}%
+}
+\newcommand{\wknote}[1]{%
+  \begin{tcolorbox}[enhanced,colback=CoralAlert!8,colframe=CoralAlert,
+    boxrule=1.2pt,arc=5pt,left=8pt]
+    \faExclamationTriangle~\textbf{\textcolor{CoralAlert}{Note:}}\quad #1
+  \end{tcolorbox}%
+}
+
+% ---- PHASE BLOCK ----------------------------------------------------
+\newcommand{\wkphase}[4]{% {n}{name}{tools}{color}
+  \begin{tcolorbox}[enhanced,colback=#4!8,colframe=#4,boxrule=1.5pt,
+    arc=6pt,coltitle=white,colbacktitle=#4,
+    title={\bfseries Phase #1 \textperiodcentered\ \MakeUppercase{#2}}]
+    \textbf{Tools:}\ #3
+  \end{tcolorbox}%
+}
+
+% ---- PROGRESS BAR (fixed: precompute width factor) -----------------
+\newcommand{\wkprogress}[3]{% {label}{percent int}{color}
+  \noindent{\footnotesize\bfseries #1}\hfill
+  {\footnotesize\textcolor{FogGray}{#2\%}}\par\vspace{2pt}%
+  \pgfmathsetmacro{\wkpctfac}{#2/100}%
+  \begin{tikzpicture}
+    \fill[FogGray!25] (0,0) rectangle (\linewidth,0.26);
+    \fill[#3] (0,0) rectangle (\wkpctfac\linewidth,0.26);
+  \end{tikzpicture}\par\vspace{6pt}%
+}
+
+\endinput

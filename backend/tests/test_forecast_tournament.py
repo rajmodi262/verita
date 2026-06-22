@@ -20,10 +20,10 @@ def test_tournament_scores_all_three_and_picks_winner():
     models = {s["model"] for s in fc["tournament"]}
     # 4-model tournament: linear+seasonality, holt (manual), holt_winters (statsmodels), seasonal_naive
     assert models == {"linear+seasonality", "holt", "holt_winters", "seasonal_naive"}
-    # winner is the lowest-MAPE model among those that scored
-    scored = [s for s in fc["tournament"] if s["mape"] is not None]
-    assert fc["method"] == min(scored, key=lambda s: s["mape"])["model"]
-    assert fc["backtest_mape"] == min(s["mape"] for s in scored)
+    # winner is the lowest-MASE model among those that scored
+    scored = [s for s in fc["tournament"] if s["mase"] is not None]
+    assert fc["method"] == min(scored, key=lambda s: s["mase"])["model"]
+    assert fc["backtest_mase"] == min(s["mase"] for s in scored)
 
 
 def test_tournament_is_ranked_and_band_ordered():

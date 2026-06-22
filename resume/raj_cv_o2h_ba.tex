@@ -1,0 +1,266 @@
+%-------------------------
+% Resume / CV - Raj Modi
+% B.Tech CSE (AI & Data Science) | MIT-WPU
+% Tailored for o2h technology - Business Analyst (BA) Intern, Jan 2027
+% One-Page Compact Design
+%-------------------------
+
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{charter}
+\usepackage{ragged2e}
+
+\usetikzlibrary{calc}
+
+% =====================================================================
+%                         COLOR PALETTE
+% =====================================================================
+\definecolor{HeaderDark}{HTML}{1A1A2E}
+\definecolor{HeaderMid}{HTML}{16213E}
+\definecolor{AccentBlue}{HTML}{0F3460}
+\definecolor{AccentTeal}{HTML}{1A936F}
+\definecolor{Charcoal}{HTML}{2A2A2A}
+\definecolor{DarkGray}{HTML}{333333}
+\definecolor{MidGray}{HTML}{555555}
+\definecolor{SubText}{HTML}{666666}
+\definecolor{LightGray}{HTML}{E8E8E8}
+\definecolor{LinkBlue}{HTML}{2563EB}
+\definecolor{SectionLine}{HTML}{0F3460}
+\definecolor{BulletColor}{HTML}{1A936F}
+\definecolor{TechTag}{HTML}{4A5568}
+
+% =====================================================================
+%                         PAGE GEOMETRY
+% =====================================================================
+\geometry{
+  left=0.4in,
+  right=0.4in,
+  top=0.2in,
+  bottom=0.18in
+}
+
+% =====================================================================
+%                         PAGE STYLE
+% =====================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+\raggedbottom
+\setlength{\tabcolsep}{0in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% =====================================================================
+%                     SECTION HEADER COMMAND
+% =====================================================================
+\newcommand{\sectionHeader}[2]{%
+  \vspace{3.5pt}%
+  \noindent%
+  {\normalsize\bfseries\color{HeaderDark}#2\enspace\textsc{#1}}%
+  \\[-6pt]%
+  {\color{SectionLine}\rule{\textwidth}{1pt}}%
+  \vspace{1pt}\par%
+}
+
+% =====================================================================
+%                     PROJECT ENTRY
+% =====================================================================
+\newcommand{\projectEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-4pt]%
+  {\scriptsize\color{AccentTeal}\textbf{#3}} {\scriptsize\color{TechTag}\textit{\,|\, #4}}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EXPERIENCE ENTRY
+% =====================================================================
+\newcommand{\expEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}\textit{#3}} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EDUCATION ENTRY
+% =====================================================================
+\newcommand{\eduEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}#3} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+\begin{document}
+
+% =======================================================================
+%                          HEADER
+% =======================================================================
+
+\begin{center}
+  {\fontsize{24}{28}\selectfont\bfseries\color{HeaderDark}Raj Modi}
+
+  \vspace{2pt}
+
+  {\small\color{MidGray}Business Analyst \,|\, Requirements, Data Analysis \& Business Intelligence}
+
+  \vspace{3pt}
+
+  {\small%
+    \href{https://www.linkedin.com/in/rajmodi2004/}{{\color{AccentBlue}\faLinkedin}~\color{LinkBlue}linkedin.com/in/rajmodi2004}%
+    \quad{\color{LightGray}|}%
+    \quad\href{https://github.com/rajmodi262}{{\color{AccentBlue}\faGithub}~\color{LinkBlue}github.com/rajmodi262}%
+    \quad{\color{LightGray}|}%
+    \quad\href{mailto:rajmodi262@gmail.com}{{\color{AccentBlue}\faEnvelope}~\color{LinkBlue}rajmodi262@gmail.com}%
+    \quad{\color{LightGray}|}%
+    \quad{\color{AccentBlue}\faPhone*}~{\color{DarkGray}+91-8817130400}%
+  }
+\end{center}
+
+\vspace{-2pt}
+
+% =======================================================================
+%                          EDUCATION
+% =======================================================================
+
+\sectionHeader{Education}{\faGraduationCap}
+
+\eduEntry{MIT World Peace University, Pune}
+  {August 2023 -- May 2027}
+  {B.\ Tech Computer Science and Engineering (AI and Data Science)}
+  {CGPA: 8.14/10.0}
+
+\eduEntry{Macro Vision Academy, Burhanpur}
+  {April 2019 -- March 2022}
+  {CBSE Board -- Class XII: 86.60\%, Class X: 90.80\%}
+  {}
+
+% =======================================================================
+%                       CORE SKILLS
+% =======================================================================
+
+\sectionHeader{Core Skills}{\faCogs}
+
+\vspace{1pt}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  {\small\textbf{\color{HeaderDark}Business Analysis:}} & {\small Requirements Elicitation, BRD/FRD/SRS, User Stories \& Acceptance Criteria, Use-Case \& Gap Analysis, Process Mapping, Requirements Traceability (RTM), Stakeholder Management, Business-Case/ROI, UAT} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Data \& BI:}} & {\small SQL (MySQL, PostgreSQL, DuckDB), Advanced Excel, Python (Pandas, NumPy), EDA, Hypothesis Testing, Power BI, Tableau, KPI Dashboards, Data Storytelling} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Tools \& Methodology:}} & {\small Agile/Scrum, Jira, Sprint Planning, Git/GitHub, UML \& draw.io, FastAPI/REST APIs, MS Office} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Communication:}} & {\small Stakeholder Communication \& Presentation, Requirements/Technical Documentation, Cross-functional Collaboration, Client Interaction} \\
+\end{tabularx}
+
+% =======================================================================
+%                          PROJECTS
+% =======================================================================
+
+\sectionHeader{Projects}{\faProjectDiagram}
+
+% --- Project 1: VWS-Skoda (FLAGSHIP - real client, requirements, process, BI) ---
+\projectEntry{VWS-Skoda Scheduling \& Analytics -- Industry Collaboration}
+  {Jun 2025 -- Feb 2026}
+  {Client Requirements, Process Optimization \& BI Reporting}
+  {Excel, Python, Pandas, SQL, Matplotlib, Seaborn}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Sole student lead on an 8-month \textbf{VW Group Academy (Skoda)} engagement with direct \textbf{client interaction}: ran requirement-elicitation sessions, documented business rules, and mapped the as-is manual scheduling process for \textbf{$\sim$1,243 annual training events} across 3 centres (Pune, Bangalore, NCR) and 50+ rooms.}
+  \item {\small Translated those requirements into an \textbf{ETL pipeline}, a 6-tier priority-scoring model, and a constraint-based allocation engine -- reaching \textbf{98.5\% auto-allocation} (1,224/1,243) and \textbf{$\sim$80\% less manual effort} -- and shipped a \textbf{BI dashboard} (KPI cards, utilization heatmaps, threshold alerts) that turned operational data into stakeholder decisions.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 2: Verita (business analysis, BI, decisions) ---
+\projectEntry{Verita -- Financial Crime \& Compliance Intelligence Platform}
+  {May 2026 -- Present}
+  {Business Analysis, BI Dashboards \& Decision Support}
+  {SQL, Python, Pandas, Excel, Power BI, XGBoost, SHAP, FastAPI}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Owned the full BA lifecycle for a compliance-analytics product on \textbf{284K+ real transactions}: elicited the problem, authored user stories and acceptance criteria, mapped the investigator workflow, and built a \textbf{quantified-ROI business case} that justified the build to stakeholders.}
+  \item {\small Designed the \textbf{KPI / BI dashboard layer} -- automated EDA, hypothesis-tested key findings, revenue/volume/cost \textbf{forecasting}, scenario analysis, and natural-language$\rightarrow$SQL querying -- and exposed per-case \textbf{explainable reason codes (SHAP)} so non-technical reviewers can understand and act on every flagged decision.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 3: MissionOS (PURE BA - requirements engineering, RTM, SRS) ---
+\projectEntry{MissionOS -- Systems Engineering \& Requirements Platform}
+  {Mar 2026 -- Apr 2026}
+  {Requirements Engineering, Traceability \& Trade Studies}
+  {JavaScript, Vite, Canvas, Chart.js, Selenium; IEEE-830 SRS, UML}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built a lifecycle platform around the classic \textbf{BA toolkit} -- authored \textbf{IEEE-830 SRS} \& UML specs, a \textbf{Requirements Traceability Matrix (RTM)}, stakeholder-influence maps, a WBS, a 5$\times$5 \textbf{risk matrix}, and a multi-criteria \textbf{trade-study (MCDA)} decision tool -- modelling 247 requirements across 6 programs with full requirement-to-subsystem traceability, validated by a 58-test Selenium suite.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 4: BlotQuant (LIFE SCIENCES domain - matches o2h) ---
+\projectEntry{BlotQuant DLM -- Western-Blot Quantification \& Forensics}
+  {Apr 2026 -- Jun 2026}
+  {Life Sciences \,|\, Reproducible Lab Analytics}
+  {Python, PyTorch (ResNet-50), OpenCV, FastAPI, React}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Scoped a real \textbf{life-sciences} pain point -- subjective, non-reproducible manual band reading and image manipulation in published Western blots -- and automated protein-band densitometry (adaptive thresholding, lane segmentation, background subtraction) alongside a dual-branch \textbf{forensics} engine (ResNet-50, ELA, FFT) that flags cloning/duplication and outputs \textbf{audit-ready PDF reports} via a React + FastAPI dashboard.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 5: AquaScan (GREEN TECH domain - matches o2h) ---
+\projectEntry{AquaScan AI -- Underwater Debris Detection \,|\, Green Tech}
+  {Jan 2026 -- Mar 2026}
+  {Environmental Monitoring \& Computer Vision}
+  {Python, YOLOv8, OpenCV, FastAPI, NumPy}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built a hybrid YOLOv8 + classical-CV system for real-time underwater trash detection supporting \textbf{ocean-cleanup (green-tech)}, using a 6-check adaptive z-score anomaly pipeline and a FastAPI service that returns annotated heatmaps and \textbf{JSON statistical reports} for downstream monitoring.}
+\end{itemize}
+
+% =======================================================================
+%                       WORK EXPERIENCE
+% =======================================================================
+
+\sectionHeader{Work Experience}{\faLaptopCode}
+
+\expEntry{Community Management and Growth Team -- Intern}
+  {Sep 2023 -- Nov 2023}
+  {Engineer's Cradle Pvt.\ Ltd.}
+  {Pune, India}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Drove cross-platform community growth across 3 channels, lifting user engagement \textbf{40\%} via targeted, data-driven campaigns and \textbf{automated Excel dashboard reporting} to the founding team.}
+\end{itemize}
+
+% =======================================================================
+%                  ACHIEVEMENTS & CERTIFICATIONS
+% =======================================================================
+
+\sectionHeader{Achievements \& Certifications}{\faTrophy}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}$\bullet$}]
+  \item {\small \textbf{SIH 2025 -- Rank 63 (Top 10\%)}, Smart India Hackathon (accessible Kolam designer with voice assistant) {\color{SubText}|} \textbf{AIR 8}, National Creative Olympiad.}
+  \item {\small \textbf{Certifications:} Google -- Advanced Data Analytics {\color{SubText}|} IBM -- Data Visualization with Python {\color{SubText}|} Indiana University -- Financial Planning.}
+  \item {\small \textbf{Joint President}, Student Alumni Relations Society, MIT-WPU (2025--26) {\color{SubText}|} \textbf{Execution Head}, RIDE 2025 tech fest (500+ attendees) -- stakeholder coordination \& delivery.}
+\end{itemize}
+
+% ============================================================
+\end{document}

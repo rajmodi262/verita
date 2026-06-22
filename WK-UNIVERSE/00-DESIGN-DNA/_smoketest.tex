@@ -1,0 +1,68 @@
+% Smoke test: exercises every macro + a background motif on A4.
+% Compile twice (remember picture). If this is clean, the foundation
+% is solid and posters can be built on it.
+\documentclass[11pt]{article}
+\usepackage[a4paper,top=18mm,bottom=18mm,left=20mm,right=18mm]{geometry}
+\usepackage{wkdna}
+
+\pagecolor{PaperWhite}
+\wkbg{\wkdotgrid{ElectricBlue}{0.10}}
+\wkfooter{Verita \textperiodcentered\ WK-UNIVERSE}{Design-system smoke test}{2026-06-14}
+
+\begin{document}
+\thispagestyle{fancy}
+
+\begin{center}
+  \bigtitle{\textcolor{DeepNavy}{WK\,\textperiodcentered\,UNIVERSE}}\\[2pt]
+  {\large\itshape\textcolor{GoldLeaf}{foundation smoke test}}
+\end{center}
+\vspace{4mm}
+
+\noindent Verita is a \jdterm{FastAPI} + \jdterm{React} platform that
+\achieve{scores} transactions for fraud with real \jdterm{scikit-learn}
+models, runs a \jdterm{DuckDB} \jdterm{SQL} engine, and \achieve{seals}
+every investigation in a \jdterm{SHA-256} hash chain. On a dark band the
+accent flips: \colorbox{AbyssNavy}{\;\jdtermlight{MCP}\; \jdtermlight{Claude Code}\;}.
+
+\vspace{4mm}
+\noindent
+\wkstat{0.913}{ROC-AUC held-out}{ElectricBlue}\hfill
+\wkstat{0.65}{PR-AUC imbalanced}{GoldLeaf}\hfill
+\wkstat{284{,}807}{transactions}{VioletElectric}
+
+\vspace{5mm}
+\noindent\wkbadge{Python}{ElectricBlue}{white}\quad
+\wkbadge{TypeScript}{DeepNavy}{white}\quad
+\wkbadge{DuckDB}{VioletElectric}{white}\quad
+\wkbadge{honest metrics}{GoldLeaf}{RichBlack}
+
+\vspace{5mm}
+\wkquote{Every auto-generated number shows its formula; every agent
+decision shows its query --- then the trace is sealed in a tamper-evident
+chain.}{Verita design thesis}
+
+\wkinsight{PR-AUC is the headline for fraud because positives are
+\textbf{0.17\%} of the data --- ROC-AUC alone flatters the model.}
+\wknote{This is a smoke test --- numbers shown are the project's real
+held-out figures, not placeholders.}
+
+\vspace{2mm}
+\wkphase{1}{Profiling}{Pandas \textperiodcentered\ SciPy \textperiodcentered\ DuckDB}{ElectricBlue}
+
+\wkprogress{CSS token migration}{72}{NeonMint}
+\wkprogress{Service-layer extraction}{85}{GoldLeaf}
+
+\vspace{3mm}
+\begin{center}
+\begin{tikzpicture}[node distance=10mm,every node/.style={font=\footnotesize\bfseries}]
+  \node[draw=ElectricBlue,fill=ElectricBlue!10,rounded corners,inner sep=5pt] (a) {Upload};
+  \node[draw=VioletElectric,fill=VioletElectric!10,rounded corners,inner sep=5pt,right=of a] (b) {Profile};
+  \node[draw=GoldLeaf,fill=GoldLeaf!12,rounded corners,inner sep=5pt,right=of b] (c) {Score};
+  \node[draw=NeonMint!70!black,fill=NeonMint!15,rounded corners,inner sep=5pt,right=of c] (d) {Audit};
+  \draw[-{Stealth[length=3mm]},ElectricBlue,thick] (a)--(b);
+  \draw[-{Stealth[length=3mm]},ElectricBlue,thick] (b)--(c);
+  \draw[-{Stealth[length=3mm]},ElectricBlue,thick] (c)--(d);
+\end{tikzpicture}
+\end{center}
+
+\end{document}

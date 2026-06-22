@@ -1,0 +1,78 @@
+% =====================================================================
+%  POSTER 5 — THE VALUE MAP  (A3 portrait, Editorial / cartographic)
+%  A treasure-map of skills; the dashed route is the build journey.
+%  Compile: pdflatex (x2).  TEXINPUTS must include 00-DESIGN-DNA.
+% =====================================================================
+\documentclass{article}
+\usepackage[a3paper,portrait,margin=0mm]{geometry}
+\usepackage{wkdna}
+
+\pagecolor{ParchmentCream}
+\wkbg{\wktopography{WarmBrown}{0.06}}
+
+\begin{document}\thispagestyle{empty}%
+\begin{tikzpicture}[remember picture,overlay,
+   shift={(current page.south west)},font=\sffamily]
+
+% ===================== CARTOGRAPHIC BORDER ==========================
+\draw[DeepNavy,line width=2.2pt] (8mm,8mm) rectangle (289mm,412mm);
+\draw[WarmBrown,line width=0.6pt] (11mm,11mm) rectangle (286mm,409mm);
+\foreach \cnr in {(8mm,8mm),(289mm,8mm),(8mm,412mm),(289mm,412mm)}{%
+   \fill[GoldPremium] \cnr circle (2.2mm);}
+
+% ===================== TITLE CARTOUCHE ==============================
+\draw[DeepNavy,line width=1.4pt,fill=DeepNavy,rounded corners=2mm] (40mm,372mm) rectangle (257mm,402mm);
+\node[text=GoldPale,font=\bfseries] at (148.5mm,390mm){\fontsize{30}{32}\selectfont THE VALUE MAP};
+\node[text=FogGray,font=\small\itshape] at (148.5mm,379mm)
+   {a chart of what \textbf{\textcolor{GoldPale}{Raj Modi}} brings to Wolters Kluwer};
+
+% ===================== COMPASS ROSE (top-right) =====================
+\begin{scope}[shift={(255mm,350mm)}]
+   \draw[WarmBrown,line width=0.8pt] (0,0) circle (13mm);
+   \foreach \a/\l in {90/{Growth},0/{Tech},270/{Exp.},180/{Origin}}{%
+      \draw[DeepNavy,line width=1pt] (0,0)--(\a:13mm);
+      \node[text=WarmBrown,font=\tiny\bfseries] at (\a:17mm){\l};}
+   \fill[GoldPremium] (90:9mm)--(18:3mm)--(0:0)--(162:3mm)--cycle;
+   \fill[EditorialRed] (270:9mm)--(198:3mm)--(0:0)--(342:3mm)--cycle;
+   \node[text=DeepNavy,font=\tiny\bfseries] at (0,0){N};
+\end{scope}
+
+% ===================== THE JOURNEY ROUTE ============================
+\draw[EditorialRed,dashed,line width=1.2pt]
+   (78mm,300mm)--(215mm,300mm)--(146mm,235mm)--(78mm,165mm)--(215mm,165mm)--(146mm,100mm);
+\foreach \p in {(78mm,300mm),(215mm,300mm),(146mm,235mm),(78mm,165mm),(215mm,165mm),(146mm,100mm)}{%
+   \node[text=EditorialRed,font=\scriptsize\bfseries] at \p {\faTimes};}
+
+% ===================== SKILL TERRITORIES (islands) ==================
+\foreach \cx/\cy/\ic/\name/\tools in {%
+   78/300/\faServer/{Backend Isles}/{Python \textperiodcentered\ FastAPI \textperiodcentered\ Pandas},
+   215/300/\faBrain/{ML Highlands}/{scikit-learn \textperiodcentered\ SHAP \textperiodcentered\ GBM},
+   146/235/\faDatabase/{Data Delta}/{DuckDB \textperiodcentered\ SQL \textperiodcentered\ profiling},
+   78/165/\faCode/{Frontend Frontier}/{React \textperiodcentered\ TypeScript \textperiodcentered\ ECharts},
+   215/165/\faLock/{Compliance Coast}/{AML \textperiodcentered\ FCC \textperiodcentered\ hash-chain},
+   146/100/\faRobot/{AI Cape}/{Gemini \textperiodcentered\ NLP \textperiodcentered\ agent}}{%
+   \draw[WarmBrown,line width=1.2pt,fill=GoldPale] (\cx mm,\cy mm) ellipse (40mm and 24mm);
+   \node[text=DeepNavy,font=\large] at (\cx mm,\cy mm+12mm){\ic};
+   \node[text=DeepNavy,font=\small\bfseries] at (\cx mm,\cy mm+1mm){\name};
+   \node[text=WarmBrown,font=\scriptsize,align=center,text width=72mm] at (\cx mm,\cy mm-11mm){\jdterm{\tools}};}
+
+% ===================== LEGEND (bottom-left) =========================
+\draw[DeepNavy,line width=1pt,fill=PaperWhite,rounded corners=2mm] (20mm,24mm) rectangle (150mm,72mm);
+\node[anchor=north west,text=WarmBrown,font=\footnotesize\bfseries] at (26mm,67mm){MAP LEGEND};
+\node[anchor=north west,text=DeepNavy,font=\scriptsize,align=left,text width=118mm] at (26mm,59mm)
+   {\textcolor{WarmBrown}{\faMapMarker}~~each island = a skill territory\\
+    \textcolor{EditorialRed}{- - -}~~the red route = the order they were built\\
+    \textcolor{DeepNavy}{\faLocationArrow}~~compass: Growth \textperiodcentered\ Tech \textperiodcentered\ Experience \textperiodcentered\ Origin};
+
+% ===================== KEY TREASURE (bottom-right) ==================
+\draw[GoldPremium,line width=1.4pt,fill=DeepNavy,rounded corners=2mm] (160mm,24mm) rectangle (276mm,72mm);
+\node[text=GoldPale,font=\footnotesize\bfseries] at (218mm,66mm){X MARKS THE TREASURE};
+\node[text=IceWhite,font=\scriptsize,align=center,text width=108mm] at (218mm,48mm)
+   {One engineer who can cross \emph{all six} territories ---\\
+    \achieve{frontend} to \achieve{ML} to \achieve{compliance} --- and ship the whole map.};
+
+% ===================== MARGIN CREDIT ===============================
+\node[text=WarmBrown,font=\scriptsize\itshape] at (148.5mm,15mm){chart by Raj Modi \textperiodcentered\ MMXXVI \textperiodcentered\ for Wolters Kluwer};
+
+\end{tikzpicture}
+\end{document}

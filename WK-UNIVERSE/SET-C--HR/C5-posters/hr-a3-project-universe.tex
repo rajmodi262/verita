@@ -1,0 +1,105 @@
+% =====================================================================
+%  POSTER 4 — PROJECT UNIVERSE  (A3 landscape, Hybrid bridge)
+%  Left = the human story (cream) | spine | Right = the technology (navy)
+%  Compile: pdflatex (x2).  TEXINPUTS must include 00-DESIGN-DNA.
+% =====================================================================
+\documentclass{article}
+\usepackage[a3paper,landscape,margin=0mm]{geometry}
+\usepackage{wkdna}
+
+\pagecolor{CreamPaper}
+
+\begin{document}\thispagestyle{empty}%
+\begin{tikzpicture}[remember picture,overlay,
+   shift={(current page.south west)},font=\sffamily,
+   archbox/.style={rounded corners=2mm,line width=1.1pt,align=center,
+     text=white,font=\small\bfseries,minimum width=120mm,minimum height=20mm}]
+
+% ===================== HALVES + SPINE ===============================
+\fill[AbyssNavy] (224mm,0mm) rectangle (420mm,262mm);   % right: technology
+\fill[DeepNavy]  (196mm,0mm) rectangle (224mm,262mm);   % centre spine
+% faint motifs (drawn manually, deterministic)
+\foreach \yy in {1,...,7}{\draw[GoldLeaf,opacity=0.06,line width=0.4pt]
+   plot[smooth] coordinates{(0,\yy*34mm)(60mm,\yy*34mm+6mm)(140mm,\yy*34mm-4mm)(196mm,\yy*34mm)};}
+\foreach \yy in {20,70,120,170,220}{\draw[ElectricBlue,opacity=0.07,line width=0.4pt]
+   (224mm,\yy mm)--(420mm,\yy mm);}
+
+% ===================== HEADER (y 262..297) ==========================
+\fill[DeepNavy] (0mm,262mm) rectangle (420mm,297mm);
+\fill[GoldPremium] (0mm,261mm) rectangle (420mm,262.6mm);
+\node[text=white,font=\bfseries] at (210mm,283mm){\fontsize{42}{44}\selectfont VERITA};
+\node[text=GoldPale,font=\normalsize\itshape] at (210mm,270mm)
+   {The project, end to end --- the human reason on the left, the engineering on the right};
+
+% ===================== SPINE TEXT ===================================
+\node[rotate=90,text=GoldPale,font=\LARGE\bfseries] at (210mm,131mm){BUILT FOR WOLTERS KLUWER};
+\node[text=GoldPremium,font=\large] at (210mm,244mm){\faStar};
+\node[text=GoldPremium,font=\large] at (210mm,20mm){\faStar};
+
+% ===================== LEFT — THE STORY (cream) =====================
+\node[anchor=north west,text=WarmBrown,font=\Large\bfseries] at (12mm,252mm){THE STORY};
+\node[anchor=north west,text=DeepNavy,font=\large\itshape,text width=176mm] at (12mm,242mm)
+   {``Give the compliance analyst their first hour back --- and make every number they
+     report defensible.''};
+% origin beats (timeline)
+\draw[GoldPremium,line width=1.4pt] (22mm,135mm)--(22mm,208mm);
+\foreach \yy/\txt in {%
+   205/{Saw analysts lose \emph{hours} to setup before a single insight.},
+   170/{Built a tool that profiles, scores \& explains a dataset \emph{instantly}.},
+   135/{Made every figure \emph{defensible} --- because compliance legally demands it.}}{%
+   \fill[GoldPremium] (22mm,\yy mm) circle (2.6mm);
+   \node[anchor=west,text=RichBlack,font=\normalsize,align=left,text width=158mm] at (28mm,\yy mm){\txt};}
+% value pills
+\foreach \i/\t in {0/{Honest}, 1/{Auditable}, 2/{Fast}}{%
+   \node[fill=DeepNavy,text=GoldPale,font=\small\bfseries,rounded corners=3mm,
+         minimum width=48mm,minimum height=11mm] at (36mm+\i*54mm,108mm){\t};}
+\node[anchor=north west,text=SlateText,font=\footnotesize,text width=176mm] at (12mm,92mm)
+   {Not a CV --- a working system. Drop a file and watch it profile, score the
+    \jdterm{fraud} risk, answer questions in plain English, and seal the investigation.};
+
+% ===================== RIGHT — THE TECHNOLOGY (navy) ===============
+\node[anchor=north west,text=NeonCyan,font=\Large\bfseries] at (232mm,252mm){THE TECHNOLOGY};
+\node[archbox,fill=StormBlue,draw=NeonCyan]      (a1) at (322mm,228mm){React 18 \textperiodcentered\ TypeScript \textperiodcentered\ ECharts};
+\node[archbox,fill=StormBlue,draw=ElectricBlue]  (a2) at (322mm,196mm){FastAPI \textperiodcentered\ 6 REST routers \textperiodcentered\ 3 services};
+\node[archbox,fill=StormBlue,draw=VioletElectric](a3) at (322mm,164mm){profiling \textperiodcentered\ ml \textperiodcentered\ nlp \textperiodcentered\ genai};
+\node[archbox,fill=StormBlue,draw=NeonMint]      (a4) at (322mm,132mm){DuckDB (OLAP) \textperiodcentered\ PostgreSQL (audit)};
+\foreach \u/\v in {a1/a2,a2/a3,a3/a4}{\draw[-{Stealth[length=3mm]},FogGray,line width=1.2pt] (\u)--(\v);}
+% tool badges
+\foreach \i/\t/\c in {0/{Python}/ElectricBlue, 1/{scikit-learn}/NeonMint,
+   2/{DuckDB}/VioletElectric, 3/{SHAP}/GoldLeaf}{%
+   \node[fill=\c,text=AbyssNavy,font=\scriptsize\bfseries,rounded corners=2mm,
+         minimum width=38mm,minimum height=9mm] at (260mm+\i*42mm,108mm){\t};}
+% pipeline summary
+\node[text=NeonMint,font=\small\bfseries] at (322mm,90mm)
+   {upload \;$\to$\; profile \;$\to$\; score \;$\to$\; investigate \;$\to$\; \jdtermlight{seal}};
+\node[text=IceWhite,font=\footnotesize,align=center,text width=180mm] at (322mm,76mm)
+   {Held-out \textbf{ROC-AUC 0.913} / \textbf{PR-AUC 0.65}; \jdtermlight{SHAP} explains every score;
+    every step \jdtermlight{hash-chained}.};
+
+% ----- left: thesis quote card (fills lower third) -----
+\draw[GoldPremium,line width=1pt,fill=white,rounded corners=2mm] (12mm,22mm) rectangle (188mm,68mm);
+\fill[GoldPremium] (12mm,22mm) rectangle (15mm,68mm);
+\node[anchor=north west,text=DeepNavy,font=\normalsize\itshape,align=left,text width=164mm] at (22mm,62mm)
+   {``It doesn't just log conclusions --- it binds them to the data, the code
+     version, and the exact query that produced them.''};
+\node[anchor=south east,text=WarmBrown,font=\footnotesize\bfseries] at (182mm,26mm){--- the design thesis};
+
+% ----- right: terminal status mini (fills lower third) -----
+\draw[ElectricBlue,line width=1pt,fill=VoidBlack,rounded corners=2mm] (232mm,22mm) rectangle (412mm,68mm);
+\fill[StormBlue] (232mm,62mm) rectangle (412mm,68mm);
+\foreach \i/\c in {0/CoralAlert,1/GoldLeaf,2/NeonMint}{\fill[\c] (239mm+\i*5mm,65mm) circle (1.2mm);}
+\node[anchor=west,text=FogGray,font=\scriptsize\ttfamily] at (255mm,65mm){verita --- status};
+\node[anchor=north west,text=NeonMint,font=\scriptsize\ttfamily,align=left,text width=170mm] at (238mm,58mm)
+   {\$ model loaded in 0.36s (joblib cache)\\
+    \$ chain verified \quad\$ 0 fabricated metrics\\
+    \$ all engines deterministic --- runs offline};
+
+% ===================== FOOTER (y 0..14) ============================
+\fill[DeepNavy] (0mm,0mm) rectangle (420mm,14mm);
+\fill[GoldPremium] (0mm,0mm) rectangle (7mm,262mm);
+\node[anchor=west,text=GoldPale,font=\small] at (12mm,7mm){\textbf{Raj Modi} \textperiodcentered\ Verita};
+\node[text=FogGray,font=\scriptsize] at (210mm,7mm){where the human reason and the engineering meet};
+\node[anchor=east,text=FogGray,font=\scriptsize] at (414mm,7mm){Wolters Kluwer Interview \textperiodcentered\ June 2026};
+
+\end{tikzpicture}
+\end{document}

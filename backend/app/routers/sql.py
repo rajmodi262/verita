@@ -1,40 +1,28 @@
 """
-SQL Router — real SQL over the uploaded dataset, powered by DuckDB.
+SQL Router - read-only SQL over the uploaded dataset, powered by DuckDB.
 
-POST /api/sql/query      {dataset_id, sql}   → live results from the uploaded file
-POST /api/sql/translate  {dataset_id, question} → suggested SQL from plain English
-
-The uploaded DataFrame is registered as the table `data` (read-only) in an ephemeral
-in-memory DuckDB connection per request — no persistence, no write surface.
+HTTP adapter only:
+POST /api/sql/query
+POST /api/sql/translate
 """
 
 from __future__ import annotations
 
 import logging
-import re
-import time
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from ..profiling import store
-from ..profiling.profiler import profile_dataframe
+from ..services.exceptions import DatasetNotFound, SqlExecutionError, SqlSafetyError
+from ..services.sql_service import (
+    FORBIDDEN_SQL as _FORBIDDEN,
+    SQL_COMMENT as _COMMENT,
+    run_query as svc_run_query,
+    translate_question as svc_translate_question,
+)
 
 logger = logging.getLogger("verita.sql")
 router = APIRouter()
-
-_MAX_ROWS = 500
-# DML/DDL + DuckDB file-I/O functions (defense-in-depth; external access is also disabled at the
-# engine level below, which is the real backstop).
-_FORBIDDEN = re.compile(
-    r"\b(insert|update|delete|drop|alter|create|attach|detach|copy|export|import|install|load|pragma|set|call|"
-    r"read_csv|read_csv_auto|read_parquet|read_json|read_json_auto|read_text|read_blob|"
-    r"parquet_scan|csv_scan|glob|sniff_csv|"
-    r"sqlite_master|information_schema|pg_catalog|duckdb_\w+)\b",
-    re.I,
-)
-# Block SQL comments outright — they're a classic guard-bypass vector and never needed here.
-_COMMENT = re.compile(r"(--|/\*|\*/|#)")
 
 
 class QueryRequest(BaseModel):
@@ -49,127 +37,23 @@ class TranslateRequest(BaseModel):
 
 @router.post("/query")
 def run_query(req: QueryRequest):
-    df = store.get(req.dataset_id)
-    if df is None:
-        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
-
-    sql = req.sql.strip().rstrip(";")
-    if not re.match(r"^\s*(select|with)\b", sql, re.I):
-        raise HTTPException(status_code=400, detail="Only SELECT queries are allowed")
-    if _COMMENT.search(sql):
-        raise HTTPException(status_code=400, detail="SQL comments are not allowed")
-    if _FORBIDDEN.search(sql):
-        raise HTTPException(status_code=400, detail="Only read-only SELECT queries are allowed")
-    if ";" in sql:
-        raise HTTPException(status_code=400, detail="Multi-statement queries are not allowed")
-
-    import duckdb
-
-    from ..audit import record_query
-
     try:
-        start = time.perf_counter()
-        # enable_external_access=False blocks ALL file/network I/O at the engine level — the
-        # real backstop behind the keyword guard. The connection only ever sees `data`.
-        con = duckdb.connect(":memory:", config={"enable_external_access": False})
-        con.register("data", df)
-        result = con.execute(f"SELECT * FROM ({sql}) AS q LIMIT {_MAX_ROWS}").fetchdf()
-        elapsed_ms = round((time.perf_counter() - start) * 1000, 1)
-        con.close()
-    except Exception as e:
-        record_query(req.dataset_id, sql, 0, 0.0, ok=False)
-        raise HTTPException(status_code=400, detail=f"SQL error: {e}")
-
-    record_query(req.dataset_id, sql, len(result), elapsed_ms, ok=True)
-
-    # JSON-safe conversion
-    result = result.astype(object).where(result.notna(), None)
-    rows = result.to_dict(orient="records")
-    for row in rows:
-        for k, v in row.items():
-            if hasattr(v, "isoformat"):
-                row[k] = v.isoformat()
-            elif hasattr(v, "item"):
-                row[k] = v.item()
-
-    return {
-        "columns": list(result.columns),
-        "rows": rows,
-        "row_count": len(rows),
-        "truncated": len(rows) >= _MAX_ROWS,
-        "elapsed_ms": elapsed_ms,
-    }
-
-
-# ── plain-English → SQL (transparent rule-based translator) ──────────────────
-
-_AGG_WORDS = {
-    "average": "AVG", "avg": "AVG", "mean": "AVG",
-    "total": "SUM", "sum": "SUM",
-    "count": "COUNT", "number of": "COUNT", "how many": "COUNT",
-    "max": "MAX", "maximum": "MAX", "highest": "MAX", "largest": "MAX",
-    "min": "MIN", "minimum": "MIN", "lowest": "MIN", "smallest": "MIN",
-}
+        return svc_run_query(req.dataset_id, req.sql)
+    except DatasetNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except (SqlSafetyError, SqlExecutionError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001 - router returns a clean API error
+        logger.exception("SQL query failed")
+        raise HTTPException(status_code=500, detail=f"SQL service error: {exc}") from exc
 
 
 @router.post("/translate")
 def translate(req: TranslateRequest):
-    """Heuristic NL→SQL: finds an aggregate, a measure, and a 'by <dimension>' grouping."""
-    df = store.get(req.dataset_id)
-    if df is None:
-        raise HTTPException(status_code=404, detail="Dataset not found — upload a file first")
-
-    profile = store.get_profile(req.dataset_id) or profile_dataframe(df.copy())
-    q = req.question.lower()
-
-    agg = next((sql_fn for word, sql_fn in _AGG_WORDS.items() if word in q), None)
-
-    def _find_col(candidates: list[str]) -> str | None:
-        for col in candidates:
-            pattern = col.lower().replace("_", "[ _]?")
-            if re.search(rf"\b{pattern}\b", q):
-                return col
-        return None
-
-    measure = _find_col(profile.measures)
-    dim = None
-    by_match = re.search(r"\bby\s+([a-z_ ]+)", q)
-    if by_match:
-        dim = _find_col(profile.dimensions) or _find_col(profile.temporals)
-    if dim is None:
-        dim = _find_col(profile.dimensions)
-
-    top_match = re.search(r"\btop\s+(\d+)", q)
-    limit = int(top_match.group(1)) if top_match else (10 if dim else 100)
-
-    if agg and measure and dim:
-        sql = f'SELECT {dim}, {agg}({measure}) AS {agg.lower()}_{measure}\nFROM data\nGROUP BY {dim}\nORDER BY {agg.lower()}_{measure} DESC\nLIMIT {limit}'
-    elif agg and measure:
-        sql = f"SELECT {agg}({measure}) AS {agg.lower()}_{measure} FROM data"
-    elif agg == "COUNT" and dim:
-        sql = f"SELECT {dim}, COUNT(*) AS count FROM data GROUP BY {dim} ORDER BY count DESC LIMIT {limit}"
-    elif measure:
-        sql = f"SELECT * FROM data ORDER BY {measure} DESC LIMIT {limit}"
-    else:
-        sql = "SELECT * FROM data LIMIT 50"
-
-    # If an LLM is configured, let it improve on the rule-based SQL (and re-guard the result).
-    from ..genai import provider as genai
-
-    enhanced = genai.translate_to_sql(
-        req.question,
-        {"measures": profile.measures, "dimensions": profile.dimensions, "temporals": profile.temporals},
-        sql,
-    )
-    final_sql = enhanced["sql"]
-    if _FORBIDDEN.search(final_sql) or _COMMENT.search(final_sql) or ";" in final_sql:
-        final_sql, enhanced = sql, {"mode": "rule-based"}  # reject unsafe LLM output, keep rule-based
-
-    return {
-        "sql": final_sql,
-        "mode": enhanced["mode"],
-        "interpretation": {
-            "aggregate": agg, "measure": measure, "dimension": dim, "limit": limit,
-        },
-        "note": f"{'LLM-assisted' if enhanced['mode'].startswith('llm') else 'Rule-based'} translation — review before running.",
-    }
+    try:
+        return svc_translate_question(req.dataset_id, req.question)
+    except DatasetNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001 - router returns a clean API error
+        logger.exception("SQL translation failed")
+        raise HTTPException(status_code=500, detail=f"SQL translation error: {exc}") from exc

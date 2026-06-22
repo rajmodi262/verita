@@ -1,0 +1,131 @@
+%-------------------------
+% Cover Letter - Raj Modi
+% Knorr-Bremse Technology Center India - Intern Trainee (Job ID 10633, Pune)
+% Visual set-match to raj_cv_knorrbremse.tex  |  Humanized: no em-dashes, minimal hyphens, plain prose
+%-------------------------
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{fontawesome5}
+\usepackage{geometry}
+\usepackage{charter}
+\usepackage{ragged2e}
+\usepackage{setspace}
+
+% =====================================================================
+%                         COLOR PALETTE  (matches the resume)
+% =====================================================================
+\definecolor{HeaderDark}{HTML}{1A1A2E}
+\definecolor{AccentBlue}{HTML}{0F3460}
+\definecolor{DarkGray}{HTML}{333333}
+\definecolor{MidGray}{HTML}{555555}
+\definecolor{SubText}{HTML}{666666}
+\definecolor{LightGray}{HTML}{E8E8E8}
+\definecolor{LinkBlue}{HTML}{2563EB}
+\definecolor{SectionLine}{HTML}{0F3460}
+
+% =====================================================================
+%                         PAGE GEOMETRY
+% =====================================================================
+\geometry{
+  left=0.85in,
+  right=0.85in,
+  top=0.5in,
+  bottom=0.5in
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+\begin{document}
+
+% =======================================================================
+%                          HEADER  (matches the resume)
+% =======================================================================
+\begin{center}
+  {\fontsize{24}{28}\selectfont\bfseries\color{HeaderDark}Raj Modi}
+
+  \vspace{2pt}
+  {\small\color{MidGray}Python \& AI Developer \,|\, LLMs \& Multi-Agent Systems \textperiodcentered\ Engineering-Process Automation \textperiodcentered\ ML}
+
+  \vspace{3pt}
+  {\small%
+    \href{https://www.linkedin.com/in/rajmodi2004/}{{\color{AccentBlue}\faLinkedin}~\color{LinkBlue}linkedin.com/in/rajmodi2004}%
+    \quad{\color{LightGray}|}%
+    \quad\href{https://github.com/rajmodi262}{{\color{AccentBlue}\faGithub}~\color{LinkBlue}github.com/rajmodi262}%
+    \quad{\color{LightGray}|}%
+    \quad\href{mailto:rajmodi262@gmail.com}{{\color{AccentBlue}\faEnvelope}~\color{LinkBlue}rajmodi262@gmail.com}%
+    \quad{\color{LightGray}|}%
+    \quad{\color{AccentBlue}\faPhone*}~{\color{DarkGray}+91-8817130400}%
+  }
+\end{center}
+
+\vspace{-4pt}
+{\color{SectionLine}\rule{\textwidth}{1pt}}
+
+\vspace{2pt}
+
+% =======================================================================
+%                          META: DATE + RECIPIENT
+% =======================================================================
+{\small\color{SubText}22 June 2026}
+
+\vspace{-2pt}
+{\small\color{DarkGray}%
+Hiring Team, Engineering / Research \& Development\\
+Knorr-Bremse Technology Center India Pvt.\ Ltd.\\
+Pune, India}
+
+\vspace{2pt}
+{\color{HeaderDark}\textbf{Re: Application for Intern Trainee (Job ID 10633)}}
+
+\vspace{2pt}
+Dear Knorr-Bremse Hiring Team,
+
+% =======================================================================
+%                          BODY
+% =======================================================================
+This role is about using Python and LLMs to automate manual SDLC work, which is what I have spent
+most of the past year building. I am in my final year of a B.Tech in Computer Science (AI and Data
+Science) at MIT-WPU in Pune, and most of my projects start from the same place: a manual engineering
+workflow that I turn into a tool which runs on its own.
+
+The project I am proudest of ran for eight months, for the Volkswagen Group Academy. Their annual
+training schedule put roughly 1,243 events a year across four centres, and the whole thing was
+planned by hand in spreadsheets. I led a team of three and built a Python engine for it: a pandas and
+openpyxl ETL stage feeding a constraint-based allocator that resolves clashes on its own, all behind
+a small Tkinter desktop app. It now places 98.5\% of events automatically and has cut the manual
+effort by about 80\%. Watching those savings land for an actual automotive client is a large part of
+why this position at Knorr-Bremse caught my eye.
+
+Since then I have spent more time on the LLM side this role focuses on. In AgentForge, I connected
+seven autonomous agents through a LangGraph state machine so they produce long, structured
+documentation without a person in the loop. In Verita, I built a natural language to SQL generator
+and an autonomous investigation agent, then put the whole platform behind an 82-test suite that runs
+in CI. Between the two, I have used LLMs to generate code and documentation and written the automated
+tests around them, which is both halves of what this role asks for. A third project, Nyay AI, added a
+hybrid RAG pipeline on LLaMA 3.3 70B. I like owning a problem from the moment I notice the manual
+effort to the day the tool that removes it ships.
+
+I am based in Pune, so working on-site would be easy. I would genuinely enjoy bringing this kind of
+automation to your engineering team. My CV is attached, and I am happy to walk through any of these
+projects in more detail. Thanks for reading.
+
+\vspace{4pt}
+Sincerely,\\
+\textbf{\color{HeaderDark}Raj Modi}
+
+\end{document}

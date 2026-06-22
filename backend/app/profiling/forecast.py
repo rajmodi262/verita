@@ -86,9 +86,31 @@ _MODELS: dict[str, Callable] = {
 }
 
 
+def _round(v: float | None, nd: int = 1) -> float | None:
+    return round(v, nd) if v is not None else None
+
+
 def _mape(actual: np.ndarray, pred: np.ndarray) -> float | None:
     nz = np.abs(actual) > 1e-9
     return float(np.mean(np.abs((actual[nz] - pred[nz]) / actual[nz])) * 100) if nz.any() else None
+
+
+def _smape(actual: np.ndarray, pred: np.ndarray) -> float | None:
+    """Symmetric MAPE — bounded, treats over/under-forecast even-handedly."""
+    denom = np.abs(actual) + np.abs(pred)
+    nz = denom > 1e-9
+    return float(np.mean(2.0 * np.abs(actual[nz] - pred[nz]) / denom[nz]) * 100) if nz.any() else None
+
+
+def _mase(actual: np.ndarray, pred: np.ndarray, y_train: np.ndarray) -> float | None:
+    """Mean Absolute Scaled Error — error relative to a naive one-step forecast on the
+    training series. MASE < 1 means the model genuinely beats 'just repeat last period'."""
+    if len(y_train) < 2:
+        return None
+    scale = float(np.mean(np.abs(np.diff(y_train))))
+    if scale < 1e-9:
+        return None
+    return float(np.mean(np.abs(actual - pred)) / scale)
 
 
 def forecast_series(df: pd.DataFrame, time_col: str, measure_col: str, periods: int = 14) -> dict[str, Any]:
@@ -109,28 +131,44 @@ def forecast_series(df: pd.DataFrame, time_col: str, measure_col: str, periods: 
     t = np.arange(len(y), dtype=float)
     dow = series.index.dayofweek.to_numpy() if freq == "D" else np.zeros(len(y), dtype=int)
 
-    split = min(max(int(len(y) * 0.8), len(y) - 12), len(y) - 2)
-    t_tr, y_tr, dow_tr = t[:split], y[:split], dow[:split]
-    t_te, y_te, dow_te = t[split:], y[split:], dow[split:]
+    # ── rolling-window (walk-forward) backtest: expand the training window one period at
+    #    a time over the last `folds` points, forecast 1-ahead each time, then score every
+    #    model on the accumulated errors. An honest backtest, not a single lucky split. ──
+    folds = int(min(max(len(y) // 5, 6), 14))
+    folds = max(2, min(folds, len(y) - 4))  # leave >= 4 points to fit (Holt-Winters needs it)
+    start = len(y) - folds
 
-    # ── tournament: score every model on the holdout ──
     scores: list[dict[str, Any]] = []
+    resid_by_model: dict[str, list[float]] = {}
     for name, fit in _MODELS.items():
+        actuals: list[float] = []
+        preds: list[float] = []
         try:
-            pred = fit(t_tr, y_tr, dow_tr)(t_te, dow_te)
-            mape = _mape(y_te, np.asarray(pred, dtype=float))
-            scores.append({"model": name, "mape": round(mape, 1) if mape is not None else None})
+            for k in range(start, len(y)):
+                model = fit(t[:k], y[:k], dow[:k])
+                yhat = float(np.asarray(model([t[k]], [dow[k]]), dtype=float).ravel()[0])
+                actuals.append(float(y[k]))
+                preds.append(yhat)
+            a, p = np.asarray(actuals), np.asarray(preds)
+            scores.append({
+                "model": name,
+                "mape": _round(_mape(a, p)),
+                "smape": _round(_smape(a, p)),
+                "mase": _round(_mase(a, p, y[:start]), 2),
+            })
+            resid_by_model[name] = list(a - p)
         except Exception:
-            scores.append({"model": name, "mape": None})
+            scores.append({"model": name, "mape": None, "smape": None, "mase": None})
 
-    valid = [s for s in scores if s["mape"] is not None]
-    winner = min(valid, key=lambda s: s["mape"])["model"] if valid else "linear+seasonality"
-    scores.sort(key=lambda s: (s["mape"] is None, s["mape"] if s["mape"] is not None else 1e9))
+    # winner = lowest MASE (it must beat the naive baseline, MASE < 1); MAPE breaks ties
+    valid = [s for s in scores if s["mase"] is not None]
+    winner = min(valid, key=lambda s: s["mase"])["model"] if valid else "linear+seasonality"
+    scores.sort(key=lambda s: (s["mase"] is None, s["mase"] if s["mase"] is not None else 1e9))
 
-    # ── refit winner on full series, project forward, band from its holdout residuals ──
+    # ── refit winner on full series, project forward, band from its backtest residuals ──
     fit = _MODELS[winner]
-    resid = y_te - np.asarray(fit(t_tr, y_tr, dow_tr)(t_te, dow_te), dtype=float)
-    band = 1.96 * float(np.std(resid))
+    resid = np.asarray(resid_by_model.get(winner) or [0.0], dtype=float)
+    band = 1.96 * float(np.std(resid)) if len(resid) > 1 else 0.0
 
     step = {"D": pd.Timedelta(days=1), "W": pd.Timedelta(weeks=1), "M": pd.DateOffset(months=1)}[freq]
     future_idx = pd.date_range(series.index[-1] + step, periods=periods, freq=freq)
@@ -143,14 +181,20 @@ def forecast_series(df: pd.DataFrame, time_col: str, measure_col: str, periods: 
         for idx, v in zip(future_idx, yhat)
     ]
     history = [{"x": idx.strftime("%Y-%m-%d"), "y": round(float(v), 2)} for idx, v in series.items()]
-    winning_mape = next((s["mape"] for s in scores if s["model"] == winner), None)
+    win = next((s for s in scores if s["model"] == winner), {})
 
     return {
         "method": winner,
         "freq": freq,
-        "backtest_mape": winning_mape,
-        "tournament": scores,  # every model's holdout MAPE, ranked
-        "backtest_note": f"4-model tournament backtested on the last {len(y_te)} held-out periods; '{winner}' won with lowest MAPE.",
+        "backtest_mape": win.get("mape"),
+        "backtest_smape": win.get("smape"),
+        "backtest_mase": win.get("mase"),
+        "tournament": scores,  # every model's MAPE / SMAPE / MASE, ranked by MASE
+        "backtest_note": (
+            f"4-model tournament, rolling-window backtest over the last {folds} periods "
+            f"(MAPE / SMAPE / MASE). '{winner}' won with the lowest MASE ({win.get('mase')}); "
+            f"a MASE below 1.0 would beat a naive one-step forecast."
+        ),
         "history": history,
         "points": points,
         "measure": measure_col,

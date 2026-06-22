@@ -1,0 +1,42 @@
+% =====================================================================
+%  wkdna.sty  —  WK-UNIVERSE umbrella package
+%  One include for every document:  \usepackage{wkdna}
+%  Loads fonts + drawing stack + palette/components/backgrounds/templates.
+%  pdflatex- and xelatex-safe.  Geometry is left to each document
+%  (posters = A3, bundles = A4).
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{wkdna}[2026/06/14 WK-UNIVERSE design DNA umbrella]
+
+% ---- encoding & fonts (CTAN packages — no system fonts needed) ------
+\RequirePackage[T1]{fontenc}
+\RequirePackage{montserrat}          % Montserrat (sans)
+\renewcommand{\familydefault}{\sfdefault}
+\RequirePackage{sourcecodepro}       % Source Code Pro (mono)
+\RequirePackage{microtype}
+
+% ---- tables / layout ------------------------------------------------
+\RequirePackage{graphicx}
+\RequirePackage{array}
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{colortbl}
+\RequirePackage{multicol}
+\RequirePackage{enumitem}
+
+% ---- drawing stack --------------------------------------------------
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,
+  shapes.geometric,shapes.misc,shapes.symbols,
+  decorations.pathreplacing,decorations.pathmorphing}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{most,skins}
+\RequirePackage{fontawesome5}
+
+% ---- WK-UNIVERSE modules (order matters: palette first) -------------
+\RequirePackage{wkpalette}
+\RequirePackage{wkcomponents}
+\RequirePackage{wkbackgrounds}
+\RequirePackage{wktemplates}
+
+\endinput

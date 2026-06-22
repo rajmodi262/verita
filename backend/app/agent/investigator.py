@@ -312,9 +312,9 @@ def investigate(df: pd.DataFrame, profile: DatasetProfile, title: str = "Dataset
             prompt = ("You are an FCC compliance analyst. Using ONLY these confirmed findings (do not invent any "
                       "numbers or entities), write a concise, professional investigation memo (under 180 words) for a "
                       f"BSA officer. End with the recommended action.\n\nFINDINGS:\n{json.dumps(facts, default=str)}")
-            out = genai._call_gemini(prompt, max_tokens=420)
+            out = genai._call_llm(prompt, max_tokens=420)
             if out:
-                memo, memo_mode = out, "llm:gemini"
+                memo, memo_mode = out, genai.mode()
     except Exception:
         pass
 

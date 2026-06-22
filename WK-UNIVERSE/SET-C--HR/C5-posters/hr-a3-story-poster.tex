@@ -1,0 +1,118 @@
+% =====================================================================
+%  POSTER 1 — THE PROJECT STORY  (A3 portrait, Editorial world)  v2
+%  Narrative spine: BLACK BOX (problem) -> BUILD -> GLASS BOX (result).
+%  Panels are filled with visuals (no dead space).
+%  Compile: pdflatex (x2).  TEXINPUTS must include 00-DESIGN-DNA.
+% =====================================================================
+\documentclass{article}
+\usepackage[a3paper,portrait,margin=0mm]{geometry}
+\usepackage{wkdna}
+
+\pagecolor{CreamPaper}
+\wkbg{\wktopography{GoldLeaf}{0.05}}
+
+\begin{document}\thispagestyle{empty}%
+\begin{tikzpicture}[remember picture,overlay,
+   shift={(current page.south west)},font=\sffamily,
+   panel/.style={draw=GoldPremium,line width=1pt,fill=white,rounded corners=3mm},
+   act/.style={font=\bfseries\large,text=DeepNavy},
+   body/.style={align=left,text=RichBlack,font=\normalsize}]
+
+% ===================== TOP HERO BAND (y 350..420) ===================
+\fill[DeepNavy] (0mm,350mm) rectangle (297mm,420mm);
+\fill[GoldPremium] (0mm,349mm) rectangle (297mm,350.6mm);
+\node[text=white,font=\bfseries] at (148.5mm,398mm){\fontsize{74}{78}\selectfont VERITA};
+\node[text=GoldPale,font=\large\itshape] at (148.5mm,378mm)
+  {Financial Crime \& Compliance Intelligence --- where every number shows its work};
+\node[text=FogGray,font=\small] at (148.5mm,361mm)
+  {Built for \textbf{\textcolor{white}{Wolters Kluwer}}\quad\textperiodcentered\quad Raj Modi\quad\textperiodcentered\quad June 2026};
+
+% ===================== STATS BAND (y 300..344) ======================
+\foreach \cx/\num/\lab/\col in {%
+   62/0.913/{ROC-AUC \textperiodcentered\ HELD-OUT}/SoftBlue,
+   148.5/0.65/{PR-AUC \textperiodcentered\ IMBALANCED}/WarmBrown,
+   235/{284{,}807}/{REAL TRANSACTIONS}/EditorialRed}{%
+   \begin{scope}[shift={(\cx mm,322mm)}]
+     \draw[\col,line width=1.2pt,fill=white,rounded corners=3mm](-38mm,-20mm) rectangle (38mm,20mm);
+     \node[text=\col,font=\bfseries] at (0,5mm){\fontsize{34}{36}\selectfont \num};
+     \node[text=SlateText,font=\small\bfseries] at (0,-12mm){\lab};
+   \end{scope}}
+
+% ===================== ACT I — THE PROBLEM (y 222..298) =============
+\node[panel,minimum width=273mm,minimum height=76mm] at (148.5mm,260mm){};
+\node[act,anchor=north west] at (18mm,294mm){ACT I \;\textperiodcentered\; THE PROBLEM};
+\node[body,anchor=north west,text width=150mm] at (18mm,285mm)
+  {Power BI's real cost isn't the charts --- it's the \emph{first hour} before you see one.
+   And compliance teams legally \emph{cannot act on a number they can't defend} to a regulator.};
+\node[anchor=west,font=\small,text=RichBlack] at (20mm,266mm){\textcolor{CoralAlert}{\faBug}~~Hours lost before the first insight};
+\node[anchor=west,font=\small,text=RichBlack] at (20mm,257mm){\textcolor{CoralAlert}{\faBug}~~Black-box dashboards nobody can \jdterm{audit}};
+\node[anchor=west,font=\small,text=RichBlack] at (20mm,248mm){\textcolor{CoralAlert}{\faBug}~~\jdterm{Fraud} buried in 284{,}807-row files};
+% --- BLACK BOX visual (right) ---
+\foreach \yy in {240,244,...,280}{\draw[FogGray,line width=0.4pt] (176mm,\yy mm)--(190mm,261mm);}
+\fill[CarbonInk,rounded corners=2mm] (190mm,238mm) rectangle (280mm,284mm);
+\node[text=white,font=\bfseries] at (235mm,264mm){\fontsize{38}{38}\selectfont ?};
+\node[text=CoralAlert,font=\footnotesize\bfseries] at (235mm,247mm){BLACK BOX};
+\node[text=SlateText,font=\scriptsize\itshape,text width=104mm,align=center] at (233mm,232mm)
+  {``a number you can't defend''};
+
+\draw[-{Stealth[length=6mm]},GoldPremium,line width=2.4pt] (148.5mm,222mm)--(148.5mm,214mm);
+
+% ===================== ACT II — THE BUILD (y 148..212) =============
+\node[panel,minimum width=273mm,minimum height=64mm] at (148.5mm,180mm){};
+\node[act,anchor=north west] at (18mm,208mm){ACT II \;\textperiodcentered\; THE BUILD};
+\draw[GoldPremium,line width=1.5pt] (40mm,190mm)--(278mm,190mm);
+\foreach \i/\sx/\step/\tool in {%
+   1/40/Profile/{Pandas\,\textperiodcentered\,SciPy}, 2/100/Recommend/{scipy.stats},
+   3/160/Score/{scikit-learn}, 4/220/Investigate/{DuckDB}, 5/278/Seal/{SHA-256}}{%
+   \fill[GoldPremium] (\sx mm,190mm) circle (3.2mm);
+   \node[text=white,font=\footnotesize\bfseries] at (\sx mm,190mm){\i};
+   \node[anchor=north,text=DeepNavy,font=\small\bfseries] at (\sx mm,184mm){\step};
+   \node[anchor=north,fill=ElectricBlue!12,rounded corners=1.5mm,inner sep=2pt,
+         text=ElectricBlue,font=\scriptsize\bfseries] at (\sx mm,177mm){\tool};}
+\node[body,anchor=north west,text width=258mm,font=\small] at (18mm,166mm)
+  {A real \jdterm{scikit-learn} pipeline (\jdterm{GradientBoosting} + \jdterm{IsolationForest}) on the
+   \jdterm{ULB} fraud set; a sandboxed \jdterm{DuckDB} \jdterm{SQL} engine; an autonomous agent that tests
+   five \jdterm{AML} hypotheses and \achieve{hash-chains} every step it takes.};
+
+\draw[-{Stealth[length=6mm]},GoldPremium,line width=2.4pt] (148.5mm,148mm)--(148.5mm,140mm);
+
+% ===================== ACT III — THE RESULT (y 70..138) ============
+\node[panel,minimum width=273mm,minimum height=68mm] at (148.5mm,104mm){};
+\node[act,anchor=north west] at (18mm,134mm){ACT III \;\textperiodcentered\; THE RESULT};
+\node[body,anchor=north west,text width=150mm,font=\small] at (18mm,125mm)
+  {Drop a file \;$\rightarrow$\; an \achieve{auditable}, BI-grade dashboard in seconds --- every number
+   shows its formula, every model decision its \jdterm{SHAP} attribution, every investigation sealed.};
+\node[anchor=west,font=\small,text=RichBlack] at (20mm,104mm){\textcolor{NeonMint!60!black}{\faCheckCircle}~~\achieve{Held-out} 0.913 / 0.65 --- honest};
+\node[anchor=west,font=\small,text=RichBlack] at (20mm,95mm){\textcolor{NeonMint!60!black}{\faCheckCircle}~~Every figure \achieve{reproducible}};
+\node[anchor=west,font=\small,text=RichBlack] at (20mm,86mm){\textcolor{NeonMint!60!black}{\faCheckCircle}~~File \;$\rightarrow$\; filed \jdterm{SAR}, one workflow};
+% --- GLASS BOX visual (right) ---
+\draw[ElectricBlue,line width=1.2pt,fill=IceWhite,rounded corners=2mm] (190mm,80mm) rectangle (280mm,128mm);
+\node[text=SoftBlue,font=\footnotesize\bfseries] at (235mm,123mm){GLASS BOX \textperiodcentered\ every number shows its work};
+\foreach \bx/\h/\lab in {199/14/P, 209/18/R, 219/12/F1}{%
+   \fill[ElectricBlue] (\bx mm,90mm) rectangle (\bx mm+6mm,90mm+\h mm);
+   \node[font=\tiny,text=SlateText] at (\bx mm+3mm,88mm){\lab};}
+\node[text=ElectricBlue,font=\scriptsize\bfseries] at (212mm,114mm){precision / recall};
+\foreach \cx in {243,254,265}{%
+   \draw[NeonMint!65!black,fill=NeonMint!22,rounded corners=1mm] (\cx mm,94mm) rectangle (\cx mm+9mm,104mm);}
+\draw[NeonMint!65!black,line width=1pt] (252mm,99mm)--(254mm,99mm) (263mm,99mm)--(265mm,99mm);
+\node[text=NeonMint!55!black,font=\small] at (270mm,110mm){\faLock};
+\node[text=NeonMint!55!black,font=\scriptsize\bfseries] at (258mm,90mm){SHA-256 sealed};
+
+% ===================== SKILLS BAND (y 20..64) =======================
+\foreach \cx/\ic/\t/\s in {%
+   62/\faRobot/{AI-NATIVE}/{builds with the model in the loop},
+   148.5/\faBrain/{PROBLEM-FIRST}/{starts from the regulator's need},
+   235/\faCode/{SHIPS CODE}/{not promises --- it runs}}{%
+   \draw[DeepNavy,line width=1pt,fill=DeepNavy,rounded corners=3mm](\cx mm-42mm,22mm) rectangle (\cx mm+42mm,60mm);
+   \node[text=GoldPale,font=\Large] at (\cx mm,52mm){\ic};
+   \node[text=white,font=\bfseries] at (\cx mm,44mm){\t};
+   \node[text=FogGray,font=\scriptsize,align=center,text width=78mm] at (\cx mm,36mm){\s};}
+
+% ===================== BOTTOM STRIP + LEFT STRIPE ===================
+\fill[DeepNavy] (0mm,0mm) rectangle (297mm,16mm);
+\node[text=GoldPale,font=\itshape] at (148.5mm,8mm)
+  {``Most AI analytics are black boxes. Verita makes every number defensible --- then seals the proof.''};
+\fill[GoldPremium] (0mm,0mm) rectangle (7mm,420mm);
+
+\end{tikzpicture}
+\end{document}

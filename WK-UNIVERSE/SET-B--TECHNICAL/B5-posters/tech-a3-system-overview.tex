@@ -1,0 +1,100 @@
+% =====================================================================
+%  POSTER 6 — SYSTEM ARCHITECTURE  (A3 landscape, Mission / blueprint)
+%  Layered architecture for the technical reviewer + live terminal.
+%  Compile: pdflatex (x2).  TEXINPUTS must include 00-DESIGN-DNA.
+% =====================================================================
+\documentclass{article}
+\usepackage[a3paper,landscape,margin=0mm]{geometry}
+\usepackage{wkdna}
+
+\pagecolor{AbyssNavy}
+\wkbg{\wkblueprint{NeonCyan}{0.07}}
+
+\begin{document}\thispagestyle{empty}%
+\begin{tikzpicture}[remember picture,overlay,
+   shift={(current page.south west)},font=\sffamily,
+   lyr/.style={rounded corners=2mm,line width=1.2pt,align=center,fill=StormBlue,
+     text=white,font=\small\bfseries},
+   eng/.style={rounded corners=2mm,line width=1pt,align=center,fill=StormBlue,
+     draw=VioletElectric,text=white,font=\scriptsize\bfseries,
+     minimum width=52mm,minimum height=22mm}]
+
+% ===================== HEADER (y 262..297) ==========================
+\fill[StormBlue] (0mm,262mm) rectangle (420mm,297mm);
+\fill[NeonCyan] (0mm,261mm) rectangle (420mm,262.6mm);
+\node[anchor=west,text=ElectricBlue,font=\bfseries] at (20mm,279mm){\fontsize{30}{32}\selectfont VERITA};
+\node[text=white,font=\Large\bfseries] at (215mm,279mm){SYSTEM ARCHITECTURE};
+\node[fill=NeonMint,text=AbyssNavy,font=\scriptsize\bfseries,rounded corners=2mm,inner sep=4pt]
+   at (388mm,279mm){blueprint \textperiodcentered\ v1.1};
+
+% registration crosshairs
+\foreach \p in {(16mm,20mm),(300mm,20mm),(16mm,250mm),(300mm,250mm)}{%
+   \draw[NeonCyan,opacity=0.5,line width=0.5pt] \p++(-3mm,0) -- ++(6mm,0);
+   \draw[NeonCyan,opacity=0.5,line width=0.5pt] \p++(0,-3mm) -- ++(0,6mm);}
+
+% ===================== ARCHITECTURE STACK (left, x14..300) ==========
+% Layer 1 — frontend
+\node[lyr,draw=NeonCyan,minimum width=284mm,minimum height=20mm] (l1) at (158mm,240mm)
+   {FRONTEND \quad React 18 \textperiodcentered\ TypeScript \textperiodcentered\ Vite \textperiodcentered\ ECharts \textperiodcentered\ Three.js \textperiodcentered\ zustand};
+% Layer 2 — API
+\node[lyr,draw=ElectricBlue,minimum width=284mm,minimum height=24mm] (l2) at (158mm,202mm)
+   {\jdtermlight{FastAPI} \;\textperiodcentered\; middleware: API-key auth \textperiodcentered\ rate-limit \textperiodcentered\ global error handler\\[1pt]
+    \footnotesize 6 REST routers \;$\to$\; 3 service layers};
+% Layer 3 — engines
+\foreach \cx/\name in {42/{profiling\\(scipy)}, 98/{ml\\(sklearn)}, 154/{nlp\\(BSA/AML)},
+   210/{genai\\(Gemini)}, 266/{investigator\\(hash-chain)}}{%
+   \node[eng] at (\cx mm,158mm){\name};}
+\node[anchor=south west,text=VioletElectric,font=\scriptsize\bfseries] at (16mm,170mm){ENGINES};
+% Layer 4 — data
+\foreach \cx/\name in {70/{DuckDB\\OLAP \textperiodcentered\ sandboxed}, 158/{PostgreSQL / SQLite\\audit trail},
+   246/{joblib\\model cache}}{%
+   \node[lyr,draw=NeonMint,minimum width=80mm,minimum height=22mm] at (\cx mm,116mm){\name};}
+\node[anchor=south west,text=NeonMint,font=\scriptsize\bfseries] at (16mm,128mm){DATA};
+% arrows
+\draw[-{Stealth[length=4mm]},NeonCyan,line width=1.3pt] (l1)--(l2) node[midway,right,text=NeonCyan,font=\scriptsize]{REST / JSON};
+\draw[-{Stealth[length=4mm]},ElectricBlue,line width=1.3pt] (158mm,190mm)--(158mm,170mm);
+\draw[-{Stealth[length=4mm]},VioletElectric,line width=1.3pt] (158mm,146mm)--(158mm,128mm);
+% guard note
+\draw[GoldLeaf,line width=1pt,rounded corners=2mm,fill=GoldLeaf!16!AbyssNavy] (16mm,76mm) rectangle (300mm,100mm);
+\node[text=GoldLeaf,font=\scriptsize\bfseries] at (158mm,94mm){THE SQL GUARD};
+\node[text=IceWhite,font=\scriptsize,align=center,text width=276mm] at (158mm,84mm)
+   {DuckDB runs with \texttt{enable\_external\_access=False}, behind a \jdtermlight{SELECT}-only,
+    comment-blocking, catalog-denying guard --- covered by an adversarial injection-test corpus.};
+% honesty footer line (left)
+\node[anchor=west,text=FogGray,font=\scriptsize,text width=284mm,align=left] at (16mm,52mm)
+   {\textbf{Engineering posture:} disk-backed dataset store (uploads survive restart) \textperiodcentered\
+    risk model persisted (0.36\,s boot vs 21\,s retrain) \textperiodcentered\ profiles computed once \& cached.};
+
+% ===================== RIGHT PANEL (x 308..410) ====================
+% terminal window
+\draw[NeonCyan,line width=1pt,fill=VoidBlack,rounded corners=2mm] (308mm,176mm) rectangle (410mm,250mm);
+\fill[StormBlue] (308mm,242mm) rectangle (410mm,250mm);
+\foreach \i/\c in {0/CoralAlert,1/GoldLeaf,2/NeonMint}{\fill[\c] (314mm+\i*5mm,246mm) circle (1.2mm);}
+\node[anchor=west,text=FogGray,font=\scriptsize\ttfamily] at (332mm,246mm){verita@build};
+\node[anchor=north west,text=NeonMint,font=\scriptsize\ttfamily,align=left,text width=98mm] at (312mm,238mm)
+   {\$ pytest -q\\
+    ~~all tests green\\
+    \$ uvicorn app.main:app\\
+    ~~model loaded 0.36s\\
+    ~~chain verified\\
+    \$ ready for review \_};
+% metrics chips
+\node[text=NeonCyan,font=\footnotesize\bfseries] at (359mm,172mm){THE NUMBERS (held-out)};
+\foreach \i/\v/\l in {0/{0.913}/{ROC-AUC}, 1/{0.65}/{PR-AUC},
+   2/{284{,}807}/{transactions}, 3/{0.17\%}/{fraud rate},
+   4/{SHA-256}/{sealed}, 5/{0}/{fabricated}}{%
+   \pgfmathsetmacro\rr{int(mod(\i,2))}\pgfmathsetmacro\cc{int(\i/2)}
+   \draw[ElectricBlue,line width=0.8pt,rounded corners=2mm,fill=StormBlue]
+     (312mm+\rr*50mm,150mm-\cc*22mm) rectangle (358mm+\rr*50mm,168mm-\cc*22mm);
+   \node[text=NeonMint,font=\small\bfseries] at (335mm+\rr*50mm,162mm-\cc*22mm){\v};
+   \node[text=FogGray,font=\tiny] at (335mm+\rr*50mm,154mm-\cc*22mm){\l};}
+\node[text=FogGray,font=\scriptsize,align=center,text width=98mm] at (359mm,78mm)
+   {\textit{Every number computed from real data at request time --- nothing hardcoded.}};
+
+% ===================== FOOTER (y 0..16) ============================
+\fill[VoidBlack] (0mm,0mm) rectangle (420mm,16mm);
+\node[anchor=west,text=NeonMint,font=\small\bfseries] at (16mm,8mm){Verita \textperiodcentered\ System Architecture};
+\node[anchor=east,text=FogGray,font=\scriptsize] at (404mm,8mm){Raj Modi \textperiodcentered\ Wolters Kluwer Interview \textperiodcentered\ June 2026};
+
+\end{tikzpicture}
+\end{document}

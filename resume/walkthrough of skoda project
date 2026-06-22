@@ -1,0 +1,282 @@
+# VW Group Academy — Room Scheduler: Complete Project Analysis
+
+## System Overview
+
+This project is a **Volkswagen Group Academy (VGA) training room management system** used to:
+1. **Extract** training events from complex Excel calendars
+2. **Classify & optimize** events (room type, shift assignment, priority)
+3. **Auto-allocate** events into physical rooms across 3 locations
+4. **Analyze** room utilization via an interactive analytics dashboard
+
+The system targets **VGA training centers** in **Pune**, **Bangalore (NCR)**, and **NCR (Delhi)**, managing ~1,243 training events across the year.
+
+---
+
+## Architecture
+
+```mermaid
+graph LR
+    A["📥 Training Calendar<br/>Excel (.xlsx)"] -->|Extract| B["extrac_ui_1-4.py<br/>VGA Event Extractor"]
+    M["📋 Requirement Matrix<br/>Excel (.xlsx)"] -->|Parse| B
+    B -->|df_events.csv| C["CSV: Raw Events"]
+    C -->|Split + Classify| D["events_for_room_algo.csv"]
+    B -->|Optimize| E["bangalore_optimizer-1.py<br/>Shift Optimizer"]
+    E -->|Optimized shifts| D
+    D -->|Feed| F["room_schedule.exe<br/>SchedulerGUI + ScheduleAllocator"]
+    F -->|Write| G["schedule_YYYY.xlsx<br/>(per year)"]
+    G -->|Load| H["vw_room_booking_tab-2.py<br/>VWAnalyticsApp Dashboard"]
+    H -->|Display| I["📊 Dashboard + Reports"]
+```
+
+---
+
+## Source Files
+
+### 1. [extrac_ui_1-4.py](file:///D:/skoda/extrac_ui_1-4.py) — Event Extractor (1,548 lines)
+
+The **front door** of the pipeline. This tkinter app:
+
+#### Key Functions
+
+| Function | Lines | Purpose |
+|---|---|---|
+| [extract_vga_events_standalone](file:///D:/skoda/extrac_ui_1-4.py#L333-L468) | 333–468 | Two-pass extraction: merged cells (multi-day events) then single-cell events. Filters by **cell background color** (only 4 allowed RGB values) and event name (must contain "vga"/"vgtap"). |
+| [split_event_into_room_blocks](file:///D:/skoda/extrac_ui_1-4.py#L599-L782) | 599–782 | **Core room classification**. Maps each event to room types (C, WS, Cluster, VGTAP, KGTTI) based on Matrix match, keyword map, or training type. Handles practice hall days. |
+| [calculate_event_priority](file:///D:/skoda/extrac_ui_1-4.py#L861-L1066) | 861–1066 | **Priority scoring engine** (6-tier system). Higher priority events are allocated first. |
+| [produce_final_csv_with_rooms](file:///D:/skoda/extrac_ui_1-4.py#L1085-L1185) | 1085–1185 | End-to-end pipeline: load events → split into blocks → priority sort → Bangalore optimizer → normalize → save CSV. |
+
+#### Color-Based Event Detection
+
+Only cells with these exact RGB fills are extracted:
+- `rgb(192, 0, 0)` — Red (firebrick)
+- `rgb(255, 192, 0)` — Gold
+- `rgb(173, 219, 123)` — Light green
+- `rgb(0, 32, 96)` — Dark navy
+
+#### Priority Tiers (highest → lowest)
+
+| Tier | Priority Range | Description |
+|---|---|---|
+| -1 | 6000+ | Fixed Practice Hall (specific PH room) |
+| 0 | 5000+ | Dedicated rooms (VGTAP, KGTTI, NSTI) |
+| 1 | 3750–4500 | Critical high-failure events (Skill Contest, SA Module, Kushaq, etc.) |
+| 2 | 3000+ | Workshop-only (WS) events |
+| 3 | 2000+ | Bangalore classroom events |
+| 4 | 1500+ | Pune classroom events |
+| 5 | 1200+ | NCR classroom events |
+| 6 | 500+ | Everything else |
+
+#### Shift Rules
+
+| Condition | Shift | Meaning |
+|---|---|---|
+| Audi events | 0 | Full day (both shifts) |
+| SALES training type | 0 | Full day |
+| Red color (firebrick) | 0 | Full day |
+| "(Shift 1)" in name | 1 | Morning only |
+| "(Shift 2)" in name | 2 | Afternoon only |
+
+---
+
+### 2. [bangalore_optimizer-1.py](file:///D:/skoda/bangalore_optimizer-1.py) — Shift Optimizer (568 lines)
+
+Specialized optimizer for **Bangalore's constrained room inventory**.
+
+#### Bangalore Room Inventory
+
+```
+C (Classroom):  Rooms 1, 2, 3   (3 rooms × 2 shifts/day)
+WS (Workshop):  Rooms 1, 2, 3   (3 rooms × 2 shifts/day)
+Cluster:        Rooms 4, 5       (2 rooms × 2 shifts/day)
+```
+
+#### Algorithm
+
+1. **Partition**: Separate Bangalore C/WS/Cluster rows from everything else
+2. **Group**: Events sharing (event_name, start_day, end_day, month) into groups
+3. **First Pass** — Greedy allocation:
+   - For each group (in priority order from upstream):
+     - Try preferred shift → other shift → shift=0 (both)
+     - All required room types must be independently satisfiable
+4. **Second Pass** — Utilization improvement (up to 5 iterations):
+   - **A**: Promote shift=0 → single shift (frees the other half)
+   - **B**: Move single-shift to alt-shift if a waiting event needs the freed slot
+   - **C**: Place previously-unallocated groups into freed slots
+
+#### Event Classification
+
+| Category | Allowed Shifts | Training Types |
+|---|---|---|
+| TECHNICAL | [2, 0] | TT, diagnostic, engine, gear, transmission |
+| NON_TECHNICAL | [1, 0] | NTT, UNKNOWN, and default |
+| ANY | [1, 2, 0] | Load-balanced freely |
+
+#### Key Class: [SlotLedger](file:///D:/skoda/bangalore_optimizer-1.py#L154-L203)
+
+Tracks room occupancy as a dictionary of `(room_type, room_number, day, shift)` → `group_id`. Provides `is_free()`, `occupy()`, `release()`, and `find_free_room()` operations.
+
+---
+
+### 3. [vw_room_booking_tab-2.py](file:///D:/skoda/vw_room_booking_tab-2.py) — Analytics Dashboard (13,999 lines)
+
+The **main application**: a comprehensive tkinter dashboard for visualizing room utilization.
+
+#### Class Map
+
+| Class | Lines | Role |
+|---|---|---|
+| [ThemeManager](file:///D:/skoda/vw_room_booking_tab-2.py#L162) | 162 | Dark/light theme toggle |
+| [Config](file:///D:/skoda/vw_room_booking_tab-2.py#L611) | 611 | Static configuration (thresholds, column mappings, defaults) |
+| [UIFactory](file:///D:/skoda/vw_room_booking_tab-2.py#L721) | 721 | Reusable UI component factory |
+| [DataLoader](file:///D:/skoda/vw_room_booking_tab-2.py#L1452) | 1452 | Excel/CSV parser with 5-priority year detection |
+| [InfoButton](file:///D:/skoda/vw_room_booking_tab-2.py#L2315) | 2315 | Help popups (WHAT/WHY/HOW) |
+| [CircularGauge](file:///D:/skoda/vw_room_booking_tab-2.py#L2423) | 2423 | Canvas-based gauge widget |
+| [UniversalFilterPanel](file:///D:/skoda/vw_room_booking_tab-2.py#L2562) | 2562 | Location/month/room/year filter bar |
+| [VWAnalyticsApp](file:///D:/skoda/vw_room_booking_tab-2.py#L3182) | 3182 | **Main application frame** |
+| [RawDataTab](file:///D:/skoda/vw_room_booking_tab-2.py#L4968) | 4968 | Sortable data table with export |
+| [DashboardTab](file:///D:/skoda/vw_room_booking_tab-2.py#L6448) | 6448 | KPI cards, charts, gauges |
+| [ComparisonTab](file:///D:/skoda/vw_room_booking_tab-2.py#L9007) | 9007 | Room-vs-room comparisons |
+| [AlertsTab](file:///D:/skoda/vw_room_booking_tab-2.py#L9552) | 9552 | Threshold-based alerts |
+| [TestCalculations](file:///D:/skoda/vw_room_booking_tab-2.py#L10052) | 10052 | Built-in validation tests |
+| [YearComparisonTab](file:///D:/skoda/vw_room_booking_tab-2.py#L10387) | 10387 | Year-over-year analysis |
+| [MonthComparisonTab](file:///D:/skoda/vw_room_booking_tab-2.py#L12416) | 12416 | Month-vs-month with radar charts |
+
+#### DataLoader Pipeline
+
+```mermaid
+graph TD
+    A[load_excel] -->|CSV?| B{Has schedule columns?}
+    A -->|Excel| C{Has 'Utilization' sheet?}
+    B -->|Yes| D[parse_event_schedule_dataframe]
+    B -->|No dashboard cols?| E[Error]
+    B -->|Yes dashboard| F[normalize_dashboard_dataframe]
+    C -->|Yes| G[parse_utilization_sheet]
+    C -->|No| H[Try first sheet]
+    H --> G
+    D --> I[add_all_calculations]
+    F --> I
+    G --> I
+    I --> J[validate_data]
+    J --> K[Ready DataFrame]
+```
+
+#### Data Format (processed DataFrame)
+
+| Column | Type | Description |
+|---|---|---|
+| location | str | "Pune", "Bangalore", "NCR" |
+| room | str | "Pune-Room 1", "Bangalore-Room 3" |
+| month | str | "Jan"–"Dec" |
+| year | str | "2025", "2026", etc. |
+| capacity | int | Max possible shifts (default 18/month) |
+| actual | int | Actual used shifts |
+| utilization | float | (actual/capacity) × 100, clamped [0, 100] |
+| waste_pct | float | 100 - utilization |
+| idle | int | capacity - actual (clipped ≥ 0) |
+| grade | str | A–F performance grade |
+| indicator | str | "green"/"yellow"/"red" |
+| mom_change | float | Month-over-month utilization change |
+| trend | str | ⬆️/➡️/⬇️ emoji |
+| rank | int | Performance rank within month |
+
+#### Utilization Thresholds
+
+| Indicator | Utilization | Color |
+|---|---|---|
+| 🟢 Green (High) | ≥ 80% | #10B981 |
+| 🟡 Yellow (Moderate) | ≥ 60% | #F59E0B |
+| 🔴 Red (Low) | < 60% | #EF4444 |
+
+#### Year Detection (5-Priority System)
+
+1. Datetime objects in Excel cells (most reliable)
+2. Sheet names with "CY YYYY" pattern
+3. Sheet names with any year pattern
+4. Filename containing year pattern
+5. String patterns in DataFrame cells
+
+---
+
+## Compiled Application: room_schedule.exe
+
+The `SchedulerGUI` and `ScheduleAllocator` classes live inside [room_schedule.exe](file:///D:/RajFiles/RoomScheduler/room_schedule.exe) (compiled via PyInstaller). Source code is **not available** in `D:\skoda` — only the compiled binary exists.
+
+### What the Scheduler Does (from log analysis)
+
+1. **Loads** a pre-existing schedule workbook template from `data/scheduler/schedule_YYYY.xlsx`
+2. **Reads** events from `data/data_events/events_for_room_algo.csv` (1,243 events)
+3. **Iterates** events in priority order, trying to allocate each to a physical room
+4. **Writes** allocations directly into the Excel schedule (cell-by-cell)
+5. **Reports**: Last run allocated **1,224/1,243** events (98.5% success rate), with **19 failures**
+
+### Room Inventory (from log analysis)
+
+| Location | Room Types | Rooms |
+|---|---|---|
+| **Pune** | C (1–5), Cluster (6–10), WS (1–6) | ~16 rooms |
+| **Bangalore** | C (1–3), Cluster (4–5), WS (1–3), KGTTI | ~9 rooms |
+| **NCR** | C (1–3), Cluster (6), WS (1–2) | ~6 rooms |
+
+### Failed Events (from last run)
+
+| # | Event | Location | Reason |
+|---|---|---|---|
+| 1 | Rennen 8.0 Skill Round | Bangalore | No room available |
+| 2 | Fundamental Training @ VGTAP Hyderabad | VGTAP | No room available |
+| 3 | Kylaq NLT Regional Round | Bangalore | No room available |
+| 4 | AQ-Engine (Shift 2) | Bangalore | No room available |
+| 5 | Sk Sales Process & Digital Tools | Bangalore | No room available |
+| 6 | Sales Manager People Management | Bangalore | No room available |
+| 7 | BQ Certification | Bangalore | No room available |
+| 8 | Kylaq NLT Regional Round | Bangalore | No room available |
+| 9 | Process Training | Bangalore | No room available |
+| 10 | AQ-HVAC | Bangalore | No room available |
+| 11 | Fundamental Training | Bangalore | No room available |
+| 12 | Porsche Basic Chassis | Pune | No room available |
+| 13 | Porsche Macan BEV Technical Introduction | Pune | No room available |
+| 14 | Porsche Advance Chassis | Pune | No room available |
+| 15 | Audi DT Screening & Customer Communication | Pune | No room available |
+| 16 | Audi HVT Training | Pune | No room available |
+| 17 | Porsche Basic Electrics | Pune | No room available |
+| 18 | Audi RS Q8 Sales Launch Training | Pune | No room available |
+| 19 | SC Certification | Pune | No room available |
+
+> [!IMPORTANT]
+> Most failures are in **Bangalore** (11/19) due to its constrained inventory (only 3 C rooms, 3 WS rooms, 2 Cluster rooms). Pune failures (8/19) appear to be Porsche/Audi specialty events competing for the same dates.
+
+---
+
+## Data Directory Structure
+
+```
+d:\RajFiles\RoomScheduler\
+├── room_schedule.exe           # Compiled scheduler GUI
+├── Uninstall.exe              # Uninstaller
+├── _internal/                 # PyInstaller runtime (Python 3.12.8)
+└── data/
+    ├── scheduler.log          # Allocation run logs
+    ├── scheduler/             # Output schedules
+    │   ├── schedule_2026.xlsx  # ← Currently active
+    │   ├── schedule_2027.xlsx
+    │   └── ... (through 2036)
+    ├── data_events/           # Input/intermediate data
+    │   ├── df_events.csv      # Raw extracted events
+    │   ├── events_for_room_algo.csv  # Processed for allocator
+    │   ├── keyword_to_classroom.csv  # Module→room mapping
+    │   └── *.xlsx             # Source training calendar & matrix
+    └── reports/               # Generated analytics reports
+```
+
+---
+
+## Key Design Decisions
+
+1. **Color-based extraction**: Events are identified by cell background color in Excel, not by text content alone. This handles the complex merged-cell calendars used by VGA.
+
+2. **Shift-aware scheduling**: Each room has 2 shifts per day. Events can occupy shift 1, shift 2, or both (shift 0). The optimizer tries to maximize single-shift usage to double effective capacity.
+
+3. **Priority-based greedy allocation**: Higher-priority events get first pick of rooms. Priorities are based on location scarcity (Bangalore > Pune > NCR), room type constraints, event type, and duration.
+
+4. **Independent room pools**: C rooms and WS rooms are independent pools — any C room can pair with any WS room. The only coupling is that multi-room events must use the **same shift**.
+
+5. **Monolithic analytics**: The 14K-line dashboard file is intentionally monolithic to enable PyInstaller single-file distribution. All tabs, charts, and export logic are self-contained.

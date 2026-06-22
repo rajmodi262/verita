@@ -1,0 +1,91 @@
+% =====================================================================
+%  wkbackgrounds.sty  —  WK-UNIVERSE page motifs
+%  DETERMINISTIC & lightweight (no random()): identical every compile,
+%  fast, and clean in print.  All anchor to current page; need 2 passes.
+%  Requires: tikz (loaded by wkdna.sty).  Usage inside a page:
+%     \AddToShipoutPictureBG{...} via wktemplates, or call directly
+%     at the top of the body inside a tikzpicture overlay context.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{wkbackgrounds}[2026/06/14 WK-UNIVERSE backgrounds]
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+
+% Each macro: {color}{opacity 0..1}. Wrap the whole motif in one scope.
+
+% ---- DOT GRID (engineered, calm) -----------------------------------
+\newcommand{\wkdotgrid}[2]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \begin{scope}[opacity=#2]
+      \foreach \xx in {0,1,...,30}{%
+        \foreach \yy in {0,1,...,43}{%
+          \fill[#1] ([shift={(\xx*10mm,\yy*10mm)}]current page.south west)
+            circle (0.5pt);}}
+    \end{scope}
+  \end{tikzpicture}%
+}
+
+% ---- BLUEPRINT GRID (fine + heavy lines) ---------------------------
+\newcommand{\wkblueprint}[2]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \begin{scope}[opacity=#2]
+      \draw[#1,line width=0.2pt,step=10mm]
+        (current page.south west) grid (current page.north east);
+      \draw[#1,line width=0.6pt,step=50mm]
+        (current page.south west) grid (current page.north east);
+    \end{scope}
+  \end{tikzpicture}%
+}
+
+% ---- CONSTELLATION (fixed stars + links) ---------------------------
+\newcommand{\wkconstellation}[2]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \begin{scope}[opacity=#2,shift={(current page.south west)}]
+      \foreach \pt/\sz in {%
+        (24mm,372mm)/1.3, (70mm,400mm)/0.8, (122mm,356mm)/1.1,
+        (180mm,398mm)/1.4, (250mm,372mm)/0.9, (40mm,300mm)/1.0,
+        (96mm,286mm)/1.5, (164mm,312mm)/0.8, (236mm,296mm)/1.2,
+        (28mm,212mm)/1.1, (88mm,196mm)/0.9, (150mm,228mm)/1.4,
+        (214mm,204mm)/1.0, (264mm,176mm)/0.8, (52mm,128mm)/1.3,
+        (118mm,112mm)/1.0, (182mm,140mm)/0.9, (244mm,104mm)/1.2,
+        (36mm,52mm)/1.1, (104mm,40mm)/0.8, (172mm,64mm)/1.4,
+        (238mm,36mm)/1.0}{\fill[#1] \pt circle (\sz pt);}
+      \draw[#1,line width=0.2pt]
+        (24mm,372mm)--(122mm,356mm)--(96mm,286mm)--(150mm,228mm)
+        (180mm,398mm)--(236mm,296mm)--(214mm,204mm)--(244mm,104mm)
+        (52mm,128mm)--(118mm,112mm)--(182mm,140mm);
+    \end{scope}
+  \end{tikzpicture}%
+}
+
+% ---- TOPOGRAPHY (smooth contour lines) -----------------------------
+\newcommand{\wktopography}[2]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \begin{scope}[opacity=#2,shift={(current page.south west)}]
+      \foreach \ii in {1,...,10}{%
+        \draw[#1,line width=0.4pt] plot[smooth,tension=0.7] coordinates{%
+          (0,\ii*40mm) (50mm,\ii*40mm+6mm) (120mm,\ii*40mm-4mm)
+          (200mm,\ii*40mm+7mm) (260mm,\ii*40mm-3mm) (297mm,\ii*40mm)};}
+    \end{scope}
+  \end{tikzpicture}%
+}
+
+% ---- CIRCUIT (deterministic traces + pads) -------------------------
+\newcommand{\wkcircuit}[2]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \begin{scope}[opacity=#2,shift={(current page.south west)},
+                  #1,line width=0.35pt]
+      \foreach \yy in {30,90,150,210,270,330,390}{%
+        \draw (0,\yy mm) -- (90mm,\yy mm) -- (110mm,\yy mm+20mm)
+              -- (210mm,\yy mm+20mm);
+        \fill (90mm,\yy mm) circle (0.9pt);
+        \fill (210mm,\yy mm+20mm) circle (0.9pt);}
+      \foreach \xx in {40,120,200,280}{%
+        \draw (\xx mm,0) -- (\xx mm,120mm) -- (\xx mm+20mm,140mm)
+              -- (\xx mm+20mm,300mm);
+        \fill (\xx mm,120mm) circle (0.9pt);}
+    \end{scope}
+  \end{tikzpicture}%
+}
+
+\endinput
