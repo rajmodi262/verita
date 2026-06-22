@@ -1,0 +1,273 @@
+%-------------------------
+% Resume / CV - Raj Modi
+% B.Tech CSE (AI & Data Science) | MIT-WPU
+% Tailored for New Harbors Consulting - Full-Stack Software Developer Intern (July 2026)
+% One-Page Compact Design
+%-------------------------
+
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{charter}
+\usepackage{ragged2e}
+
+\usetikzlibrary{calc}
+
+% =====================================================================
+%                         COLOR PALETTE
+% =====================================================================
+\definecolor{HeaderDark}{HTML}{1A1A2E}
+\definecolor{HeaderMid}{HTML}{16213E}
+\definecolor{AccentBlue}{HTML}{0F3460}
+\definecolor{AccentTeal}{HTML}{1A936F}
+\definecolor{Charcoal}{HTML}{2A2A2A}
+\definecolor{DarkGray}{HTML}{333333}
+\definecolor{MidGray}{HTML}{555555}
+\definecolor{SubText}{HTML}{666666}
+\definecolor{LightGray}{HTML}{E8E8E8}
+\definecolor{LinkBlue}{HTML}{2563EB}
+\definecolor{SectionLine}{HTML}{0F3460}
+\definecolor{BulletColor}{HTML}{1A936F}
+\definecolor{TechTag}{HTML}{4A5568}
+
+% =====================================================================
+%                         PAGE GEOMETRY
+% =====================================================================
+\geometry{
+  left=0.4in,
+  right=0.4in,
+  top=0.14in,
+  bottom=0.12in
+}
+
+% =====================================================================
+%                         PAGE STYLE
+% =====================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+\raggedbottom
+\setlength{\tabcolsep}{0in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% =====================================================================
+%                     SECTION HEADER COMMAND
+% =====================================================================
+\newcommand{\sectionHeader}[2]{%
+  \vspace{1.5pt}%
+  \noindent%
+  {\normalsize\bfseries\color{HeaderDark}#2\enspace\textsc{#1}}%
+  \\[-6pt]%
+  {\color{SectionLine}\rule{\textwidth}{1pt}}%
+  \vspace{1pt}\par%
+}
+
+% =====================================================================
+%                     PROJECT ENTRY
+% =====================================================================
+\newcommand{\projectEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-4pt]%
+  {\scriptsize\color{AccentTeal}\textbf{#3}} {\scriptsize\color{TechTag}\textit{\,|\, #4}}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EXPERIENCE ENTRY
+% =====================================================================
+\newcommand{\expEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}\textit{#3}} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EDUCATION ENTRY
+% =====================================================================
+\newcommand{\eduEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}#3} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+\begin{document}
+
+% =======================================================================
+%                          HEADER
+% =======================================================================
+
+\begin{center}
+  {\fontsize{24}{28}\selectfont\bfseries\color{HeaderDark}Raj Modi}
+
+  \vspace{2pt}
+
+  {\small\color{MidGray}Full-Stack Software Developer \,|\, TypeScript \textperiodcentered\ React/Next.js \textperiodcentered\ FastAPI \textperiodcentered\ PostgreSQL \textperiodcentered\ DevOps \& AI}
+
+  \vspace{3pt}
+
+  {\small%
+    \href{https://www.linkedin.com/in/rajmodi2004/}{{\color{AccentBlue}\faLinkedin}~\color{LinkBlue}linkedin.com/in/rajmodi2004}%
+    \quad{\color{LightGray}|}%
+    \quad\href{https://github.com/rajmodi262}{{\color{AccentBlue}\faGithub}~\color{LinkBlue}github.com/rajmodi262}%
+    \quad{\color{LightGray}|}%
+    \quad\href{mailto:rajmodi262@gmail.com}{{\color{AccentBlue}\faEnvelope}~\color{LinkBlue}rajmodi262@gmail.com}%
+    \quad{\color{LightGray}|}%
+    \quad{\color{AccentBlue}\faPhone*}~{\color{DarkGray}+91-8817130400}%
+  }
+\end{center}
+
+\vspace{-2pt}
+
+% =======================================================================
+%                          SUMMARY
+% =======================================================================
+
+\sectionHeader{Summary}{\faUser}
+
+\vspace{1pt}
+{\small Final-semester B.Tech (CSE) student who \textbf{designs, develops, and deploys full-stack web-app MVPs} end-to-end --- proficient in \textbf{TypeScript} and \textbf{database technologies} (PostgreSQL, MySQL), with hands-on \textbf{DevOps} (Docker, CI/CD, DigitalOcean) and \textbf{AI} (RAG, semantic matching, MCP). Experienced \textbf{managing user databases} and \textbf{integrating existing back-ends} into cloud platforms. Fast, curious learner who ships working software over theory --- a strong fit for AEC-sector cloud development.}
+
+% =======================================================================
+%                       TECHNICAL SKILLS
+% =======================================================================
+
+\sectionHeader{Technical Skills}{\faCogs}
+
+\vspace{1pt}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  {\small\textbf{\color{HeaderDark}Languages:}} & {\small TypeScript, JavaScript (ES6+), Python, SQL, Java} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Front-End:}} & {\small React, Next.js, Vue.js, Tailwind CSS, Ant Design, shadcn/ui, Zustand, Recharts / ECharts, Three.js} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Back-End:}} & {\small Next.js API Routes, tRPC, FastAPI, Node.js, REST API design \& integration, WebSockets, NextAuth / JWT Auth} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Database \& ORM:}} & {\small PostgreSQL, MySQL, DuckDB, Redis; Prisma, Drizzle ORM} \\[2pt]
+  {\small\textbf{\color{HeaderDark}DevOps \& Cloud:}} & {\small Docker, Docker Compose, DigitalOcean, Vercel, GitHub Actions (CI/CD), Git/GitHub} \\[2pt]
+  {\small\textbf{\color{HeaderDark}AI / ML:}} & {\small RAG, Semantic Matching, MCP (Model Context Protocol), LangGraph Multi-Agent, XGBoost / SHAP, spaCy NLP} \\
+\end{tabularx}
+
+% =======================================================================
+%                          PROJECTS
+% =======================================================================
+
+\sectionHeader{Projects}{\faProjectDiagram}
+
+% --- Project 1: Keystone (FLAGSHIP - AEC full-stack TS: Next.js+tRPC+Prisma+AI) ---
+\projectEntry{Keystone -- AEC Project Platform with Conflict-Aware Document AI}
+  {\href{https://keystone-app-two.vercel.app}{\color{LinkBlue}\faGlobe~Live Demo} \,|\, 2026}
+  {Multi-Tenant Full-Stack SaaS \,|\, Novel Conflict-Aware RAG}
+  {Next.js 14, TypeScript, tRPC, Prisma, PostgreSQL/pgvector, shadcn/ui, Tailwind CSS, Docker, Vercel}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Designed, developed, and deployed a \textbf{multi-tenant cloud-platform MVP} for Architecture/Engineering/Construction firms --- \textbf{end-to-end TypeScript} (Next.js 14 App Router $+$ \textbf{tRPC} $+$ \textbf{Prisma} $+$ \textbf{PostgreSQL}) to manage projects, drawings/specs, and RFI workflows, with org-scoped \textbf{role-based access} (Architect/Engineer/Contractor/Client) over a managed \textbf{users database}.}
+  \item {\small Built a novel \textbf{conflict-aware RAG} engine that clusters retrieved evidence to \textbf{surface contradictions between specs and drawings} (vs.\ a single confident answer), plus a \textbf{change-impact graph} computing the downstream ``blast radius'' of any document revision --- via \textbf{pgvector semantic search}, an \textbf{MCP server}, and source-cited answers; \textbf{deployed live on Vercel + Neon} (GitHub Actions CI/CD) with a \textbf{shadcn/ui $+$ Tailwind} UI.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 2: Verita (full-stack TS + ML, Docker, CI, deployed) ---
+\projectEntry{Verita -- Financial Crime \& Compliance Intelligence}
+  {2026}
+  {Full-Stack TypeScript + ML + CI/CD}
+  {React, TypeScript, FastAPI, PostgreSQL, DuckDB, XGBoost, Docker}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built and deployed a full-stack analytics platform (\textbf{React + TypeScript}, FastAPI, \textbf{PostgreSQL + DuckDB}) with real ML fraud scoring (\textbf{XGBoost}, ROC-AUC $\sim$0.99), SHAP explainability, and natural-language$\rightarrow$SQL --- \textbf{Dockerized} with GitHub Actions \textbf{CI} (82 tests passing).}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 3: AgentForge (TS frontend + DevOps/Docker + users DB + MCP) ---
+\projectEntry{AgentForge -- Multi-Agent AI Planning Engine}
+  {2026}
+  {TypeScript Front-End, Users DB \& Multi-Agent AI}
+  {React + TypeScript, FastAPI, LangGraph, PostgreSQL, Redis, Docker Compose, JWT, MCP}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Engineered a 7-agent \textbf{LangGraph} system with a \textbf{React + TypeScript} front-end and real-time WebSocket streaming; \textbf{containerized the full stack} (FastAPI, \textbf{PostgreSQL}, Redis) for \textbf{one-command Docker Compose} deployment.}
+  \item {\small Implemented \textbf{JWT authentication} and a managed \textbf{users database} with protected, role-based routes, plus a custom \textbf{MCP server} exposing agent tools.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 4: MissionOS (AEC-adjacent: multi-project engineering lifecycle web app) ---
+\projectEntry{MissionOS -- Systems Engineering \& Project Lifecycle Platform}
+  {2026}
+  {Multi-Project Lifecycle Management Web App}
+  {JavaScript (SPA), Vite, Canvas, Chart.js, Selenium}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built a single-page web platform managing the full \textbf{engineering project lifecycle} across 6 concurrent programs --- tracking \textbf{247 requirements}, 8 interface-mapped subsystems, a 5$\times$5 risk matrix, and multi-criteria trade studies through 11 lifecycle phases, with authenticated access and a KPI command-deck dashboard.}
+  \item {\small Hardened with a \textbf{58-test Selenium suite} and built as a modular, dependency-mapped architecture.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 5: Nyay AI (RAG + Semantic Matching) ---
+\projectEntry{Nyay AI -- Unified Legal Intelligence Platform}
+  {2026}
+  {Hybrid RAG \& Semantic Search}
+  {Python, Flask, Hybrid RAG, Knowledge Graph, LLaMA 3.3}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built a \textbf{hybrid RAG} pipeline --- dense-vector + BM25 \textbf{semantic matching} with reciprocal-rank fusion, HyDE query expansion, and CRAG self-correction --- over legal documents in 22+ Indian languages, returning source-cited, streaming answers.}
+\end{itemize}
+
+% =======================================================================
+%                       WORK EXPERIENCE
+% =======================================================================
+
+\sectionHeader{Work Experience}{\faLaptopCode}
+
+\expEntry{Software Developer \& Project Management Lead}
+  {Jun 2025 -- Feb 2026}
+  {VW Group Academy (\v{S}koda / Volkswagen)}
+  {Remote, India}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small \textbf{Led a 3-student team} as project-management lead and key developer on an 8-month engagement with a \textbf{real enterprise client}: gathered requirements and built an automated scheduling engine (ETL $+$ constraint-based allocator) for \textbf{$\sim$1,243 annual training events} across 3 centres --- reaching \textbf{98.5\% auto-allocation} and cutting manual effort \textbf{$\sim$80\%}.}
+\end{itemize}
+
+\vspace{1pt}
+
+\expEntry{Community \& Growth Intern}
+  {2023}
+  {Engineer's Cradle Pvt.\ Ltd.}
+  {Remote, India}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Lifted user engagement \textbf{40\%} via data-driven campaigns and automated reporting.}
+\end{itemize}
+
+% =======================================================================
+%                  ACHIEVEMENTS & CERTIFICATIONS
+% =======================================================================
+
+\sectionHeader{Achievements \& Certifications}{\faTrophy}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}$\bullet$}]
+  \item {\small \textbf{SIH 2025 -- Rank 63 (Top 10\%)}, Smart India Hackathon (accessible Kolam designer with voice assistant) {\color{SubText}|} \textbf{AIR 8}, National Creative Olympiad.}
+  \item {\small \textbf{Certifications:} Google -- Advanced Data Analytics {\color{SubText}|} IBM -- Data Visualization with Python {\color{SubText}|} Indiana University -- Financial Planning.}
+  \item {\small \textbf{Joint President}, Student Alumni Relations Society, MIT-WPU (2025--26) {\color{SubText}|} \textbf{Execution Head}, RIDE 2025 tech fest (500+ attendees).}
+\end{itemize}
+
+% ============================================================
+\end{document}

@@ -1,0 +1,218 @@
+% =====================================================================
+%  VERITA — THE STORY  (A4, 8 pages, clear & lightly illustrated)
+%  HR bundle rebuilt for FLOW + UNDERSTANDING. Plain-English narrative:
+%  Problem -> What it is -> The 3 things -> How it flows -> Why it's
+%  different -> The fit & who built it -> The first 90 days.
+%  Compile: pdflatex (x2).  TEXINPUTS must include 00-DESIGN-DNA.
+% =====================================================================
+\documentclass[12pt]{article}
+\usepackage[a4paper,margin=0mm]{geometry}
+\usepackage{wkdna}
+\linespread{1.12}
+\pagestyle{empty}
+
+\newcommand{\base}{\fill[CreamPaper] (0,0) rectangle (210mm,297mm);
+  \foreach \yy in {1,...,9}{\draw[GoldPremium,opacity=0.05,line width=0.5pt] plot[smooth]
+    coordinates{(0,\yy*32mm)(70mm,\yy*32mm+5mm)(150mm,\yy*32mm-4mm)(210mm,\yy*32mm)};}
+  \fill[GoldPremium] (0,0) rectangle (6mm,297mm);}
+\newcommand{\seal}[2]{% cx cy  (gold wax-seal stamp)
+  \begin{scope}[shift={(#1mm,#2mm)},rotate=-10]
+    \draw[GoldPremium,line width=2.5pt] (0,0) circle (17mm);
+    \draw[GoldPremium,line width=1pt] (0,0) circle (13.5mm);
+    \node[text=GoldPremium,font=\large] at (0,5mm){\faStar};
+    \node[text=GoldPremium,font=\small\bfseries] at (0,0){VERITA};
+    \node[text=GoldPremium,font=\tiny\bfseries] at (0,-5mm){VERIFIED \textperiodcentered\ 2026};
+  \end{scope}}
+\newcommand{\pullquote}[2]{% y text  (gold pull-quote band)
+  \draw[GoldPremium,line width=1pt,rounded corners=2mm,fill=GoldPale] (28mm,#1mm-12mm) rectangle (182mm,#1mm+12mm);
+  \fill[GoldPremium] (28mm,#1mm-12mm) rectangle (31.5mm,#1mm+12mm);
+  \node[text=DeepNavy,font=\Large\bfseries] at (107mm,#1mm){#2};}
+\newcommand{\head}[2]{% number title
+  \node[anchor=base west,text=GoldPremium,font=\bfseries] at (16mm,272mm){\fontsize{26}{26}\selectfont #1};
+  \node[anchor=base west,text=DeepNavy,font=\bfseries] at (40mm,272mm){\fontsize{21}{21}\selectfont #2};
+  \draw[GoldPremium,line width=1.4pt] (16mm,266mm)--(194mm,266mm);}
+\newcommand{\foot}[1]{%
+  \draw[GoldPremium!60,line width=0.6pt] (16mm,16mm)--(194mm,16mm);
+  \node[anchor=base west,text=SlateText,font=\footnotesize] at (16mm,11mm){\textbf{Verita} \textperiodcentered\ the story};
+  \node[anchor=base east,text=SlateText,font=\footnotesize] at (194mm,11mm){Raj Modi \textperiodcentered\ Wolters Kluwer \textperiodcentered\ #1\,/\,8};}
+\newcommand{\body}[2]{% y text  (readable prose block)
+  \node[anchor=north west,text=RichBlack,font=\normalsize,align=left,text width=174mm] at (16mm,#1){#2};}
+\newcommand{\HG}[1]{\begin{tikzpicture}[remember picture,overlay,
+   shift={(current page.south west)},font=\sffamily]#1\end{tikzpicture}\newpage}
+
+\begin{document}
+
+% ============================ PAGE 1 — COVER =========================
+\HG{%
+  \base
+  \draw[DeepNavy,line width=1.4pt] (13mm,13mm) rectangle (197mm,284mm);
+  \draw[GoldPremium,line width=0.6pt] (16mm,16mm) rectangle (194mm,281mm);
+  \node[text=DeepNavy,font=\bfseries] at (108mm,205mm){\fontsize{60}{62}\selectfont VERITA};
+  \fill[GoldPremium] (74mm,188mm) rectangle (142mm,190mm);
+  \seal{108}{84}
+  \node[text=WarmBrown,font=\large\itshape] at (108mm,178mm){Financial Crime \& Compliance Intelligence};
+  \node[text=RichBlack,font=\large,align=center,text width=150mm] at (108mm,150mm)
+    {Upload any financial dataset and, in seconds, get a dashboard that explains your data,
+     a fraud-risk score for every transaction, and a sealed report a regulator could check.};
+  \node[text=DeepNavy,font=\large\bfseries,align=center,text width=150mm] at (108mm,118mm)
+    {A working product --- not a r\'esum\'e.};
+  \node[text=SlateText,font=\normalsize] at (108mm,44mm){Raj Modi \textperiodcentered\ built for Wolters Kluwer \textperiodcentered\ June 2026};
+}
+
+% ====================== PAGE 2 — THE PROBLEM =========================
+\HG{%
+  \base \head{01}{The problem it solves}
+  \body{254mm}{A compliance analyst opens a file with hundreds of thousands of transactions.
+    Before they see a single useful insight, an hour is gone just setting up charts. And when they
+    finally spot something suspicious, they hit a wall that is unique to finance:}
+  \node[text=DeepNavy,font=\Large\itshape,align=center,text width=170mm] at (105mm,196mm)
+    {``You cannot act on a number you cannot explain to a regulator.''};
+  % simple before-state illustration
+  \node[anchor=north west,text=RichBlack,font=\normalsize,align=left,text width=174mm] at (16mm,170mm)
+    {So two costs pile up, every single day:};
+  \draw[EditorialRed,line width=1.2pt,rounded corners=3mm,fill=white] (16mm,118mm) rectangle (103mm,156mm);
+  \node[text=EditorialRed,font=\Large] at (28mm,143mm){\faClock};
+  \node[anchor=north west,text=RichBlack,font=\normalsize,align=left,text width=62mm] at (38mm,150mm)
+    {\textbf{Lost time} --- the first hour vanishes before any answer appears.};
+  \draw[EditorialRed,line width=1.2pt,rounded corners=3mm,fill=white] (107mm,118mm) rectangle (194mm,156mm);
+  \node[text=EditorialRed,font=\Large] at (119mm,143mm){\faQuestion};
+  \node[anchor=north west,text=RichBlack,font=\normalsize,align=left,text width=62mm] at (129mm,150mm)
+    {\textbf{No trust} --- a number you can't defend is a number you can't use.};
+  \body{100mm}{Verita was built to remove both. The rest of this story is simply: \emph{how}.}
+  \foot{2}
+}
+
+% ====================== PAGE 3 — WHAT IS VERITA ======================
+\HG{%
+  \base \head{02}{So, what is Verita?}
+  \body{254mm}{In one sentence: \textbf{Verita turns any financial dataset into an instant, trustworthy
+    report.} You drop in a file, and it does three things for you at once ---}
+  % input -> box -> outputs diagram
+  \node[draw=DeepNavy,line width=1.4pt,fill=white,rounded corners=2mm,minimum width=28mm,minimum height=20mm,
+        align=center,font=\small\bfseries,text=DeepNavy] (in) at (32mm,196mm){\faFile\\your file\\(CSV / Excel)};
+  \node[draw=GoldPremium,line width=2pt,fill=GoldPale,rounded corners=2mm,minimum width=30mm,minimum height=24mm,
+        align=center,font=\bfseries,text=DeepNavy] (box) at (82mm,196mm){VERITA};
+  \draw[-{Stealth[length=4mm]},DeepNavy,line width=1.4pt] (in)--(box);
+  \foreach \i/\t/\col in {0/{a dashboard that explains your data}/SoftBlue,
+     1/{a fraud-risk score for every transaction}/EditorialRed,
+     2/{a sealed, tamper-proof report}/WarmBrown}{%
+     \node[draw=\col,line width=1.2pt,fill=white,rounded corners=2mm,minimum width=64mm,minimum height=13mm,
+           align=left,font=\small,text=RichBlack,anchor=west,inner sep=4pt] (o\i) at (126mm,214mm-\i*18mm){\t};
+     \draw[-{Stealth[length=3mm]},\col,line width=1.2pt] (box.east) to[out=0,in=180] (o\i.west);}
+  \body{156mm}{No BI tool to learn, no black boxes, no waiting. The promise underneath all of it is
+    a single rule that runs through the whole product:}
+  \pullquote{119}{Every number it shows, it can prove.}
+  \body{104mm}{That one rule is what makes Verita usable in compliance, where ``trust me'' is never
+    a good enough answer.}
+  \foot{3}
+}
+
+% ====================== PAGE 4 — THE 3 THINGS ========================
+\HG{%
+  \base \head{03}{Three things, each done well}
+  \body{254mm}{Verita is really three tools that share one file and one principle. Here is what each
+    one does, in plain terms:}
+  \foreach \i/\ic/\name/\desc/\col in {%
+     0/\faChartBar/{The Auto-Dashboard}/{Drop in a file and get a polished, business-grade dashboard in seconds --- the charts an analyst would have built, without the hour of setup.}/SoftBlue,
+     1/\faSearch/{The Fraud Engine}/{Scores every transaction for fraud risk using real machine learning --- and, crucially, shows \emph{why} each one was flagged, in language a person can act on.}/EditorialRed,
+     2/\faLock/{The Investigator}/{An AI that investigates the data on its own, writes up what it found, and then \emph{seals} the report so no one can quietly change it afterwards.}/WarmBrown}{%
+     \draw[\col,line width=1.4pt,rounded corners=3mm,fill=white] (16mm,188mm-\i*56mm) rectangle (194mm,236mm-\i*56mm);
+     \fill[\col] (16mm,188mm-\i*56mm) rectangle (52mm,236mm-\i*56mm);
+     \node[text=white,font=\Huge] at (34mm,212mm-\i*56mm){\ic};
+     \node[anchor=north west,text=\col,font=\large\bfseries] at (58mm,232mm-\i*56mm){\name};
+     \node[anchor=north west,text=RichBlack,font=\normalsize,align=left,text width=128mm] at (58mm,223mm-\i*56mm){\desc};}
+  \foot{4}
+}
+
+% ====================== PAGE 5 — HOW IT FLOWS ========================
+\HG{%
+  \base \head{04}{How it works, start to finish}
+  \body{254mm}{From the moment you drop in a file to the moment you have a defensible answer, Verita
+    moves through five clear steps. You can follow the whole journey at a glance:}
+  % 5-step flow
+  \foreach \i/\cx/\step/\plain/\ic in {%
+     0/26/{UPLOAD}/{Drop in your file.}/\faUpload, 1/64/{UNDERSTAND}/{It profiles the data and builds the dashboard.}/\faChartBar,
+     2/102/{DETECT}/{It scores every transaction for fraud.}/\faSearch, 3/140/{EXPLAIN}/{It shows why each score is what it is.}/\faEye,
+     4/178/{SEAL}/{It locks the result in a tamper-proof record.}/\faLock}{%
+     \node[text=WarmBrown,font=\normalsize] at (\cx mm,211mm){\ic};
+     \fill[GoldPremium] (\cx mm,196mm) circle (7.5mm);
+     \node[text=DeepNavy,font=\bfseries] at (\cx mm,196mm){\the\numexpr\i+1\relax};
+     \node[text=DeepNavy,font=\small\bfseries] at (\cx mm,183mm){\step};
+     \node[text=RichBlack,font=\scriptsize,align=center,text width=34mm] at (\cx mm,170mm){\plain};}
+  \foreach \a/\b in {26/64,64/102,102/140,140/178}{%
+     \draw[-{Stealth[length=3mm]},DeepNavy,line width=1.4pt] (\a mm+8.5mm,196mm)--(\b mm-8.5mm,196mm);}
+  \node[anchor=north west,text=RichBlack,font=\normalsize,align=left,text width=174mm] at (16mm,146mm)
+    {The key is the order. Most tools stop at step three --- they hand you a score and ask you to
+     trust it. Verita keeps going. \textbf{Steps four and five --- explain, then seal --- are the
+     whole point.} They turn a number into something you can put your name on.};
+  \foot{5}
+}
+
+% ====================== PAGE 6 — WHY DIFFERENT =======================
+\HG{%
+  \base \head{05}{Why this one is different}
+  \body{254mm}{Most analytics tools are ``black boxes.'' They give you an answer and ask you to trust
+    it. Verita's rule is the opposite ---}
+  % black box vs glass box (understated)
+  \draw[SlateText,line width=1.4pt,rounded corners=3mm,fill=RichBlack] (16mm,176mm) rectangle (100mm,220mm);
+  \node[text=white,font=\bfseries] at (58mm,206mm){\Large THE OLD WAY};
+  \node[text=FogGray,font=\normalsize,align=center,text width=72mm] at (58mm,191mm){``Here's a number.\\ Trust me.''};
+  \draw[GoldPremium,line width=1.6pt,rounded corners=3mm,fill=white] (110mm,176mm) rectangle (194mm,220mm);
+  \node[text=DeepNavy,font=\bfseries] at (152mm,206mm){\Large VERITA};
+  \node[text=RichBlack,font=\normalsize,align=center,text width=72mm] at (152mm,191mm){``Here's a number ---\\ and here's the proof.''};
+  \body{166mm}{Click any figure and it shows the exact formula behind it. Every AI decision shows the
+    question it asked the data. And the whole investigation is sealed, so nothing can be changed
+    after the fact. The project's spine is one promise:}
+  \pullquote{119}{Every number shows its work.}
+  \body{104mm}{It also tells you what it \emph{can't} do. On real fraud data --- \textbf{284,807}
+    actual transactions --- it catches fraud with honest, measured accuracy, and openly lists its own
+    limits. That honesty is the feature.}
+  \foot{6}
+}
+
+% ====================== PAGE 7 — THE FIT + WHO =======================
+\HG{%
+  \base \head{06}{Why it fits --- and who built it}
+  \body{254mm}{Verita wasn't built in general. It was built against the Wolters Kluwer FCC Data
+    Science role, point by point:}
+  \foreach \i/\need/\does in {%
+     0/{Forecasting}/{predicts trends and shows how accurate it was},
+     1/{Fraud \& AML detection}/{real machine learning, with honest results},
+     2/{Working with data \& SQL}/{a built-in query engine and auto-profiling},
+     3/{Reporting}/{instant dashboards, PDF exports, an audit trail},
+     4/{Regulatory rigour}/{sealed, reproducible, no invented numbers}}{%
+     \node[anchor=west,text=DeepNavy,font=\normalsize\bfseries,text width=58mm] at (18mm,210mm-\i*15mm){\need};
+     \node[text=GoldPremium,font=\normalsize] at (82mm,210mm-\i*15mm){\faArrowRight};
+     \node[anchor=west,text=RichBlack,font=\normalsize,text width=104mm] at (90mm,210mm-\i*15mm){\does};}
+  \draw[DeepNavy,line width=1.4pt,rounded corners=3mm,fill=DeepNavy] (16mm,40mm) rectangle (194mm,118mm);
+  \fill[GoldPremium] (16mm,40mm) rectangle (19mm,118mm);
+  \node[anchor=north west,text=GoldPale,font=\large\bfseries] at (24mm,110mm){Who built it};
+  \node[anchor=north west,text=white,font=\normalsize,align=left,text width=164mm] at (24mm,100mm)
+    {I didn't send a list of skills --- I built the thing the role is about. I taught myself the
+     full stack, designed the ``every number shows its work'' principle, and shipped a real, working
+     product. Every claim in this story is something I can sit down and demonstrate.};
+  \foot{7}
+}
+
+% ====================== PAGE 8 — 90 DAYS + CLOSE =====================
+\HG{%
+  \base \head{07}{The first 90 days}
+  \body{254mm}{If you hire me, here is how I'd start --- the same way I built Verita: learn it deeply,
+    own a piece end to end, then make it production-grade.}
+  \foreach \i/\ph/\days/\desc/\col in {%
+     0/{LEARN}/{days 1--30}/{Get fluent in the stack, the data, and the regulations. Ship a first owned report and ask a lot of questions.}/WarmBrown,
+     1/{OWN}/{days 31--60}/{Take a real model or forecast from raw data to a defended, documented result --- the way Verita was built.}/GoldLeaf,
+     2/{HARDEN}/{days 61--90}/{Make it production-grade: monitor for drift, capture analyst feedback, and write the limitations down.}/SoftBlue}{%
+     \draw[\col,line width=1.4pt,rounded corners=3mm,fill=white] (16mm,196mm-\i*40mm) rectangle (194mm,228mm-\i*40mm);
+     \node[anchor=west,text=\col,font=\large\bfseries] at (22mm,217mm-\i*40mm){\ph};
+     \node[anchor=west,text=SlateText,font=\footnotesize] at (22mm,208mm-\i*40mm){\days};
+     \node[anchor=west,text=RichBlack,font=\normalsize,align=left,text width=120mm] at (66mm,212mm-\i*40mm){\desc};}
+  \draw[DeepNavy,line width=1.4pt,rounded corners=3mm,fill=DeepNavy] (16mm,40mm) rectangle (194mm,86mm);
+  \node[text=GoldPale,font=\Large\bfseries,align=center,text width=170mm] at (105mm,68mm)
+    {I came with a solution, not a CV.};
+  \node[text=white,font=\normalsize\itshape,align=center,text width=170mm] at (105mm,54mm)
+    {Let's build the next version together. \quad---\quad Raj Modi};
+  \foot{8}
+}
+
+\end{document}

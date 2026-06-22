@@ -1,0 +1,234 @@
+%-------------------------
+% Resume / CV - Raj Modi
+% B.Tech CSE (AI & Data Science) | MIT-WPU
+% Tailored for Knorr-Bremse Technology Center India - Intern Trainee (Req ID 10633, Pune)
+% Focus: Python + LLMs to automate manual SDLC activities (code gen, test automation, doc automation)
+% Projects-forward: SKODA -> Verita -> AgentForge -> Nyay AI (high technical density)
+%-------------------------
+
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{charter}
+\usepackage{ragged2e}
+
+\usetikzlibrary{calc}
+
+% =====================================================================
+%                         COLOR PALETTE
+% =====================================================================
+\definecolor{HeaderDark}{HTML}{1A1A2E}
+\definecolor{HeaderMid}{HTML}{16213E}
+\definecolor{AccentBlue}{HTML}{0F3460}
+\definecolor{AccentTeal}{HTML}{1A936F}
+\definecolor{Charcoal}{HTML}{2A2A2A}
+\definecolor{DarkGray}{HTML}{333333}
+\definecolor{MidGray}{HTML}{555555}
+\definecolor{SubText}{HTML}{666666}
+\definecolor{LightGray}{HTML}{E8E8E8}
+\definecolor{LinkBlue}{HTML}{2563EB}
+\definecolor{SectionLine}{HTML}{0F3460}
+\definecolor{BulletColor}{HTML}{1A936F}
+\definecolor{TechTag}{HTML}{4A5568}
+
+% =====================================================================
+%                         PAGE GEOMETRY
+% =====================================================================
+\geometry{
+  left=0.35in,
+  right=0.35in,
+  top=0.12in,
+  bottom=0.1in
+}
+
+% =====================================================================
+%                         PAGE STYLE
+% =====================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+\raggedbottom
+\setlength{\tabcolsep}{0in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% =====================================================================
+%                     SECTION HEADER COMMAND
+% =====================================================================
+\newcommand{\sectionHeader}[2]{%
+  \vspace{1.5pt}%
+  \noindent%
+  {\normalsize\bfseries\color{HeaderDark}#2\enspace\textsc{#1}}%
+  \\[-6pt]%
+  {\color{SectionLine}\rule{\textwidth}{1pt}}%
+  \vspace{1pt}\par%
+}
+
+% =====================================================================
+%                     PROJECT ENTRY
+% =====================================================================
+\newcommand{\projectEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-4pt]%
+  {\scriptsize\color{AccentTeal}\textbf{#3}} {\scriptsize\color{TechTag}\textit{\,|\, #4}}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EDUCATION ENTRY
+% =====================================================================
+\newcommand{\eduEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}#3} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+\begin{document}
+
+% =======================================================================
+%                          HEADER
+% =======================================================================
+
+\begin{center}
+  {\fontsize{24}{28}\selectfont\bfseries\color{HeaderDark}Raj Modi}
+
+  \vspace{2pt}
+
+  {\small\color{MidGray}Python \& AI Developer \,|\, LLMs \& Multi-Agent Systems \textperiodcentered\ Engineering-Process Automation \textperiodcentered\ ML \textperiodcentered\ FastAPI}
+
+  \vspace{3pt}
+
+  {\small%
+    \href{https://www.linkedin.com/in/rajmodi2004/}{{\color{AccentBlue}\faLinkedin}~\color{LinkBlue}linkedin.com/in/rajmodi2004}%
+    \quad{\color{LightGray}|}%
+    \quad\href{https://github.com/rajmodi262}{{\color{AccentBlue}\faGithub}~\color{LinkBlue}github.com/rajmodi262}%
+    \quad{\color{LightGray}|}%
+    \quad\href{mailto:rajmodi262@gmail.com}{{\color{AccentBlue}\faEnvelope}~\color{LinkBlue}rajmodi262@gmail.com}%
+    \quad{\color{LightGray}|}%
+    \quad{\color{AccentBlue}\faPhone*}~{\color{DarkGray}+91-8817130400}%
+  }
+\end{center}
+
+\vspace{-2pt}
+
+% =======================================================================
+%                          SUMMARY
+% =======================================================================
+
+\sectionHeader{Summary}{\faUser}
+
+\vspace{1pt}
+{\small Final-semester B.Tech (CSE --- AI \& Data Science) engineer who builds \textbf{Python tools and LLM-powered systems that automate manual engineering and SDLC workflows} --- LLM \textbf{code generation} (natural-language$\rightarrow$SQL), \textbf{automated documentation generation}, \textbf{test automation} (pytest / Vitest / Selenium, CI-gated), \textbf{multi-agent LLM orchestration} (LangGraph), and \textbf{RAG / MCP}. Delivered a Python automation engine for a \textbf{real automotive client (VW Group Academy)} that cut manual effort \textbf{$\sim$80\%} --- a direct fit for using \textbf{Python + LLMs to turn manual SDLC effort into measurable cost savings.}}
+
+% =======================================================================
+%                       TECHNICAL SKILLS
+% =======================================================================
+
+\sectionHeader{Technical Skills}{\faCogs}
+
+\vspace{1pt}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  {\small\textbf{\color{HeaderDark}Languages:}} & {\small Python, TypeScript / JavaScript (ES6+), SQL, Java} \\[2pt]
+  {\small\textbf{\color{HeaderDark}AI / LLM:}} & {\small LLMs (LLaMA 3.3 70B / Groq, Gemini, Claude), LangGraph multi-agent orchestration, Hybrid RAG (dense + BM25 + RRF), HyDE, CRAG, MCP, Pydantic structured output, prompt engineering, spaCy NLP} \\[2pt]
+  {\small\textbf{\color{HeaderDark}ML \& Automation:}} & {\small scikit-learn (Gradient Boosting, Isolation Forest), SHAP, PSI drift, 5-fold CV, Holt-Winters, Prophet / PyTorch, pandas / NumPy / SciPy; Python ETL (openpyxl), constraint-satisfaction heuristics, Tkinter, PyInstaller} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Back-End, Test \& DevOps:}} & {\small FastAPI, Flask, REST, WebSockets, SSE, tRPC, Node.js; pytest, Vitest, Selenium; Docker / Compose, GitHub Actions CI/CD; PostgreSQL, DuckDB, pgvector, Redis} \\
+\end{tabularx}
+
+% =======================================================================
+%                          PROJECTS
+% =======================================================================
+
+\sectionHeader{Projects}{\faProjectDiagram}
+
+% --- Project 1: SKODA VWS Room Booking (Python automation, real client, measurable savings) ---
+\projectEntry{\v{S}koda VWS Room Booking -- Constraint-Based Training-Schedule Automation Engine}
+  {Jun 2025 -- Feb 2026}
+  {8-Month Industrial Project \,|\, VW Group Academy (\v{S}koda / VW) \,|\, Team Lead}
+  {Python, pandas, NumPy, openpyxl, Tkinter, PyInstaller, Constraint-Satisfaction / Greedy Heuristics, ETL}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Architected and shipped a \textbf{production desktop app} for a \textbf{real automotive client --- the Volkswagen Group Academy} (\v{S}koda / VW / Audi / Porsche) --- \textbf{leading a 3-member team} over an 8-month engagement; \textbf{fully automates annual training-calendar allocation} of \textbf{$\sim$1,243 events} across 4 centres (Pune, NCR, Bengaluru, Hyderabad) previously scheduled by hand.}
+  \item {\small Built a \textbf{pandas / openpyxl ETL pipeline} normalising heterogeneous \textit{Training Calendar} / \textit{Room Booking} workbooks, then a \textbf{constraint-satisfaction greedy first-fit allocator} with \textbf{preference-tiered room assignment} (Classroom $\rightarrow$ Cluster $\rightarrow$ Workshop), \textbf{shift-level temporal partitioning}, and \textbf{hard no-double-booking conflict detection} --- hitting \textbf{98.5\% auto-allocation (1,224 / 1,243)} and \textbf{$\sim$80\% less manual effort}, with an auto-generated \textbf{capacity-utilization matrix}; shipped as a \textbf{single-click PyInstaller executable} with a \textbf{Tkinter GUI}.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 2: Verita (Python ML + agentic LLM + NL->SQL + test automation/CI) ---
+\projectEntry{Verita -- AI-Native Financial-Crime \& Compliance Intelligence Platform}
+  {2026}
+  {Real-ML Risk Scoring \,|\, Agentic Auditable Investigator \,|\, NL$\rightarrow$SQL}
+  {Python, FastAPI, scikit-learn, DuckDB, SciPy, SHAP, joblib, pytest, GitHub Actions CI, React, TypeScript, ECharts}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built a full-stack \textbf{FastAPI + React/TypeScript} platform whose \textbf{FCC Risk Engine} trains a \textbf{scikit-learn ensemble (Gradient Boosting + Isolation Forest)} on the \textbf{real ULB credit-card fraud corpus} (284K txns, 0.17\% positive class) --- \textbf{honest held-out ROC-AUC 0.913 / PR-AUC 0.65}, \textbf{5-fold CV}, \textbf{SHAP} + permutation importance, \textbf{PSI drift monitoring}, a live \textbf{decision-threshold} control, and a ranked \textbf{AML alert queue}.}
+  \item {\small Engineered an \textbf{autonomous ``Auditable Investigator'' agent} that plans AML hypotheses, validates each against a live \textbf{DuckDB} query, and \textbf{hash-chains the reasoning trace with SHA-256} (each step folding in the prior hash) for a \textbf{tamper-evident, reproducible} record --- plus a \textbf{natural-language$\rightarrow$SQL} console, \textbf{Holt-Winters} forecasting (backtested MAPE), and an \textbf{82-test suite (72 pytest / 10 Vitest) gated by GitHub Actions CI}.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 3: AgentForge (multi-agent LLM, LangGraph, doc automation, MCP) ---
+\projectEntry{AgentForge -- Production Multi-Agent LLM Orchestration Engine}
+  {2026}
+  {7 Autonomous Agents \,|\, LangGraph State Machine \,|\, Automated Documentation}
+  {Python 3.11, FastAPI, LangGraph, Claude / Gemini, Pydantic, SQLAlchemy, PostgreSQL, Redis, WebSockets, Docker Compose, MCP, JWT}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Orchestrated \textbf{7 autonomous LLM agents} via a \textbf{LangGraph state machine} in a \textbf{9-node ``diamond'' topology} with \textbf{parallel fan-out/fan-in} (4 concurrent agents) and a multi-round \textbf{``Board Meeting'' debate} for adversarial cross-validation; each agent runs a \textbf{Generate $\rightarrow$ Self-Critique $\rightarrow$ Refine} chain-of-thought with \textbf{Pydantic-validated, schema-safe JSON}, \textbf{automating 30-page report / documentation generation}.}
+  \item {\small Streamed real-time agent reasoning over \textbf{WebSockets}; secured with \textbf{JWT + RBAC}, persisted via \textbf{SQLAlchemy / PostgreSQL + Redis}, exposed agent tools through a custom \textbf{MCP server}, and packaged the stack for \textbf{one-command Docker Compose} deployment.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 4: Nyay AI (Hybrid RAG, LLaMA 3.3 70B, multi-agent, multilingual) ---
+\projectEntry{Nyay AI -- Multilingual Legal-Intelligence Platform with Hybrid RAG}
+  {2026}
+  {Hybrid Retrieval \,|\, LLaMA 3.3 70B \,|\, 8-Agent Studio \,|\, 22+ Languages}
+  {Python, Flask, LLaMA 3.3 70B (Groq), sentence-transformers, BM25, NER, RRF, HyDE, CRAG, D3.js, SSE}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Engineered a \textbf{hybrid RAG} pipeline fusing \textbf{dense embeddings (all-MiniLM-L6-v2)}, a \textbf{custom legal BM25} scorer, and \textbf{NER entity-overlap} via \textbf{Reciprocal Rank Fusion} --- with \textbf{HyDE query expansion} and \textbf{CRAG self-correction} triggering a \textbf{confidence-gated web-search fallback} before \textbf{LLaMA 3.3 70B (Groq LPU)} generation, streaming \textbf{source-cited} answers over \textbf{SSE} in \textbf{22+ Indian languages}.}
+  \item {\small Built an \textbf{8-agent Studio} (adversarial AI Courtroom, clause-redlining Adversarial Drafter, Risk Heatmap, Legal-Twin persona), a \textbf{D3.js force-directed knowledge graph} (Acts / Sections / Courts / Cases), and a real-time \textbf{RAG Pipeline Observatory}.}
+\end{itemize}
+
+% =======================================================================
+%                          EDUCATION
+% =======================================================================
+
+\sectionHeader{Education}{\faGraduationCap}
+
+\eduEntry{B.Tech, Computer Science \& Engineering (AI \& Data Science)}
+  {2022 -- 2026}
+  {MIT World Peace University (MIT-WPU), Pune}
+  {}
+
+% =======================================================================
+%                  ACHIEVEMENTS & CERTIFICATIONS
+% =======================================================================
+
+\sectionHeader{Achievements \& Certifications}{\faTrophy}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}$\bullet$}]
+  \item {\small \textbf{SIH 2025 -- Rank 63 (Top 10\%)}, Smart India Hackathon {\color{SubText}|} \textbf{AIR 8}, National Creative Olympiad {\color{SubText}|} \textbf{Google} Advanced Data Analytics \& \textbf{IBM} Data Visualization (Python) certified {\color{SubText}|} \textbf{Joint President}, SARS MIT-WPU; \textbf{Execution Head}, RIDE 2025 (500+ attendees).}
+\end{itemize}
+
+% ============================================================
+\end{document}

@@ -9,7 +9,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config import CORS_ORIGINS
+from .config import CORS_ORIGINS, CORS_ORIGIN_REGEX
 from .logging_config import configure_logging
 
 # Phase 10 — Feedback: structured logs that a collector (ELK/Loki) can parse.
@@ -34,6 +34,7 @@ except Exception as e:  # pragma: no cover - monitoring is optional in dev
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
+    allow_origin_regex=CORS_ORIGIN_REGEX,  # any localhost/127.0.0.1 port in dev
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -78,17 +79,45 @@ def health():
     import os
 
     from .genai import provider as genai
-
     from .db import dialect
+
+    # Compute detailed model stats when the engine is loaded
+    engine = getattr(app.state, "risk_engine", None)
+    model_info: dict = {}
+    if engine and engine.dataset:
+        model_info = {
+            "status": "loaded",
+            "data_source": engine.dataset.source,
+            "shap_available": bool(getattr(engine, "shap_importances", [])),
+            "features": len(engine.feature_names) if engine.feature_names else 0,
+        }
+        if engine.y_test is not None and engine.y_proba is not None:
+            from sklearn.metrics import roc_auc_score
+            model_info["roc_auc"] = round(float(roc_auc_score(
+                engine.y_test.to_numpy(), engine.y_proba
+            )), 4)
+    else:
+        model_info = {"status": "lazy — loads on first /api/risk call"}
 
     return {
         "status": "healthy",
         "service": "verita",
         "version": app.version,
         "auth": "enabled" if os.getenv("VERITA_API_KEY", "").strip() else "open",
-        "risk_model": "loaded" if getattr(app.state, "risk_engine", None) else "lazy",
+        "risk_model": model_info,
         "genai": genai.mode(),
         "database": {"dialect": dialect(), "ready": bool(getattr(app.state, "db_ready", False))},
+        "capabilities": [
+            "auto-dashboard",
+            "risk-scoring",
+            "shap-explain",
+            "cross-validation",
+            "nlp-compliance",
+            "sql-playground",
+            "investigator",
+            "hash-chain",
+            "forecast-tournament",
+        ],
     }
 
 

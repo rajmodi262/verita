@@ -1,0 +1,119 @@
+% =====================================================================
+%  POSTER 2 — USER JOURNEY -> TECHNICAL PIPELINE (A3 landscape, Mission)
+%  3 swim-lanes: USER -> INTERFACE -> PIPELINE. AI/MCP + Seal enlarged.
+%  Compile: pdflatex (x2).  TEXINPUTS must include 00-DESIGN-DNA.
+% =====================================================================
+\documentclass{article}
+\usepackage[a3paper,landscape,margin=0mm]{geometry}
+\usepackage{wkdna}
+
+\pagecolor{AbyssNavy}
+\wkbg{\wkcircuit{ElectricBlue}{0.05}}
+
+\begin{document}\thispagestyle{empty}%
+\begin{tikzpicture}[remember picture,overlay,
+   shift={(current page.south west)},font=\sffamily,
+   stage/.style={rounded corners=2mm,line width=1pt,align=center,
+     font=\footnotesize\bfseries,text=white,minimum width=44mm,minimum height=24mm},
+   comp/.style={fill=white,rounded corners=1.5mm,line width=1pt,align=center,
+     font=\scriptsize\bfseries,text=DeepNavy,minimum width=50mm,minimum height=22mm}]
+
+% ===================== HEADER (y 267..297) ==========================
+\fill[StormBlue] (0mm,267mm) rectangle (420mm,297mm);
+\fill[ElectricBlue] (0mm,266mm) rectangle (420mm,267.4mm);
+\node[anchor=west,text=ElectricBlue,font=\bfseries] at (20mm,282mm){\fontsize{30}{32}\selectfont VERITA};
+\node[text=white,font=\Large\bfseries] at (215mm,282mm){User Journey \;$\rightarrow$\; Technical Pipeline};
+\node[fill=NeonMint,text=AbyssNavy,font=\footnotesize\bfseries,rounded corners=2mm,inner sep=4pt]
+   at (388mm,282mm){v1.1 \textperiodcentered\ PRODUCTION-MINDED};
+
+% ===================== LANE LABELS (rotated, far left) ==============
+\node[rotate=90,text=NeonMint,font=\small\bfseries] at (8mm,236mm){THE USER};
+\node[rotate=90,text=NeonCyan,font=\small\bfseries] at (8mm,178mm){INTERFACE};
+\node[rotate=90,text=ElectricBlue,font=\small\bfseries] at (8mm,78mm){PIPELINE};
+
+% column anchors
+\def\colA{52} \def\colB{120} \def\colC{188} \def\colD{256} \def\colE{318}
+
+% ===================== LANE 1 — USER (y 210..260) ===================
+\fill[CreamPaper] (16mm,210mm) rectangle (348mm,260mm);
+\foreach \cx/\ic/\lab in {%
+   52/\faGlobe/{Opens Verita}, 120/\faUpload/{Drops a CSV},
+   188/\faChartBar/{Reads dashboard}, 256/\faComments/{Asks in English},
+   318/\faSearch/{Runs Investigator}}{%
+   \fill[ElectricBlue] (\cx mm,242mm) circle (7mm);
+   \node[text=white,font=\large] at (\cx mm,242mm){\ic};
+   \node[text=DeepNavy,font=\footnotesize\bfseries] at (\cx mm,225mm){\lab};}
+\foreach \a/\b in {52/120,120/188,188/256,256/318}{%
+   \draw[-{Stealth[length=3mm]},SlateText,line width=1pt,dashed] (\a mm+10mm,242mm)--(\b mm-10mm,242mm);}
+
+% ===================== LANE 2 — INTERFACE (y 154..202) =============
+\fill[IceWhite] (16mm,154mm) rectangle (348mm,202mm);
+\foreach \cx/\name/\bc in {%
+   52/{Landing.tsx}/NeonCyan, 120/{Studio\\dropzone}/GoldLeaf,
+   188/{ECharts\\canvas}/NeonMint, 256/{NL\,$\to$\,SQL\\console}/VioletElectric,
+   318/{Investigator\\panel}/CoralAlert}{%
+   \node[comp,draw=\bc] at (\cx mm,178mm){\name};}
+% dotted connectors user -> interface
+\foreach \cx in {52,120,188,256,318}{%
+   \draw[FogGray,dotted,line width=0.7pt] (\cx mm,225mm)--(\cx mm,190mm);}
+% triggers arrow interface -> pipeline
+\node[text=NeonMint,font=\scriptsize\bfseries] at (182mm,150mm){each action fires the pipeline below};
+\draw[-{Stealth[length=4mm]},NeonMint,line width=1.4pt] (182mm,154mm)--(182mm,148mm);
+
+% ===================== LANE 3 — PIPELINE (y 14..142) ===============
+\draw[StormBlue,line width=1pt,rounded corners=2mm] (16mm,14mm) rectangle (348mm,142mm);
+% --- linear core pipeline: one clean row, left -> right ---
+\node[stage,fill=GoldLeaf!85!black,draw=GoldLeaf] (s1) at (42mm,112mm){\faServer\\FastAPI\\router};
+\node[stage,fill=ElectricBlue,draw=NeonCyan]      (s2) at (100mm,112mm){\faCogs\\Pandas\\profiling};
+\node[stage,fill=ElectricBlue,draw=NeonCyan]      (s3) at (158mm,112mm){\faChartLine\\scipy\\insights};
+\node[stage,fill=NeonMint!75!black,draw=NeonMint] (s4) at (216mm,112mm){\faDatabase\\DuckDB\\(sandbox)};
+\node[stage,fill=VioletElectric,draw=white,line width=1.4pt,minimum height=28mm] (s5) at (274mm,112mm){\faRobot\\AI Agent\\+ Gemini};
+\node[stage,fill=CoralAlert,draw=white,line width=1.4pt,minimum height=28mm] (s6) at (322mm,112mm){\faLock\\SHA-256\\sealed};
+\foreach \u/\v in {s1/s2,s2/s3,s3/s4,s4/s5,s5/s6}{%
+   \draw[-{Stealth[length=3mm]},NeonCyan,line width=1.3pt] (\u)--(\v);}
+% --- substance panel A: the real AML typologies ---
+\draw[VioletElectric,line width=1.2pt,rounded corners=2mm,fill=VioletElectric!22!AbyssNavy] (20mm,20mm) rectangle (178mm,92mm);
+\node[text=white,font=\footnotesize\bfseries] at (99mm,86mm){THE AGENT TESTS 5 REAL \jdtermlight{AML} TYPOLOGIES};
+\node[anchor=north west,text=IceWhite,font=\scriptsize,align=left,text width=148mm] at (26mm,79mm)
+   {\textbf{1}~~Geographic risk concentration\\
+    \textbf{2}~~Channel risk concentration\\
+    \textbf{3}~~Structuring near the \$10{,}000 threshold\\
+    \textbf{4}~~Large-value concentration (top-1\% share)\\
+    \textbf{5}~~Temporal activity spike (mean\,+\,2$\sigma$)\\[2pt]
+    \textit{each tested with a real \jdtermlight{DuckDB} query + statistic.}};
+% --- substance panel B: the hash chain payload ---
+\draw[CoralAlert,line width=1.2pt,rounded corners=2mm,fill=CoralAlert!20!AbyssNavy] (184mm,20mm) rectangle (344mm,92mm);
+\node[text=white,font=\footnotesize\bfseries] at (264mm,86mm){EACH STEP IS \jdtermlight{HASH-CHAINED}};
+\foreach \i/\bx in {0/196,1/232,2/268,3/304}{%
+   \draw[white,line width=0.8pt,fill=StormBlue,rounded corners=1mm] (\bx mm,52mm) rectangle (\bx mm+26mm,68mm);
+   \node[font=\tiny,text=NeonCyan] at (\bx mm+13mm,60mm){SHA-256};}
+\foreach \bx in {222,258,294}{\draw[-{Stealth[length=2mm]},white] (\bx mm,60mm)--(\bx mm+10mm,60mm);}
+\node[text=NeonMint,font=\small] at (336mm,72mm){\faLock};
+\node[anchor=north,text=IceWhite,font=\scriptsize,align=center,text width=150mm] at (264mm,46mm)
+   {commits \texttt{id\,$\cdot$\,query\,$\cdot$\,finding\,$\cdot$\,severity\,$\cdot$\,timestamp\,$\cdot$\,prev-hash}\\
+    \textit{doctor any step \;$\rightarrow$\; the chain breaks.}};
+
+% ===================== METRICS PANEL (right, x 356..412) ============
+\draw[ElectricBlue,line width=1pt,rounded corners=2mm,fill=StormBlue]
+   (356mm,14mm) rectangle (412mm,260mm);
+\node[text=NeonMint,font=\footnotesize\bfseries] at (384mm,252mm){PIPELINE FACTS};
+\foreach \i/\fact in {%
+   0/{6 REST routers}, 1/{3 service layers}, 2/{DuckDB sandboxed},
+   3/{TreeSHAP (exact)}, 4/{ROC-AUC 0.913}, 5/{PR-AUC 0.65},
+   6/{SHA-256 verified}, 7/{Gemini optional}, 8/{rule-based fallback}}{%
+   \node[anchor=west,text=IceWhite,font=\scriptsize] at (360mm,238mm-\i*12mm)
+     {\textcolor{NeonCyan}{\faCheck}~~\fact};}
+\node[anchor=west,text=FogGray,font=\scriptsize,align=left,text width=50mm] at (360mm,120mm)
+   {\textit{Every stage logged; every number computed at request time --- no hardcoded metrics.}};
+
+% ===================== FOOTER LEGEND (y 0..12) =====================
+\fill[VoidBlack] (0mm,0mm) rectangle (420mm,12mm);
+\foreach \i/\c/\t in {0/GoldLeaf/{Input}, 1/ElectricBlue/{Core}, 2/VioletElectric/{AI \textperiodcentered\ MCP},
+   3/NeonMint/{Data}, 4/CoralAlert/{Output}}{%
+   \fill[\c] (20mm+\i*40mm,4mm) rectangle (24mm+\i*40mm,8mm);
+   \node[anchor=west,text=FogGray,font=\scriptsize] at (25mm+\i*40mm,6mm){\t};}
+\node[anchor=east,text=FogGray,font=\scriptsize] at (412mm,6mm)
+   {Verita \textperiodcentered\ Complete Technical Pipeline \textperiodcentered\ Raj Modi \textperiodcentered\ Wolters Kluwer};
+
+\end{tikzpicture}
+\end{document}

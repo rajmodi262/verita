@@ -1,0 +1,79 @@
+% =====================================================================
+%  POSTER 3 — THE DATA UNIVERSE  (A3 portrait, Mission world)
+%  Orbital data-flow: rings = layers, everything flows inward to OUTPUT.
+%  Compile: pdflatex (x2).  TEXINPUTS must include 00-DESIGN-DNA.
+% =====================================================================
+\documentclass{article}
+\usepackage[a3paper,portrait,margin=0mm]{geometry}
+\usepackage{wkdna}
+
+\pagecolor{VoidBlack}
+\wkbg{\wkconstellation{white}{0.09}}
+
+\begin{document}\thispagestyle{empty}%
+\begin{tikzpicture}[remember picture,overlay,
+   shift={(current page.south west)},font=\sffamily,
+   planet/.style={text=IceWhite,font=\scriptsize\bfseries,
+     fill=VoidBlack,inner sep=1.6pt,rounded corners=0.6mm}]
+
+% ===================== HEADER (y 372..420) ==========================
+\fill[StormBlue] (0mm,372mm) rectangle (297mm,420mm);
+\fill[ElectricBlue] (0mm,371mm) rectangle (297mm,372.6mm);
+\node[text=ElectricBlue,font=\bfseries] at (148.5mm,402mm){\fontsize{40}{42}\selectfont THE DATA UNIVERSE};
+\node[text=IceWhite,font=\large] at (148.5mm,386mm)
+   {Verita --- every byte's journey, from raw upload to a \jdtermlight{sealed} memo};
+
+% ===================== ORBITAL SYSTEM (centre 148.5,205) ============
+\begin{scope}[shift={(148.5mm,205mm)}]
+  % rings
+  \foreach \r in {50,88,126}{\draw[white,opacity=0.18,dashed,line width=0.5pt] (0,0) circle (\r mm);}
+  % --- centre sun (OUTPUT) ---
+  \fill[GoldLeaf,opacity=0.15] (0,0) circle (34mm);
+  \fill[GoldLeaf,opacity=0.30] (0,0) circle (28mm);
+  \fill[GoldLeaf] (0,0) circle (22mm);
+  \node[text=RichBlack,font=\bfseries] at (0,4mm){\fontsize{15}{16}\selectfont OUTPUT};
+  \node[text=RichBlack,font=\scriptsize,align=center,text width=42mm] at (0,-7mm)
+     {auditable dashboard\\+ SHA-256 sealed memo};
+  % inward flow arrows
+  \foreach \ang in {90,210,330}{%
+     \draw[-{Stealth[length=3mm]},NeonMint,opacity=0.6,line width=1pt] (\ang:124mm)--(\ang:26mm);}
+  % --- Ring 1: INPUT (ElectricBlue) ---
+  \foreach \ang/\lab in {90/{raw CSV / XLSX}, 210/{284{,}807 tx}, 330/{narratives}}{%
+     \fill[ElectricBlue] (\ang:50mm) circle (3mm);
+     \node[planet,text=ElectricBlue] at (\ang:50mm)[xshift=0mm,yshift=6mm]{\lab};}
+  % --- Ring 2: PROCESSING (NeonMint) ---
+  \foreach \ang/\lab in {50/{profiling}, 130/{risk scoring}, 230/{NL$\to$SQL}, 310/{investigator}}{%
+     \fill[NeonMint] (\ang:88mm) circle (3.4mm);
+     \node[planet,text=NeonMint] at (\ang:88mm)[yshift=7mm]{\lab};}
+  % --- Ring 3: INTEGRATION / PERSIST (Violet + Gold) ---
+  \foreach \ang/\lab/\col in {30/{DuckDB}/VioletElectric, 150/{REST API}/VioletElectric,
+        210/{PostgreSQL}/GoldLeaf, 330/{Prometheus}/GoldLeaf}{%
+     \fill[\col] (\ang:126mm) circle (4mm);
+     \node[planet,text=\col] at (\ang:126mm)[yshift=7.5mm]{\lab};}
+\end{scope}
+
+% ===================== LEGEND (top-left card) =======================
+\draw[ElectricBlue,line width=1pt,rounded corners=2mm,fill=StormBlue] (12mm,300mm) rectangle (96mm,360mm);
+\node[text=NeonMint,font=\footnotesize\bfseries] at (54mm,354mm){HOW TO READ IT};
+\foreach \i/\c/\t in {0/ElectricBlue/{Ring 1 \textperiodcentered\ Input}, 1/NeonMint/{Ring 2 \textperiodcentered\ Processing},
+   2/VioletElectric/{Ring 3 \textperiodcentered\ Integration}, 3/GoldLeaf/{Ring 3 \textperiodcentered\ Persist}}{%
+   \fill[\c] (18mm,344mm-\i*11mm) circle (2mm);
+   \node[anchor=west,text=IceWhite,font=\scriptsize] at (23mm,344mm-\i*11mm){\t};}
+\node[anchor=west,text=NeonMint,font=\scriptsize] at (18mm,300mm){\faArrowRight~flows inward to OUTPUT};
+
+% ===================== HONESTY CARD (top-right) =====================
+\draw[GoldLeaf,line width=1pt,rounded corners=2mm,fill=GoldLeaf!18!VoidBlack] (201mm,300mm) rectangle (285mm,360mm);
+\node[text=GoldLeaf,font=\footnotesize\bfseries] at (243mm,354mm){THE HONESTY RULE};
+\node[text=IceWhite,font=\scriptsize,align=center,text width=78mm] at (243mm,330mm)
+   {Every number is computed from \emph{your} data at request time.\\[2pt]
+    No hardcoded metrics. No \texttt{random()} charts. No fabricated explanations.};
+
+% ===================== BOTTOM METRICS STRIP (y 0..18) ==============
+\fill[StormBlue] (0mm,0mm) rectangle (297mm,18mm);
+\foreach \i/\v/\l in {0/{6}/{REST routers}, 1/{3}/{ML engines}, 2/{0.913}/{ROC-AUC},
+   3/{SHA-256}/{sealed trace}, 4/{0}/{fabricated metrics}}{%
+   \node[text=NeonMint,font=\small\bfseries] at (40mm+\i*58mm,12mm){\v};
+   \node[text=FogGray,font=\scriptsize] at (40mm+\i*58mm,5mm){\l};}
+
+\end{tikzpicture}
+\end{document}

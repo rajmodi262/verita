@@ -7,6 +7,12 @@ import sys
 # Tests always train on the fast synthetic set — never multi-GB local datasets.
 os.environ["VERITA_FORCE_SYNTHETIC"] = "1"
 
+# Tests are hermetic and offline: force the deterministic rule-based engines and never call a real
+# LLM, even if a local .env defines GROQ_API_KEY / GEMINI_API_KEY. Setting these to "" before the
+# app import means load_dotenv(override=False) won't repopulate them.
+os.environ["GROQ_API_KEY"] = ""
+os.environ["GEMINI_API_KEY"] = ""
+
 import numpy as np
 import pandas as pd
 import pytest

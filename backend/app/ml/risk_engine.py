@@ -1,8 +1,9 @@
 """
 Verita — FCC Risk & Anomaly Engine.
 
-A real scikit-learn pipeline:
-  • GradientBoosting classifier for fraud probability (trained on a held-out split).
+A real ML pipeline:
+  • XGBoost classifier for fraud probability (scale_pos_weight handles the class imbalance;
+    trained on a held-out split).
   • IsolationForest for unsupervised anomaly scoring (feeds the AML alert queue).
 
 All metrics are measured on the held-out test set at request time — ROC, precision-recall,
@@ -20,7 +21,26 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import GradientBoostingClassifier, IsolationForest
+from sklearn.ensemble import IsolationForest
+from xgboost import XGBClassifier
+from xgboost.sklearn import XGBModel
+from sklearn.base import BaseEstimator
+
+# Monkeypatch XGBClassifier and XGBModel to resolve scikit-learn 1.6 MRO compatibility issue.
+# In scikit-learn 1.6, get_tags calls __sklearn_tags__() on each class in reversed(mro()).
+# Because ClassifierMixin comes after BaseEstimator in XGBClassifier's MRO, ClassifierMixin's
+# super().__sklearn_tags__() call resolves to object, which raises AttributeError.
+# Defining __sklearn_tags__ directly on both prevents get_tags from taking the fallback path.
+def _xgb_sklearn_tags(self):
+    tags = BaseEstimator.__sklearn_tags__(self)
+    tags.estimator_type = "classifier"
+    from sklearn.utils._tags import ClassifierTags
+    tags.classifier_tags = ClassifierTags()
+    tags.target_tags.required = True
+    return tags
+
+XGBClassifier.__sklearn_tags__ = _xgb_sklearn_tags
+XGBModel.__sklearn_tags__ = _xgb_sklearn_tags
 from sklearn.metrics import (
     auc,
     average_precision_score,
@@ -47,7 +67,7 @@ def _downsample_curve(xs: np.ndarray, ys: np.ndarray, n: int = 100) -> list[dict
 
 @dataclass
 class RiskEngine:
-    clf: GradientBoostingClassifier | None = None
+    clf: XGBClassifier | None = None
     iforest: IsolationForest | None = None
     dataset: Dataset | None = None
     X_test: pd.DataFrame | None = None
@@ -67,11 +87,26 @@ class RiskEngine:
         X_tr, X_te, y_tr, y_te = train_test_split(
             ds.X, ds.y, test_size=0.25, random_state=42, stratify=ds.y
         )
-        # Classic GBM — proven ~0.91 ROC-AUC on the real ULB data. n_estimators tuned for a
-        # one-time train in ~1-2min; the fitted engine is then persisted to joblib and reloaded
-        # in milliseconds on every later boot.
-        self.clf = GradientBoostingClassifier(
-            n_estimators=120, max_depth=3, learning_rate=0.12, subsample=0.85, random_state=42
+        # XGBoost gradient boosting. Chosen over sklearn's GradientBoostingClassifier for three
+        # concrete reasons on this problem: (1) `scale_pos_weight` lets the model account for the
+        # 0.17% class imbalance directly in the loss instead of relying on threshold-tuning alone;
+        # (2) regularised histogram boosting usually lifts PR-AUC on tabular fraud data; (3) its
+        # TreeExplainer SHAP is exact and numerically stable (the sklearn GBM produced billion-
+        # scale SHAP attributions on this data — see the SHAP block below). One-time train ~1-2min,
+        # then persisted to joblib and reloaded in milliseconds on every later boot.
+        neg, pos = int((y_tr == 0).sum()), int((y_tr == 1).sum())
+        scale_pos_weight = neg / max(pos, 1)  # balance the rare positive class in the loss
+        self.clf = XGBClassifier(
+            n_estimators=400,
+            max_depth=5,
+            learning_rate=0.08,
+            subsample=0.85,
+            colsample_bytree=0.8,
+            scale_pos_weight=scale_pos_weight,
+            eval_metric="aucpr",        # optimise the metric that matters under heavy imbalance
+            tree_method="hist",         # fast histogram boosting
+            n_jobs=-1,
+            random_state=42,
         )
         self.clf.fit(X_tr, y_tr)
 
@@ -103,42 +138,68 @@ class RiskEngine:
             ds.source, roc_auc_score(self.y_test, self.y_proba),
         )
 
-        # —— SHAP: TreeExplainer gives exact attributions for GBM (no kernel approximation) ——
-        # Computed once at train time; stored in the joblib cache so subsequent boots pay no
-        # extra cost. Closes the 'black box at the model layer' gap in the product thesis.
+        # —— SHAP: interventional TreeExplainer in PROBABILITY space ——
+        # We explain the PROBABILITY output against a background sample (interventional), not the
+        # tree_path_dependent default, so each contribution is a bounded, signed share of the
+        # [0,1] fraud probability and intuitive for an analyst ("this feature added 0.12 to the
+        # fraud probability"). This also sidesteps a real pitfall: on 0.17%-imbalanced data,
+        # path-dependent SHAP on a boosted model can split a huge constant base value across
+        # features, producing |SHAP| in the billions that merely cancel out. We still VALIDATE
+        # every row (additive to 1e-3 AND |shap| bounded) and keep only the trustworthy ones —
+        # cheap insurance regardless of the booster.
         try:
             import shap  # pip install shap>=0.46
-            shap_cap = min(len(X_te), 2000)  # SHAP is O(samples × n_tree_nodes) — cap is safe
-            Xi_shap = X_te.iloc[:shap_cap]
-            explainer = shap.TreeExplainer(self.clf)
-            shap_values = explainer.shap_values(Xi_shap)  # ndarray (n_samples, n_features)
-            # Global explanation: mean |SHAP| per feature, sorted descending
-            self.shap_importances = sorted(
-                [
-                    {
-                        "feature": f,
-                        "mean_abs_shap": round(float(np.abs(shap_values[:, i]).mean()), 5),
-                    }
-                    for i, f in enumerate(self.feature_names)
-                ],
-                key=lambda x: x["mean_abs_shap"],
-                reverse=True,
+
+            bg = shap.sample(X_tr, 100, random_state=42)  # background = training distribution
+            explainer = shap.TreeExplainer(
+                self.clf, data=bg,
+                feature_perturbation="interventional", model_output="probability",
             )
-            # Sample explanation: first 20 rows for waterfall charts in the UI
-            n_sample = min(20, shap_cap)
-            self.shap_sample = {
-                "values": shap_values[:n_sample].tolist(),
-                # expected_value may be an ndarray in some shap versions — extract scalar safely
-                "base_value": float(np.asarray(explainer.expected_value).flat[0]),
-                "feature_names": self.feature_names,
-                "data": Xi_shap.iloc[:n_sample].values.tolist(),
-            }
-            logger.info(
-                "SHAP TreeExplainer computed for %d features (top: %s = %.4f)",
-                len(self.feature_names),
-                self.shap_importances[0]["feature"] if self.shap_importances else "?",
-                self.shap_importances[0]["mean_abs_shap"] if self.shap_importances else 0,
-            )
+            base_proba = float(np.asarray(explainer.expected_value).flat[0])
+
+            # Candidate rows: the riskiest test rows first (interesting waterfalls), then fill in
+            # from the head of the test set so legit rows are represented too.
+            order = np.argsort(self.y_proba)[::-1]
+            cand = list(dict.fromkeys(list(order[:60]) + list(range(min(len(X_te), 200)))))
+
+            valid_vecs: list[np.ndarray] = []
+            valid_idx: list[int] = []
+            for j in cand:
+                row = X_te.iloc[[j]]
+                sv = np.asarray(explainer.shap_values(row, check_additivity=False)).reshape(-1)
+                p = float(self.clf.predict_proba(row)[0, 1])
+                # Trust the row only if SHAP reconstructs the probability AND every contribution
+                # is bounded like a real share of a [0,1] probability.
+                if abs(base_proba + sv.sum() - p) <= 1e-3 and float(np.abs(sv).max()) <= 1.5:
+                    valid_vecs.append(sv)
+                    valid_idx.append(int(j))
+                if len(valid_vecs) >= 60:
+                    break
+
+            if valid_vecs:
+                V = np.vstack(valid_vecs)
+                # Global explanation: mean |SHAP| per feature over the validated rows, sorted desc.
+                self.shap_importances = sorted(
+                    [{"feature": f, "mean_abs_shap": round(float(np.abs(V[:, i]).mean()), 5)}
+                     for i, f in enumerate(self.feature_names)],
+                    key=lambda x: x["mean_abs_shap"], reverse=True,
+                )
+                # Sample explanation: first 20 validated rows for UI waterfall charts.
+                n_sample = min(20, len(valid_idx))
+                self.shap_sample = {
+                    "values": V[:n_sample].tolist(),
+                    "base_value": base_proba,
+                    "output_space": "probability",  # base + Σ shap == predict_proba, not log-odds
+                    "feature_names": self.feature_names,
+                    "data": X_te.iloc[valid_idx[:n_sample]].values.tolist(),
+                }
+                logger.info(
+                    "SHAP (interventional/probability) computed on %d validated rows (top: %s = %.4f)",
+                    len(valid_idx), self.shap_importances[0]["feature"],
+                    self.shap_importances[0]["mean_abs_shap"],
+                )
+            else:
+                logger.warning("No SHAP rows passed additivity validation — SHAP disabled for this model.")
         except ImportError:
             logger.warning("shap not installed — SHAP explanations unavailable. Run: pip install shap>=0.46")
         except Exception as e:
@@ -196,8 +257,11 @@ class RiskEngine:
         ds = load_dataset()
         # Fresh classifier — same hyperparams as production but trained from scratch each fold.
         # Using self.clf would leak test data into the fold estimates.
-        clf_fresh = GradientBoostingClassifier(
-            n_estimators=120, max_depth=3, learning_rate=0.12, subsample=0.85, random_state=42
+        neg, pos = int((ds.y == 0).sum()), int((ds.y == 1).sum())
+        clf_fresh = XGBClassifier(
+            n_estimators=400, max_depth=5, learning_rate=0.08, subsample=0.85,
+            colsample_bytree=0.8, scale_pos_weight=neg / max(pos, 1), eval_metric="aucpr",
+            tree_method="hist", n_jobs=-1, random_state=42,
         )
         kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         scores = cross_val_score(
@@ -227,6 +291,26 @@ class RiskEngine:
                 )
             ),
         }
+
+    def optimize_threshold(
+        self, cost_fn: float = 500.0, cost_fp: float = 5.0, currency: str = "$"
+    ) -> dict[str, Any]:
+        """Expected-cost-optimal decision threshold on the held-out set.
+
+        Delegates to model_explainer.optimal_threshold using the SAME held-out predictions the
+        ROC/PR metrics are measured on — so the recommended cut-off is honest, not a separate
+        in-sample fit. ``currency`` only affects the human-readable text; the threshold depends
+        purely on the cost_fn/cost_fp ratio, so $/₹ give the same cut-off for the same ratio.
+        """
+        assert self.y_test is not None and self.y_proba is not None
+        from .model_explainer import optimal_threshold
+
+        out = optimal_threshold(
+            self.y_test.to_numpy(), self.y_proba, cost_fn=cost_fn, cost_fp=cost_fp, currency=currency
+        )
+        out["data_source"] = self.dataset.source if self.dataset else "unknown"
+        out["test_size"] = int(len(self.y_test))
+        return out
 
     # ── alert queue ──────────────────────────────────────────────────────────
     def alerts(self, threshold: float = 0.5, limit: int = 25) -> dict[str, Any]:

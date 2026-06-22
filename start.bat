@@ -12,7 +12,7 @@ echo.
 :: ---------------------------------------------------------------
 :: 1) Prerequisites
 :: ---------------------------------------------------------------
-echo [1/4] Checking prerequisites...
+echo [1/5] Checking prerequisites...
 
 where python >nul 2>&1
 if errorlevel 1 (
@@ -42,7 +42,7 @@ echo.
 :: 2) Backend dependencies (Python virtual environment)
 :: ---------------------------------------------------------------
 if not exist ".venv\Scripts\python.exe" (
-  echo [2/4] First run: creating Python environment and installing backend deps...
+  echo [2/5] First run: creating Python environment and installing backend deps...
   echo       ^(this can take a couple of minutes - grab a coffee^)
   python -m venv .venv
   if errorlevel 1 ( color 0c & echo   [ERROR] Could not create virtual environment. & pause & exit /b 1 )
@@ -51,7 +51,7 @@ if not exist ".venv\Scripts\python.exe" (
   if errorlevel 1 ( color 0c & echo   [ERROR] Backend dependency install failed. & pause & exit /b 1 )
   echo   - Backend dependencies installed.
 ) else (
-  echo [2/4] Backend environment found - skipping install.
+  echo [2/5] Backend environment found - skipping install.
 )
 echo.
 
@@ -59,24 +59,45 @@ echo.
 :: 3) Frontend dependencies (npm)
 :: ---------------------------------------------------------------
 if not exist "frontend\node_modules" (
-  echo [3/4] First run: installing frontend deps with npm...
+  echo [3/5] First run: installing frontend deps with npm...
   pushd frontend
   call npm install
   if errorlevel 1 ( color 0c & echo   [ERROR] Frontend dependency install failed. & popd & pause & exit /b 1 )
   popd
   echo   - Frontend dependencies installed.
 ) else (
-  echo [3/4] Frontend packages found - skipping install.
+  echo [3/5] Frontend packages found - skipping install.
 )
 echo.
 
 :: ---------------------------------------------------------------
-:: 4) Launch both servers (each in its own window) + open browser
+:: 4) Clean slate: stop ANY previous Verita sessions so we never
+::    stack duplicate servers or fight over ports 8000 / 5173.
+::    Matching by the PROJECT PATH in each process's command line also
+::    catches orphaned "uvicorn --reload" workers that closing the
+::    window leaves behind holding the port (the bug that made a plain
+::    restart silently keep serving the OLD code).
+:: ---------------------------------------------------------------
+echo [4/5] Stopping any previous Verita sessions...
+set "ROOT=%~dp0"
+:: close old launcher-spawned server windows (this launcher is NOT matched)
+taskkill /FI "WINDOWTITLE eq Verita Backend*"  /T /F >nul 2>&1
+taskkill /FI "WINDOWTITLE eq Verita Frontend*" /T /F >nul 2>&1
+:: kill any python/node process whose command line points into THIS project folder
+:: (catches orphaned reload workers + their spawned children), then free the ports.
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$r=('%ROOT%').ToLower(); Get-CimInstance Win32_Process | Where-Object { ($_.Name -in 'python.exe','pythonw.exe','node.exe') -and $_.CommandLine -and ($_.CommandLine.ToLower().Contains($r) -or $_.CommandLine -match 'app\.main:app') } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }; Get-NetTCPConnection -LocalPort 8000,5173 -State Listen -ErrorAction SilentlyContinue | Select-Object -Expand OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }" >nul 2>&1
+timeout /t 3 /nobreak >nul
+echo   - Previous sessions cleared. Ports 8000 and 5173 are free.
+echo.
+
+:: ---------------------------------------------------------------
+:: 5) Launch the TWO servers (each in its own window) + open Chrome.
 ::    No DATABASE_URL is set, so the audit trail uses a zero-config
 ::    SQLite file. For real PostgreSQL, run "docker compose up" instead.
 :: ---------------------------------------------------------------
-echo [4/4] Starting servers...
-start "Verita Backend  (http://localhost:8000)"  /d "%~dp0backend"  cmd /k "..\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000"
+echo [5/5] Starting the two servers...
+start "Verita Backend  (http://localhost:8000)"  /d "%~dp0backend"  cmd /k "..\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
 start "Verita Frontend (http://localhost:5173)" /d "%~dp0frontend" cmd /k "npm run dev -- --port 5173 --strictPort"
 
 echo   - Backend  : http://localhost:8000  (API docs at /docs)
@@ -84,15 +105,27 @@ echo   - Frontend : http://localhost:5173
 echo.
 echo Waiting for the dev server to warm up...
 timeout /t 9 /nobreak >nul
-start "" "http://localhost:5173/"
+
+:: ---- open the site in Chrome specifically ----
+set "URL=http://localhost:5173/"
+set "CHROME="
+if exist "%ProgramFiles%\Google\Chrome\Application\chrome.exe"        set "CHROME=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
+if exist "%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"   set "CHROME=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"
+if exist "%LocalAppData%\Google\Chrome\Application\chrome.exe"        set "CHROME=%LocalAppData%\Google\Chrome\Application\chrome.exe"
+if defined CHROME (
+  start "" "%CHROME%" "%URL%"
+) else (
+  echo   [note] Chrome not found in the usual place - opening default browser.
+  start "" "chrome" "%URL%" || start "" "%URL%"
+)
 
 echo.
 echo ================================================================
-echo  Verita is running. Your browser should open automatically.
-echo  If not, visit http://localhost:5173/
+echo  Verita is running. Chrome should open at %URL%
+echo  If not, visit %URL% yourself.
 echo.
-echo  To STOP: close the two "Verita Backend" / "Verita Frontend"
-echo  windows that opened.
+echo  To STOP everything: just run this start.bat again (it clears
+echo  old sessions first), or close the two Verita server windows.
 echo ================================================================
 echo.
 pause

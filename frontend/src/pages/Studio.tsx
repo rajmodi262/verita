@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UploadCloud, FileSpreadsheet, Loader2, GripVertical, X, LayoutGrid, Lightbulb, Share2, Terminal, Globe2, Printer, TrendingUp, ScanSearch } from "lucide-react";
+import { UploadCloud, FileSpreadsheet, Loader2, GripVertical, X, LayoutGrid, Lightbulb, Share2, Terminal, Globe2, Printer, TrendingUp, ScanSearch, type LucideIcon } from "lucide-react";
 import RGL, { type Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { API_BASE } from "../config";
+import { apiPost, apiUpload } from "../lib/api";
+import { errMessage } from "../lib/errors";
+import { chartTheme } from "../lib/chartTheme";
 import { useTheme } from "../store/themeStore";
 import EChart from "../components/EChart";
 import { specToOption, forecastOption, type ForecastData } from "../lib/chartOptions";
@@ -16,12 +18,20 @@ import Investigator from "../components/studio/Investigator";
 import GeoMap from "../components/studio/GeoMap";
 import WhatChanged from "../components/studio/WhatChanged";
 import TimeMachine from "../components/studio/TimeMachine";
+import type {
+  ChartDatum,
+  ChartSpec,
+  DataProfile,
+  QualityReport,
+  RelationshipGraph,
+  SqlQueryResult,
+} from "../types/api";
 
 
 const SPAN: Record<string, number> = { line: 12, heatmap: 6, bar: 6, pie: 4, histogram: 6 };
 
 /** Pack chart specs left-to-right into a 12-col grid as the initial draggable layout. */
-function buildLayout(charts: any[]): Layout[] {
+function buildLayout(charts: ChartSpec[]): Layout[] {
   let x = 0, y = 0, rowH = 0;
   return charts.map((c) => {
     const w = SPAN[c.chart_type] || 6;
@@ -38,17 +48,17 @@ interface Result {
   filename: string;
   title: string;
   sampled: boolean;
-  profile: any;
-  dashboard: any[];
+  profile: DataProfile;
+  dashboard: ChartSpec[];
   insights: Insight[];
-  quality: any;
+  quality: QualityReport;
   executive_summary: string;
-  relationships: { nodes: any[]; edges: any[] };
+  relationships: RelationshipGraph;
 }
 
 type Tab = "dashboard" | "investigator" | "insights" | "relationships" | "map" | "sql";
 
-const TABS: { id: Tab; label: string; icon: any }[] = [
+const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutGrid },
   { id: "investigator", label: "Investigator", icon: ScanSearch },
   { id: "insights", label: "Key Findings", icon: Lightbulb },
@@ -79,21 +89,23 @@ function ScanOverlay({ findings }: { findings: string[] }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: "grid", placeItems: "center", minHeight: "70vh" }}>
-      <div className="glass" style={{ width: "min(560px, 92%)", padding: "34px 36px", position: "relative", overflow: "hidden" }}>
+      <div style={{ width: "min(520px, 92%)", padding: "30px 32px", position: "relative", overflow: "hidden", background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "4px 4px 0 rgba(0,0,0,0.4)" }}>
         {/* sweeping scan line */}
         <motion.div
           animate={{ top: ["0%", "100%", "0%"] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          style={{ position: "absolute", left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, #4d7cff, #22d3ee, transparent)", boxShadow: "0 0 18px 2px rgba(77,124,255,0.5)" }}
+          style={{ position: "absolute", left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent, var(--foil-gold), transparent)" }}
         />
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-          <Loader2 size={18} color="var(--blue)" style={{ animation: "spin 1s linear infinite" }} />
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "1.05rem" }}>Analyzing your data</span>
+          <Loader2 size={16} color="var(--foil-gold)" style={{ animation: "spin 1s linear infinite" }} />
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--text)" }}>
+            ANALYZING DATASET
+          </span>
         </div>
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem", lineHeight: 2, color: "var(--text-muted)" }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.74rem", lineHeight: 1.9, color: "var(--text-muted)" }}>
           {lines.map((l, i) => (
             <motion.div key={l + i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 }}>
-              <span style={{ color: i === lines.length - 1 && !findings.length ? "var(--blue)" : "#16c784" }}>
+              <span style={{ color: i === lines.length - 1 && !findings.length ? "var(--foil-gold)" : "var(--seal-green)" }}>
                 {i === lines.length - 1 && !findings.length ? "▸" : "✓"}
               </span>{" "}
               {l}
@@ -117,7 +129,7 @@ export default function Studio() {
   const [dragOver, setDragOver] = useState(false);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState<Tab>("dashboard");
-  const [pinned, setPinned] = useState<any[]>([]);
+  const [pinned, setPinned] = useState<ChartSpec[]>([]);
   const [gridLayout, setGridLayout] = useState<Layout[]>([]);
   // Forecast is keyed to the specific chart it's toggled on (not a single global flag).
   const [forecast, setForecast] = useState<{ data: ForecastData | null; loading: boolean; activeId: string | null }>({ data: null, loading: false, activeId: null });
@@ -125,22 +137,19 @@ export default function Studio() {
 
   const toggleForecast = useCallback(async (datasetId: string, chartId: string) => {
     if (forecast.activeId === chartId) { setForecast((f) => ({ ...f, activeId: null })); return; }
+    // The forecast endpoint is dataset-level (the dataset's primary measure), so a
+    // computed forecast is valid for any line chart in this dataset — reuse the cache.
     if (forecast.data) { setForecast((f) => ({ ...f, activeId: chartId })); return; }
     setForecast((f) => ({ ...f, loading: true }));
     try {
-      const res = await fetch(`${API_BASE}/api/dashboard/forecast`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dataset_id: datasetId, periods: 14 }),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.detail);
-      setForecast({ data: body, loading: false, activeId: chartId });
+      const data = await apiPost<ForecastData>("/api/dashboard/forecast", { dataset_id: datasetId, periods: 14 });
+      setForecast({ data, loading: false, activeId: chartId });
     } catch {
       setForecast((f) => ({ ...f, loading: false }));
     }
   }, [forecast]);
 
-  const pinFromSql = useCallback((result: { columns: string[]; rows: Record<string, any>[] }, sql: string) => {
+  const pinFromSql = useCallback((result: SqlQueryResult, sql: string) => {
     const labelCol = result.columns.find((c) => typeof result.rows[0]?.[c] === "string") || result.columns[0];
     const valueCol = result.columns.find((c) => typeof result.rows[0]?.[c] === "number" && c !== labelCol);
     if (!valueCol) return;
@@ -154,20 +163,14 @@ export default function Studio() {
     setTab("dashboard");
   }, []);
 
-  const muted = theme === "dark" ? "#8c97b5" : "#5b6680";
-  const grid = theme === "dark" ? "rgba(255,255,255,0.08)" : "rgba(11,16,32,0.08)";
+  const { muted, grid } = chartTheme(theme);
 
   const upload = useCallback(async (file: File) => {
     setPhase("scanning"); setFindings([]); setError("");
     try {
       const fd = new FormData();
       fd.append("file", file);
-      const res = await fetch(`${API_BASE}/api/dashboard/generate`, { method: "POST", body: fd });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.detail || `Server error ${res.status}`);
-      }
-      const data: Result = await res.json();
+      const data = await apiUpload<Result>("/api/dashboard/generate", fd);
 
       // Reveal phase: play the REAL findings the engine just computed.
       const p = data.profile;
@@ -183,8 +186,8 @@ export default function Studio() {
       setHidden(new Set());
       setTab("dashboard");
       setTimeout(() => { setResult(data); setPhase("ready"); }, 1600);
-    } catch (e: any) {
-      setError(e.message || "Upload failed");
+    } catch (e: unknown) {
+      setError(errMessage(e, "Upload failed"));
       setPhase("error");
     }
   }, []);
@@ -235,26 +238,33 @@ export default function Studio() {
         ) : (
           <motion.div key="drop" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ display: "grid", placeItems: "center", minHeight: "70vh" }}>
             <div
+              role="button"
+              tabIndex={0}
+              aria-label="Upload a CSV or Excel dataset to build a dashboard"
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
               onDrop={(e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); }}
               onClick={() => inputRef.current?.click()}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
               data-cursor
-              className="glass"
               style={{
-                width: "min(620px, 90%)", padding: "56px 40px", textAlign: "center", cursor: "pointer",
-                border: `1.5px dashed ${dragOver ? "var(--blue)" : "var(--border)"}`,
-                boxShadow: dragOver ? "0 0 60px -10px var(--blue)" : "none", transition: "all .2s",
+                width: "min(600px, 90%)", padding: "52px 40px", textAlign: "center", cursor: "pointer",
+                background: "var(--surface)",
+                border: `2px dashed ${dragOver ? "var(--foil-gold)" : "var(--border)"}`,
+                boxShadow: dragOver ? "4px 4px 0 rgba(168,132,44,0.3)" : "var(--shadow-desk)",
+                transition: "border-color .18s, box-shadow .18s",
               }}
             >
-              <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls,.tsv" hidden onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
-              <UploadCloud size={44} color="var(--blue)" />
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", marginTop: 18 }}>Drop a dataset to build a dashboard</h2>
-              <p style={{ color: "var(--text-muted)", marginTop: 10, lineHeight: 1.6 }}>
+              <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls,.tsv" aria-label="Dataset file" hidden onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+              <UploadCloud size={40} color="var(--foil-gold)" />
+              <h2 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "1.55rem", marginTop: 16, letterSpacing: "-0.02em", color: "var(--text)" }}>
+                Drop a dataset to build a dashboard
+              </h2>
+              <p style={{ color: "var(--text-muted)", marginTop: 10, lineHeight: 1.65, fontSize: "0.88rem" }}>
                 CSV or Excel. Verita profiles every column, surfaces key findings, maps relationships,
                 and opens a real SQL console — no BI tool to learn.
               </p>
-              {phase === "error" && <p style={{ color: "var(--danger)", marginTop: 16, fontSize: "0.9rem" }}>⚠ {error}</p>}
+              {phase === "error" && <p style={{ color: "var(--danger)", marginTop: 16, fontFamily: "var(--font-mono)", fontSize: "0.76rem" }}>⚠ {error}</p>}
             </div>
           </motion.div>
         )}
@@ -263,18 +273,19 @@ export default function Studio() {
   }
 
   /* ── ready: smart header + tabs ── */
-  const r = result!;
+  if (!result) return null; // type guard — phase==="ready" implies result is set
+  const r = result;
   return (
     <div>
       {/* Smart header */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
           <div>
-            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.2rem)", letterSpacing: "-0.02em" }}>
+            <h1 style={{ fontFamily: "var(--font-serif)", fontWeight: 900, fontSize: "clamp(1.5rem, 3vw, 2.2rem)", letterSpacing: "-0.02em", color: "var(--text)" }}>
               {r.title}
             </h1>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
-              <FileSpreadsheet size={14} color="var(--blue)" />
+              <FileSpreadsheet size={14} color="var(--foil-gold)" />
               <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "var(--text-muted)" }}>
                 {r.filename} · {r.profile.row_count.toLocaleString()} rows · {r.profile.column_count} columns
                 {r.sampled && " · sampled"}
@@ -299,12 +310,12 @@ export default function Studio() {
                 background: "none", border: "none", cursor: "pointer",
                 fontFamily: "var(--font-body)", fontSize: "0.88rem", fontWeight: 600,
                 color: tab === id ? "var(--text)" : "var(--text-muted)",
-                borderBottom: tab === id ? "2px solid var(--blue)" : "2px solid transparent",
+                borderBottom: tab === id ? "2px solid var(--stamp-red)" : "2px solid transparent",
                 marginBottom: -1,
               }}
             >
               <Icon size={15} /> {label}
-              {id === "insights" && <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", padding: "1px 6px", borderRadius: 999, background: "var(--surface-2)", color: "var(--blue)" }}>{r.insights.length}</span>}
+              {id === "insights" && <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", padding: "1px 6px", background: "var(--surface-2)", color: "var(--foil-gold)" }}>{r.insights.length}</span>}
             </button>
           ))}
         </div>
@@ -317,9 +328,9 @@ export default function Studio() {
             {/* KPI row */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 14, marginBottom: 16 }}>
               {kpis.map((k, i) => (
-                <motion.div key={k.id} className="glass" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} style={{ padding: "16px 18px" }}>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)" }}>{k.title}</div>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.8rem", fontWeight: 600, marginTop: 5, color: k.accent === "danger" ? "var(--danger)" : "var(--text)" }}>{k.value}</div>
+                <motion.div key={k.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} style={{ padding: "16px 18px", background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "4px 4px 0 rgba(0,0,0,0.35)" }}>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.54rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)" }}>{k.title}</div>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.7rem", fontWeight: 600, marginTop: 6, lineHeight: 1, color: k.accent === "danger" ? "var(--danger)" : "var(--text)" }}>{k.value}</div>
                 </motion.div>
               ))}
             </div>
@@ -334,40 +345,45 @@ export default function Studio() {
             <RGL className="layout" width={gridWidth} layout={gridLayout} onLayoutChange={setGridLayout} cols={12} rowHeight={64} margin={[16, 16]} draggableHandle=".drag-handle" isBounded>
               {visibleCharts.map((c) => {
                 const isLine = c.chart_type === "line";
-                const showForecast = isLine && forecast.activeId === c.id && forecast.data;
+                // Narrowed to ForecastData|null — no non-null assertions downstream.
+                const fc = isLine && forecast.activeId === c.id ? forecast.data : null;
+                const isActive = forecast.activeId === c.id;
                 return (
-                  <div key={c.id} className="glass" style={{ padding: "10px 14px", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                  <div key={c.id} style={{ padding: "10px 14px", display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-desk-sm)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 6 }}>
                       <span className="drag-handle" style={{ cursor: "move", display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "0.9rem", flex: 1, minWidth: 0 }}>
-                        <GripVertical size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+                        <GripVertical size={14} color="var(--text-muted)" aria-hidden style={{ flexShrink: 0 }} />
                         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {c.title}{showForecast && (
-                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "#a855f7", marginLeft: 8 }}
-                              title={(forecast.data!.tournament || []).map((m) => `${m.model}: ${m.mape == null ? "n/a" : m.mape + "%"}`).join("  ·  ")}>
-                              won: {forecast.data!.method}{forecast.data!.backtest_mape != null && ` · MAPE ${forecast.data!.backtest_mape}%`}
-                              {forecast.data!.tournament && forecast.data!.tournament.length > 1 && ` (beat ${forecast.data!.tournament.length - 1} others)`}
+                          {c.title}{fc && (
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--violet-text)", marginLeft: 8 }}
+                              title={(fc.tournament || []).map((m) => `${m.model}: ${m.mape == null ? "n/a" : m.mape + "%"}`).join("  ·  ")}>
+                              won: {fc.method}{fc.backtest_mape != null && ` · MAPE ${fc.backtest_mape}%`}
+                              {fc.tournament && fc.tournament.length > 1 && ` (beat ${fc.tournament.length - 1} others)`}
                             </span>
                           )}
                         </span>
                       </span>
                       {isLine && (
-                        <button data-cursor aria-label="Toggle forecast overlay" onClick={() => toggleForecast(r.dataset_id, c.id)} title="Toggle forecast overlay"
+                        <button data-cursor aria-label="Toggle forecast overlay" aria-pressed={isActive} onClick={() => toggleForecast(r.dataset_id, c.id)} title="Toggle forecast overlay"
                           style={{
-                            display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 7,
-                            fontSize: "0.66rem", fontWeight: 600, border: "1px solid var(--border)", cursor: "pointer", flexShrink: 0,
-                            background: forecast.activeId === c.id ? "linear-gradient(120deg,#6366f1,#a855f7)" : "var(--surface)",
-                            color: forecast.activeId === c.id ? "#fff" : "var(--text-muted)",
+                            display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px",
+                            fontFamily: "var(--font-mono)", fontSize: "0.58rem", letterSpacing: "0.1em",
+                            border: isActive ? "1px solid var(--foil-gold)" : "1px solid var(--border)",
+                            cursor: "pointer", flexShrink: 0,
+                            background: isActive ? "var(--foil-gold)" : "var(--surface)",
+                            color: isActive ? "var(--ink)" : "var(--text-muted)",
+                            boxShadow: "var(--shadow-desk-press)",
                           }}>
-                          {forecast.loading ? <Loader2 size={11} style={{ animation: "spin 1s linear infinite" }} /> : <TrendingUp size={11} />} Forecast
+                          {forecast.loading ? <Loader2 size={11} aria-hidden style={{ animation: "spin 1s linear infinite" }} /> : <TrendingUp size={11} aria-hidden />} Forecast
                         </button>
                       )}
                       <button aria-label={`Remove ${c.title} panel`} onClick={() => setHidden((h) => new Set(h).add(c.id))} title="Remove panel"
                         style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 2, flexShrink: 0 }}>
-                        <X size={14} />
+                        <X size={14} aria-hidden />
                       </button>
                     </div>
                     <div style={{ flex: 1, minHeight: 0 }}>
-                      <EChart option={showForecast ? forecastOption(forecast.data!, muted, grid) : specToOption(c, muted, grid)} height="100%" />
+                      <EChart option={fc ? forecastOption(fc, muted, grid) : specToOption(c, muted, grid)} height="100%" />
                     </div>
                   </div>
                 );
@@ -392,7 +408,9 @@ export default function Studio() {
 
       {tab === "relationships" && <RelationshipMap nodes={r.relationships.nodes} edges={r.relationships.edges} muted={muted} />}
 
-      {tab === "map" && geoChart && <GeoMap data={geoChart.data} title={geoChart.title} />}
+      {tab === "map" && geoChart && Array.isArray(geoChart.data) && (
+        <GeoMap data={geoChart.data as ChartDatum[]} title={geoChart.title} />
+      )}
 
       {tab === "investigator" && <Investigator datasetId={r.dataset_id} />}
 
@@ -425,6 +443,18 @@ export default function Studio() {
 }
 
 const ghostBtn: React.CSSProperties = {
-  padding: "9px 16px", borderRadius: 10, fontSize: "0.85rem", fontWeight: 600,
-  border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)", flexShrink: 0,
+  padding: "8px 14px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "0.62rem",
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  fontWeight: 500,
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  color: "var(--text)",
+  flexShrink: 0,
+  cursor: "pointer",
+  boxShadow: "2px 2px 0 rgba(0,0,0,0.3)",
+  display: "inline-flex",
+  alignItems: "center",
 };

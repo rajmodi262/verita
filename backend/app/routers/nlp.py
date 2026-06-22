@@ -1,19 +1,18 @@
 """
-NLP Router — compliance text analysis.
+NLP Router - compliance text analysis.
 
-POST /api/nlp/analyze   { "text": "..." }  → entities, regulatory matches, risk, recommended action
+HTTP adapter only:
+POST /api/nlp/analyze
 """
 
 from __future__ import annotations
 
-import logging
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from ..nlp.analyzer import analyze
+from ..services.exceptions import TextAnalysisError
+from ..services.nlp_service import analyze_text as svc_analyze_text
 
-logger = logging.getLogger("verita.nlp")
 router = APIRouter()
 
 
@@ -24,7 +23,6 @@ class AnalyzeRequest(BaseModel):
 @router.post("/analyze")
 def analyze_text(req: AnalyzeRequest):
     try:
-        return analyze(req.text)
-    except Exception as e:
-        logger.exception("NLP analysis failed")
-        raise HTTPException(status_code=500, detail=f"Analysis error: {e}")
+        return svc_analyze_text(req.text)
+    except TextAnalysisError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc

@@ -1,0 +1,282 @@
+%-------------------------
+% Resume / CV - Raj Modi
+% B.Tech CSE (AI & Data Science) | MIT-WPU
+% Tailored for Graphsense Solutions - AI Engineer Intern
+% Focus: RAG pipelines, LLM application dev, MCP, context engineering, agentic workflows
+% One-Page Compact Design
+%-------------------------
+
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{charter}
+\usepackage{ragged2e}
+
+\usetikzlibrary{calc}
+
+% =====================================================================
+%                         COLOR PALETTE
+% =====================================================================
+\definecolor{HeaderDark}{HTML}{1A1A2E}
+\definecolor{HeaderMid}{HTML}{16213E}
+\definecolor{AccentBlue}{HTML}{0F3460}
+\definecolor{AccentTeal}{HTML}{1A936F}
+\definecolor{Charcoal}{HTML}{2A2A2A}
+\definecolor{DarkGray}{HTML}{333333}
+\definecolor{MidGray}{HTML}{555555}
+\definecolor{SubText}{HTML}{666666}
+\definecolor{LightGray}{HTML}{E8E8E8}
+\definecolor{LinkBlue}{HTML}{2563EB}
+\definecolor{SectionLine}{HTML}{0F3460}
+\definecolor{BulletColor}{HTML}{1A936F}
+\definecolor{TechTag}{HTML}{4A5568}
+
+% =====================================================================
+%                         PAGE GEOMETRY
+% =====================================================================
+\geometry{
+  left=0.4in,
+  right=0.4in,
+  top=0.18in,
+  bottom=0.18in
+}
+
+% =====================================================================
+%                         PAGE STYLE
+% =====================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+\raggedbottom
+\setlength{\tabcolsep}{0in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% =====================================================================
+%                     SECTION HEADER COMMAND
+% =====================================================================
+\newcommand{\sectionHeader}[2]{%
+  \vspace{2.5pt}%
+  \noindent%
+  {\normalsize\bfseries\color{HeaderDark}#2\enspace\textsc{#1}}%
+  \\[-6pt]%
+  {\color{SectionLine}\rule{\textwidth}{1pt}}%
+  \vspace{1pt}\par%
+}
+
+% =====================================================================
+%                     PROJECT ENTRY
+% =====================================================================
+\newcommand{\projectEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-4pt]%
+  {\scriptsize\color{AccentTeal}\textbf{#3}} {\scriptsize\color{TechTag}\textit{\,|\, #4}}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                 HIGHLIGHTED PROJECT ENTRY (Industry)
+% =====================================================================
+\definecolor{Highlight}{HTML}{FFF3CD}
+\newcommand{\industrybadge}{\colorbox{AccentTeal}{\textcolor{white}{\scriptsize\bfseries\,INDUSTRY PROJECT\,}}}
+\newcommand{\projectEntryHL}[4]{%
+  \vspace{2pt}%
+  \noindent\colorbox{Highlight}{\textbf{\color{HeaderDark}#1}}~\industrybadge\hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\scriptsize\color{AccentTeal}\textbf{#3}} {\scriptsize\color{TechTag}\textit{\,|\, #4}}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EXPERIENCE ENTRY
+% =====================================================================
+\newcommand{\expEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}\textit{#3}} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EDUCATION ENTRY
+% =====================================================================
+\newcommand{\eduEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}#3} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+\begin{document}
+
+% =======================================================================
+%                          HEADER
+% =======================================================================
+
+\begin{center}
+  {\fontsize{24}{28}\selectfont\bfseries\color{HeaderDark}Raj Modi}
+
+  \vspace{2pt}
+
+  {\small\color{MidGray}AI Engineer \,|\, LLM Applications, RAG \& Agentic Systems}
+
+  \vspace{3pt}
+
+  {\small%
+    \href{https://www.linkedin.com/in/rajmodi2004/}{{\color{AccentBlue}\faLinkedin}~\color{LinkBlue}linkedin.com/in/rajmodi2004}%
+    \quad{\color{LightGray}|}%
+    \quad\href{https://github.com/rajmodi262}{{\color{AccentBlue}\faGithub}~\color{LinkBlue}github.com/rajmodi262}%
+    \quad{\color{LightGray}|}%
+    \quad\href{mailto:rajmodi262@gmail.com}{{\color{AccentBlue}\faEnvelope}~\color{LinkBlue}rajmodi262@gmail.com}%
+    \quad{\color{LightGray}|}%
+    \quad{\color{AccentBlue}\faPhone*}~{\color{DarkGray}+91-8817130400}%
+  }
+\end{center}
+
+\vspace{-2pt}
+
+% =======================================================================
+%                          EDUCATION
+% =======================================================================
+
+\sectionHeader{Education}{\faGraduationCap}
+
+\eduEntry{MIT World Peace University, Pune}
+  {August 2023 -- May 2027}
+  {B.\ Tech Computer Science and Engineering (AI and Data Science)}
+  {CGPA: 8.14/10.0}
+
+\eduEntry{Macro Vision Academy, Burhanpur}
+  {April 2019 -- March 2022}
+  {CBSE Board -- Class XII: 86.60\%, Class X: 90.80\%}
+  {}
+
+% =======================================================================
+%                       TECHNICAL SKILLS
+% =======================================================================
+
+\sectionHeader{Technical Skills}{\faCogs}
+
+\vspace{1pt}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  {\small\textbf{\color{HeaderDark}AI \& LLM Engineering:}} & {\small LLM Application Development, RAG Pipelines (Dense + BM25 Hybrid, RRF, CRAG self-correction), Agentic Workflows \& AI Agents, MCP (Model Context Protocol), Context Engineering, Prompt Engineering, Function Calling / Tool Use, LLM Evals / Evaluation, Pytest, LangGraph, LangChain, Groq, Gemini, LLaMA 3.3, Anthropic Claude, Sentence-Transformers, Embeddings, Vector Search, NER, NLP, Generative AI} \\[1pt]
+  {\small\textbf{\color{HeaderDark}Languages:}} & {\small Python, SQL, JavaScript, TypeScript, Java, C++, C, Bash, HTML5, CSS3} \\[1pt]
+  {\small\textbf{\color{HeaderDark}Backend \& Frontend:}} & {\small FastAPI, REST APIs, Flask, Next.js, React, Vite, Streamlit, SSE Streaming, Tailwind CSS} \\[1pt]
+  {\small\textbf{\color{HeaderDark}ML \& Data Science:}} & {\small Pandas, NumPy, Scikit-Learn, XGBoost, LightGBM, SHAP, Isolation Forest, Anomaly Detection, Feature Engineering, Time-Series Forecasting (ARIMA, Prophet, Holt-Winters), EDA, Predictive Modeling, OpenCV, YOLOv8} \\[1pt]
+  {\small\textbf{\color{HeaderDark}Data \& DevOps:}} & {\small PostgreSQL, MySQL, MongoDB, DuckDB, SQLite, ETL Pipelines, Git, GitHub, Docker, AWS, CI/CD, Linux, Agile/Scrum; Coding Agents (Claude Code, Cursor, Codex)} \\
+\end{tabularx}
+
+% =======================================================================
+%                          PROJECTS
+% =======================================================================
+
+\sectionHeader{Projects}{\faProjectDiagram}
+
+% --- Project 1: AgentForge (strongest JD fit - agentic/LLM/RAG) ---
+\projectEntry{AgentForge -- Multi-Agent AI Planning Engine}
+  {Jun 2026 -- Present}
+  {Agentic Workflows, MCP, LLM Orchestration \& Context Engineering}
+  {Python, LangGraph, MCP, Claude/Gemini APIs, FastAPI, Pydantic, WebSocket, React, Docker}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Architected a production multi-agent system orchestrating \textbf{7 autonomous LLM agents} via a \textbf{LangGraph} state-machine \textbf{agentic workflow} (parallel fan-out/fan-in topology), transforming a raw business idea into a full strategic blueprint.}
+  \item {\small Engineered a 3-step per-agent reasoning loop (Generate$\rightarrow$Self-Critique$\rightarrow$Refine) with \textbf{context engineering}, Pydantic-validated \textbf{tool outputs}, RAG-backed grounding, a 4-round inter-agent debate for cross-validation, and real-time WebSocket streaming on a \textbf{FastAPI} backend.}
+  \item {\small Exposed the engine as an \textbf{MCP (Model Context Protocol) server}, letting coding agents (\textbf{Claude Code, Cursor}) and any MCP client invoke the multi-agent workflow as native tools/resources; Dockerized with CI/CD.}
+\end{itemize}
+
+\vspace{2pt}
+
+% --- Project 2: Skoda Auto / VW Group (industry project) ---
+\projectEntry{Skoda Auto (VW Group) -- Automated Training-Center Scheduling}
+  {Jun 2025 -- Feb 2026}
+  {Company-Sponsored Industrial Project \,$\cdot$\, Data Science, ETL \& Optimization}
+  {Python, Pandas, NumPy, Scikit-Learn, Tkinter, SQL}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Delivered an 8-month \textbf{industry project for Skoda Auto / VW Group Academy} with direct client interaction --- automating $\sim$1,243 annual training events across 3 centers via an \textbf{ETL pipeline} + constraint-based optimizer, achieving \textbf{98.5\% allocation} and $\sim$80\% less manual overhead.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 3: Nyay AI (RAG + Agents) ---
+\projectEntry{Nyay AI -- Agentic NLP Platform for Legal Intelligence}
+  {Oct 2025 -- Dec 2025}
+  {LLM Application Dev, Hybrid RAG \& Agentic Workflows}
+  {Python, LLaMA 3.3, LangGraph, Sentence-Transformers, BM25, Flask, NER, SSE}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Engineered a production \textbf{Hybrid RAG pipeline} (dense embeddings + BM25 + NER with Reciprocal Rank Fusion) hitting \textbf{89\% retrieval accuracy} across 22+ Indian languages, with \textbf{context \& prompt engineering} for grounded, citation-backed answers.}
+  \item {\small Orchestrated \textbf{8 tool-calling AI agents} with \textbf{CRAG self-correction} for compliance-risk analysis, streaming verified output over SSE --- an end-to-end \textbf{agentic workflow} from query routing to validated response.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 4: Verita (GenAI + agentic, strong metrics) ---
+\projectEntry{Verita -- Agentic Financial Crime \& Compliance Platform}
+  {May 2026 -- Present}
+  {Generative AI, LLM Applications \& Risk Analytics}
+  {Python, FastAPI, LLMs (Groq/Gemini), XGBoost, SHAP, DuckDB, React}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built an \textbf{LLM-powered compliance investigator} with a natural-language$\rightarrow$SQL \textbf{tool-calling agent} (DuckDB) that automates decision-making workflows, plus auto-EDA, Holt-Winters forecasting, scenario analysis, and a quantified-ROI business case.}
+  \item {\small Trained an XGBoost + Isolation Forest risk engine on \textbf{284K+ real transactions} (\textbf{ROC-AUC 0.99, PR-AUC 0.88}) with SHAP per-transaction reason codes and a cost-sensitive threshold for \textbf{anomaly detection}; served via a \textbf{FastAPI} backend to a React dashboard.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 5: AquaScan AI ---
+\projectEntry{AquaScan AI -- Real-Time Underwater Trash Detection}
+  {Jan 2026 -- Mar 2026}
+  {Computer Vision \& ML Application}
+  {Python, YOLOv8, OpenCV, FastAPI, Scikit-Learn, React, Vite}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built an AI system for real-time underwater debris detection; trained YOLOv8s to \textbf{94\% mAP} with feature engineering and anomaly detection, served via FastAPI with GeoJSON heatmap dashboards and an automated 6-check data pipeline.}
+\end{itemize}
+
+% =======================================================================
+%                       WORK EXPERIENCE
+% =======================================================================
+
+\sectionHeader{Work Experience}{\faLaptopCode}
+
+\expEntry{Community Management and Growth Team -- Intern}
+  {Sep 2023 -- Nov 2023}
+  {Engineer's Cradle Pvt.\ Ltd.}
+  {Pune, India}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Drove cross-platform community growth across 3 digital channels, lifting user engagement \textbf{40\%} through targeted content campaigns, data-driven outreach, and automated dashboard reporting to the founding team.}
+\end{itemize}
+
+% =======================================================================
+%                  ACHIEVEMENTS & CERTIFICATIONS
+% =======================================================================
+
+\sectionHeader{Achievements \& Certifications}{\faTrophy}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}$\bullet$}]
+  \item {\small \textbf{SIH 2025} -- Qualified for Second Round, Rank 63 (Top 10\%) {\color{SubText}|} \textbf{AIR 8}, National Creative Olympiad 2021--22 {\color{SubText}|} 6 end-to-end AI/ML projects deployed with interactive dashboards.}
+  \item {\small \textbf{Joint President}, Student Alumni Relations Society, MIT-WPU (2025--26) {\color{SubText}|} \textbf{Execution Head}, RIDE 2025 tech fest (500+ attendees) {\color{SubText}|} \textbf{Core Coordinator}, Nostalgia 2025 (1000+ attendees).}
+  \item {\small \textbf{Certifications:} Google -- Advanced Data Analytics {\color{SubText}|} IBM -- Data Visualization with Python {\color{SubText}|} Indiana University -- Financial Planning.}
+\end{itemize}
+
+% ============================================================
+\end{document}

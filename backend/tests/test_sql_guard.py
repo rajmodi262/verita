@@ -77,7 +77,8 @@ def test_nl_to_sql_translation(client, dataset_id):
     resp = client.post("/api/sql/translate", json={"dataset_id": dataset_id, "question": "average amount by channel top 5"})
     assert resp.status_code == 200
     body = resp.json()
-    assert "GROUP BY channel" in body["sql"]
+    # Identifiers are now quoted (handles spaces/casing safely); the SQL must still group by channel.
+    assert 'GROUP BY "channel"' in body["sql"] or "GROUP BY channel" in body["sql"]
     assert body["interpretation"]["aggregate"] == "AVG"
     assert body["interpretation"]["measure"] == "amount"
     # And the generated SQL must actually run.

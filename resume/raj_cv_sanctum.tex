@@ -1,0 +1,259 @@
+%-------------------------
+% Resume / CV - Raj Modi
+% B.Tech CSE (AI & Data Science) | MIT-WPU
+% Tailored for Sanctum Wealth - Data Science / Analytics
+% Focus: predictive & financial-risk modeling, forecasting, BI dashboards
+% One-Page Compact Design
+%-------------------------
+
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{charter}
+\usepackage{ragged2e}
+
+\usetikzlibrary{calc}
+
+% =====================================================================
+%                         COLOR PALETTE
+% =====================================================================
+\definecolor{HeaderDark}{HTML}{1A1A2E}
+\definecolor{HeaderMid}{HTML}{16213E}
+\definecolor{AccentBlue}{HTML}{0F3460}
+\definecolor{AccentTeal}{HTML}{1A936F}
+\definecolor{Charcoal}{HTML}{2A2A2A}
+\definecolor{DarkGray}{HTML}{333333}
+\definecolor{MidGray}{HTML}{555555}
+\definecolor{SubText}{HTML}{666666}
+\definecolor{LightGray}{HTML}{E8E8E8}
+\definecolor{LinkBlue}{HTML}{2563EB}
+\definecolor{SectionLine}{HTML}{0F3460}
+\definecolor{BulletColor}{HTML}{1A936F}
+\definecolor{TechTag}{HTML}{4A5568}
+
+% =====================================================================
+%                         PAGE GEOMETRY
+% =====================================================================
+\geometry{
+  left=0.4in,
+  right=0.4in,
+  top=0.25in,
+  bottom=0.25in
+}
+
+% =====================================================================
+%                         PAGE STYLE
+% =====================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+\raggedbottom
+\setlength{\tabcolsep}{0in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% =====================================================================
+%                     SECTION HEADER COMMAND
+% =====================================================================
+\newcommand{\sectionHeader}[2]{%
+  \vspace{4pt}%
+  \noindent%
+  {\normalsize\bfseries\color{HeaderDark}#2\enspace\textsc{#1}}%
+  \\[-6pt]%
+  {\color{SectionLine}\rule{\textwidth}{1pt}}%
+  \vspace{1pt}\par%
+}
+
+% =====================================================================
+%                     PROJECT ENTRY
+% =====================================================================
+\newcommand{\projectEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-4pt]%
+  {\scriptsize\color{AccentTeal}\textbf{#3}} {\scriptsize\color{TechTag}\textit{\,|\, #4}}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EXPERIENCE ENTRY
+% =====================================================================
+\newcommand{\expEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}\textit{#3}} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+%                     EDUCATION ENTRY
+% =====================================================================
+\newcommand{\eduEntry}[4]{%
+  \vspace{1pt}%
+  \noindent\textbf{\color{HeaderDark}#1} \hfill {\small\color{SubText}#2}\\[-3pt]%
+  {\small\color{MidGray}#3} \hfill {\small\color{SubText}#4}%
+  \vspace{0pt}\par%
+}
+
+% =====================================================================
+\begin{document}
+
+% =======================================================================
+%                          HEADER
+% =======================================================================
+
+\begin{center}
+  {\fontsize{24}{28}\selectfont\bfseries\color{HeaderDark}Raj Modi}
+
+  \vspace{2pt}
+
+  {\small\color{MidGray}Data Science \& Analytics \,|\, Predictive, Financial \& Risk Modeling}
+
+  \vspace{3pt}
+
+  {\small%
+    \href{https://www.linkedin.com/in/rajmodi2004/}{{\color{AccentBlue}\faLinkedin}~\color{LinkBlue}linkedin.com/in/rajmodi2004}%
+    \quad{\color{LightGray}|}%
+    \quad\href{https://github.com/rajmodi262}{{\color{AccentBlue}\faGithub}~\color{LinkBlue}github.com/rajmodi262}%
+    \quad{\color{LightGray}|}%
+    \quad\href{mailto:rajmodi262@gmail.com}{{\color{AccentBlue}\faEnvelope}~\color{LinkBlue}rajmodi262@gmail.com}%
+    \quad{\color{LightGray}|}%
+    \quad{\color{AccentBlue}\faPhone*}~{\color{DarkGray}+91-8817130400}%
+  }
+\end{center}
+
+\vspace{-2pt}
+
+% =======================================================================
+%                          EDUCATION
+% =======================================================================
+
+\sectionHeader{Education}{\faGraduationCap}
+
+\eduEntry{MIT World Peace University, Pune}
+  {August 2023 -- May 2027}
+  {B.\ Tech Computer Science and Engineering (AI and Data Science)}
+  {CGPA: 8.14/10.0}
+
+\vspace{1pt}
+{\footnotesize\color{SubText}\textit{Coursework: Machine Learning, Predictive Modeling, Probability \& Statistics, Data Preprocessing, DBMS, Data Mining, AI, NLP}\par}
+
+\eduEntry{Macro Vision Academy, Burhanpur}
+  {April 2019 -- March 2022}
+  {CBSE Board -- Class XII: 86.60\%, Class X: 90.80\%}
+  {}
+
+% =======================================================================
+%                       TECHNICAL SKILLS
+% =======================================================================
+
+\sectionHeader{Technical Skills}{\faCogs}
+
+\vspace{1pt}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+  {\small\textbf{\color{HeaderDark}Languages \& Databases:}} & {\small Python, SQL, Java, C++, C, MySQL, PostgreSQL, SQLite, DuckDB, MongoDB, ETL Pipelines} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Data Science \& ML:}} & {\small Pandas, NumPy, Scikit-Learn, XGBoost, LightGBM, SHAP, Isolation Forest, Predictive \& Prescriptive Modeling, Statistical Modeling, Regression, Classification, Feature Engineering, Hypothesis Testing, Anomaly Detection} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Forecasting \& Risk:}} & {\small Time-Series Forecasting (ARIMA, Prophet, Holt-Winters), Financial \& Economic Modeling, Risk Analytics, Fraud/Anomaly Detection, Scenario Analysis, Portfolio \& Investment Analytics} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Analytics \& BI:}} & {\small Exploratory Data Analysis (EDA), Tableau, Power BI, Advanced Excel, Matplotlib, Seaborn, Streamlit, KPI Dashboards, Data Storytelling, Business Intelligence} \\[2pt]
+  {\small\textbf{\color{HeaderDark}Tools \& Workflow:}} & {\small Git, GitHub, Jupyter, FastAPI, Docker, Linux, Agile/Scrum, Jira; NLP, LLMs \& RAG (working knowledge)} \\
+\end{tabularx}
+
+% =======================================================================
+%                          PROJECTS
+% =======================================================================
+
+\sectionHeader{Projects}{\faProjectDiagram}
+
+% --- Project 1: Verita (financial risk analytics) ---
+\projectEntry{Verita -- Financial Crime \& Compliance Risk Analytics Platform}
+  {May 2026 -- Present}
+  {Risk Modeling, Forecasting \& Data Visualization}
+  {Python, Pandas, Scikit-Learn, XGBoost, SHAP, Isolation Forest, DuckDB, SQL}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built an end-to-end \textbf{financial-risk analytics} platform on \textbf{284K+ real transactions}: engineered an XGBoost + Isolation Forest model (held-out \textbf{ROC-AUC 0.99, PR-AUC 0.88}) with feature engineering, \textbf{SHAP} explainability (per-transaction reason codes), and a cost-sensitive threshold for \textbf{fraud/anomaly detection} and predictive risk scoring.}
+  \item {\small Delivered \textbf{automated data pipelines} and an \textbf{analytics dashboard} -- auto-EDA, hypothesis-tested findings, \textbf{Holt-Winters} revenue/volume/cost \textbf{forecasting}, scenario analysis, and natural-language$\rightarrow$SQL querying -- with a quantified-ROI business case.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 2: EconoScope (economic/financial forecasting) ---
+\projectEntry{EconoScope -- Global Economic Forecasting \& Analytics}
+  {Nov 2025 -- Jan 2026}
+  {Regression, Time-Series \& Financial Analytics}
+  {Python, Pandas, Scikit-Learn, XGBoost, LightGBM, Streamlit}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Forecast GDP for \textbf{190+ countries} from World Bank macroeconomic data -- trained 10 regression models (Ridge, LASSO, RF, XGBoost, LightGBM, MLP) on 25 indicators with 4-method feature selection; deployed a Streamlit dashboard for real-time \textbf{economic scenario analysis} and prediction.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 3: VWS-Skoda (DS, EDA, dashboards, client work) ---
+\projectEntry{VWS-Skoda Analytics \& Optimization -- Industry Collaboration}
+  {Jun 2025 -- Feb 2026}
+  {Data Science, EDA \& Predictive Analytics}
+  {Python, Pandas, NumPy, Scikit-Learn, Matplotlib, Seaborn, SQL}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Led an 8-month \textbf{VW Group Academy (Skoda)} collaboration with direct client interaction: built an \textbf{ETL pipeline} + priority-scoring engine automating $\sim$1,243 annual events (\textbf{98.5\% allocation}, $\sim$80\% less manual overhead).}
+  \item {\small Performed deep \textbf{exploratory data analysis (EDA)} on operational utilization metrics and delivered an interactive \textbf{BI dashboard} (KPI cards, heatmaps, month/year comparisons, threshold alerts) for data-driven decision-making across 50+ assets.}
+\end{itemize}
+
+\vspace{1pt}
+
+% --- Project 4: Nyay AI (NLP document/compliance analytics) ---
+\projectEntry{Nyay AI -- NLP-Powered Document \& Compliance Intelligence}
+  {Oct 2025 -- Dec 2025}
+  {NLP, Information Retrieval \& Risk Analysis}
+  {Python, LLaMA 3.3, Sentence-Transformers, BM25, NER, Flask}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Built a Hybrid RAG pipeline (dense embeddings + BM25 + NER with Reciprocal Rank Fusion) achieving \textbf{89\% accuracy} for legal/compliance document analysis across 22+ Indian languages, with automated compliance-risk extraction.}
+\end{itemize}
+
+% =======================================================================
+%                       WORK EXPERIENCE
+% =======================================================================
+
+\sectionHeader{Work Experience}{\faLaptopCode}
+
+\expEntry{Community Management and Growth Team -- Intern}
+  {Sep 2023 -- Nov 2023}
+  {Engineer's Cradle Pvt.\ Ltd.}
+  {Pune, India}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}\textbf{--}}]
+  \item {\small Drove cross-platform community growth across 3 digital channels, lifting user engagement \textbf{40\%} through targeted, data-driven campaigns and automated Excel dashboard reporting to the founding team.}
+\end{itemize}
+
+% =======================================================================
+%                  ACHIEVEMENTS & CERTIFICATIONS
+% =======================================================================
+
+\sectionHeader{Achievements \& Certifications}{\faTrophy}
+
+\begin{itemize}[leftmargin=14pt, itemsep=0pt, parsep=0pt, topsep=1pt, label={\color{BulletColor}$\bullet$}]
+  \item {\small \textbf{Certifications:} Google -- Advanced Data Analytics {\color{SubText}|} IBM -- Data Visualization with Python {\color{SubText}|} Indiana University -- Financial Planning.}
+  \item {\small \textbf{SIH 2025} -- Qualified for Second Round, Rank 63 (Top 10\%) {\color{SubText}|} \textbf{AIR 8}, National Creative Olympiad 2021--22 {\color{SubText}|} 6 end-to-end data-science projects deployed with interactive dashboards.}
+  \item {\small \textbf{Joint President}, Student Alumni Relations Society, MIT-WPU (2025--26) {\color{SubText}|} \textbf{Execution Head}, RIDE 2025 tech fest (500+ attendees).}
+\end{itemize}
+
+% ============================================================
+\end{document}

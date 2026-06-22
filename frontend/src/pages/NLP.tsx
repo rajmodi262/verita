@@ -1,39 +1,61 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Sparkles, Loader2, FileSearch } from "lucide-react";
-import { API_BASE } from "../config";
+import { Loader2, FileSearch } from "lucide-react";
+import { apiPost } from "../lib/api";
+import { errMessage } from "../lib/errors";
+import { normalizeRiskLevel, type NlpResult, type NlpEntity } from "../types/api";
 
-interface Entity { text: string; label: string; start: number; end: number }
-interface Match { framework: string; keyword: string; context: string }
-interface Result {
-  risk_score: number;
-  risk_level: string;
-  recommended_action: string;
-  signals: string[];
-  entities: Entity[];
-  regulatory_matches: Match[];
-  framework_hits: Record<string, number>;
-  summary: Record<string, number>;
-}
-
-const LEVEL_COLOR: Record<string, string> = { Critical: "#ff2d55", High: "#ff7a8a", Medium: "#f5a524", Low: "#16c784" };
-const ENTITY_COLOR: Record<string, string> = {
-  MONEY: "#16c784", JURISDICTION: "#ff7a8a", SWIFT_CODE: "#4d7cff",
-  ACCOUNT: "#a855f7", PERCENT: "#22d3ee", DATE: "#8c97b5",
+// Risk-level text colors (AAA) + border-fill colors, keyed by canonical level.
+const LEVEL_TEXT: Record<string, string> = {
+  Critical: "var(--danger-text)", High: "var(--danger-text)", Medium: "var(--foil-gold-text)", Low: "var(--success-text)",
 };
-const FRAMEWORK_COLOR: Record<string, string> = { OFAC: "#ff2d55", AML: "#ff7a8a", BSA: "#f5a524", FinCEN: "#4d7cff" };
+const LEVEL_FILL: Record<string, string> = {
+  Critical: "var(--danger)", High: "var(--stamp-red)", Medium: "var(--foil-gold)", Low: "var(--seal-green)",
+};
+// Entity underline/tint colors (non-text fills) — tokenized.
+const ENTITY_COLOR: Record<string, string> = {
+  MONEY: "var(--success)", JURISDICTION: "var(--danger)", SWIFT_CODE: "var(--blue)",
+  ACCOUNT: "var(--violet)", PERCENT: "var(--cyan)", DATE: "var(--text-muted)",
+};
+const FRAMEWORK_COLOR: Record<string, string> = {
+  OFAC: "var(--danger)", AML: "var(--stamp-red)", BSA: "var(--foil-gold)", FinCEN: "var(--blue)",
+};
 
 const SAMPLE = "On 03/14/2024 the subject wired $48,500 via SWIFT (CHASUS33) to a shell company in Russia, then structured the remaining funds as multiple small transfers just under the $10,000 reporting threshold to avoid detection. The beneficiary is a politically exposed person (PEP) flagged on the OFAC SDN list.";
 
-function highlight(text: string, entities: Entity[]) {
+const panelStyle: React.CSSProperties = {
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  boxShadow: "var(--shadow-desk-sm)",
+  padding: "16px 18px",
+};
+const labelStyle: React.CSSProperties = {
+  fontFamily: "var(--font-mono)",
+  fontSize: "0.54rem",
+  letterSpacing: "0.24em",
+  textTransform: "uppercase",
+  color: "var(--text-muted)",
+  marginBottom: 10,
+};
+
+function highlight(text: string, entities: NlpEntity[]) {
   const sorted = [...entities].sort((a, b) => a.start - b.start);
   const out: React.ReactNode[] = [];
   let cursor = 0;
   sorted.forEach((e, i) => {
-    if (e.start < cursor) return; // skip overlaps
+    if (e.start < cursor) return;
     if (e.start > cursor) out.push(text.slice(cursor, e.start));
     out.push(
-      <mark key={i} title={e.label} style={{ background: `${ENTITY_COLOR[e.label] || "#8c97b5"}26`, color: "var(--text)", borderBottom: `2px solid ${ENTITY_COLOR[e.label] || "#8c97b5"}`, borderRadius: 3, padding: "0 2px" }}>
+      <mark
+        key={i}
+        title={e.label}
+        style={{
+          background: `${ENTITY_COLOR[e.label] || "var(--text-muted)"}22`,
+          color: "var(--text)",
+          borderBottom: `2px solid ${ENTITY_COLOR[e.label] || "var(--text-muted)"}`,
+          borderRadius: 0,
+          padding: "0 2px",
+        }}
+      >
         {text.slice(e.start, e.end)}
       </mark>
     );
@@ -45,115 +67,216 @@ function highlight(text: string, entities: Entity[]) {
 
 export default function NLP() {
   const [text, setText] = useState(SAMPLE);
-  const [result, setResult] = useState<Result | null>(null);
+  const [result, setResult] = useState<NlpResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const analyze = async () => {
-    setLoading(true); setError("");
+    setLoading(true);
+    setError("");
     try {
-      const res = await fetch(`${API_BASE}/api/nlp/analyze`, {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }),
-      });
-      if (!res.ok) throw new Error(`Server ${res.status}`);
-      setResult(await res.json());
-    } catch (e: any) {
-      setError("Backend unavailable — start the API on :8000");
+      const data = await apiPost<NlpResult>("/api/nlp/analyze", { text });
+      setResult(data);
+    } catch (e: unknown) {
+      setError(errMessage(e, "Backend unavailable — start the API on :8000"));
     } finally {
       setLoading(false);
     }
   };
 
+  const level = result ? normalizeRiskLevel(result.risk_level) ?? result.risk_level : "";
+
   return (
     <div>
-      <p style={{ color: "var(--text-muted)", marginBottom: 18, maxWidth: 720 }}>
-        Paste a transaction narrative, alert note, or regulatory text. Verita extracts entities,
-        matches it against BSA / AML / OFAC / FinCEN frameworks, and recommends an action — with the
-        exact signals that drove the score. Fully transparent, no black box.
-      </p>
+      {/* Page header */}
+      <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid var(--border)" }}>
+        <div style={labelStyle}>CASE FILE / NLP INSIGHT</div>
+        <h1
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
+            letterSpacing: "-0.02em",
+            color: "var(--text)",
+          }}
+        >
+          Compliance Text Analysis
+        </h1>
+        <p style={{ color: "var(--text-muted)", marginTop: 6, fontSize: "0.86rem", maxWidth: "68ch" }}>
+          Paste a transaction narrative, alert note, or regulatory text. Verita extracts entities,
+          matches against BSA / AML / OFAC / FinCEN frameworks, and recommends an action — with
+          the exact signals that drove the score.
+        </p>
+      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: result ? "1fr 1fr" : "1fr", gap: 18, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: result ? "1fr 1fr" : "1fr", gap: 14, alignItems: "start" }}>
         {/* Input */}
-        <div className="glass" style={{ padding: 18 }}>
+        <div style={panelStyle}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-            <span style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>Compliance text</span>
-            <button data-cursor onClick={() => { setText(SAMPLE); setResult(null); }} style={ghostBtn}>Load sample</button>
+            <label htmlFor="nlp-text" style={labelStyle as React.CSSProperties}>COMPLIANCE TEXT</label>
+            <button
+              data-cursor
+              onClick={() => { setText(SAMPLE); setResult(null); }}
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.58rem",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                padding: "5px 10px",
+                border: "1px solid var(--border)",
+                background: "transparent",
+                color: "var(--text-muted)",
+                cursor: "pointer",
+              }}
+            >
+              LOAD SAMPLE
+            </button>
           </div>
           <textarea
+            id="nlp-text"
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={10}
             style={{
-              width: "100%", resize: "vertical", background: "var(--surface-2)", color: "var(--text)",
-              border: "1px solid var(--border)", borderRadius: 12, padding: 14, fontFamily: "var(--font-body)",
-              fontSize: "0.9rem", lineHeight: 1.6, outline: "none",
+              width: "100%",
+              resize: "vertical",
+              background: "var(--surface-2)",
+              color: "var(--text)",
+              border: "1px solid var(--border)",
+              borderRadius: 0,
+              padding: "12px 14px",
+              fontFamily: "var(--font-body)",
+              fontSize: "0.88rem",
+              lineHeight: 1.65,
+              boxShadow: "inset 2px 2px 0 rgba(0,0,0,0.2)",
             }}
           />
-          <button data-cursor onClick={analyze} disabled={loading || !text.trim()} style={aiBtn}>
-            {loading ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : <Sparkles size={16} />}
-            {loading ? "Analyzing…" : "Analyze"}
+          <button
+            data-cursor
+            onClick={analyze}
+            disabled={loading || !text.trim()}
+            style={{
+              marginTop: 10,
+              padding: "10px 20px",
+              border: "1px solid var(--foil-gold)",
+              background: "transparent",
+              color: "var(--foil-gold-text)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.66rem",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              cursor: loading || !text.trim() ? "not-allowed" : "pointer",
+              boxShadow: "var(--shadow-desk-sm)",
+              opacity: loading || !text.trim() ? 0.5 : 1,
+            }}
+          >
+            {loading
+              ? <><Loader2 size={13} aria-hidden style={{ animation: "spin 1s linear infinite" }} /> ANALYZING…</>
+              : <>ANALYZE DOCUMENT</>
+            }
           </button>
-          {error && <p style={{ color: "var(--danger)", marginTop: 10, fontSize: "0.85rem" }}>⚠ {error}</p>}
+          {error && <p role="alert" style={{ color: "var(--danger-text)", marginTop: 10, fontFamily: "var(--font-mono)", fontSize: "0.72rem" }}>⚠ {error}</p>}
           <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
         </div>
 
         {/* Results */}
         {result && (
-          <motion.div initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {/* risk verdict */}
-            <div className="glass" style={{ padding: 20, borderLeft: `3px solid ${LEVEL_COLOR[result.risk_level]}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Risk verdict */}
+            <div style={{ ...panelStyle, borderLeft: `3px solid ${LEVEL_FILL[level] || "var(--text-muted)"}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                 <div>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)" }}>Risk level</div>
-                  <div style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 700, color: LEVEL_COLOR[result.risk_level] }}>{result.risk_level}</div>
+                  <div style={labelStyle}>RISK LEVEL</div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "2rem",
+                      fontWeight: 700,
+                      color: LEVEL_TEXT[level] || "var(--text)",
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    {String(level).toUpperCase()}
+                  </div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "2.2rem", fontWeight: 600 }}>{result.risk_score}</div>
-                  <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>/ 100</div>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "2.2rem", fontWeight: 600, color: "var(--text)" }}>
+                    {result.risk_score}
+                  </div>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.58rem", letterSpacing: "0.16em", color: "var(--text-muted)" }}>/ 100</div>
                 </div>
               </div>
-              <div style={{ marginTop: 14, padding: "10px 14px", borderRadius: 10, background: `${LEVEL_COLOR[result.risk_level]}1f`, display: "inline-flex", alignItems: "center", gap: 8 }}>
-                <FileSearch size={15} color={LEVEL_COLOR[result.risk_level]} />
-                <span style={{ fontWeight: 600 }}>Recommended: {result.recommended_action}</span>
+              <div
+                style={{
+                  marginTop: 14,
+                  padding: "8px 12px",
+                  border: `1px solid ${LEVEL_FILL[level] || "var(--border)"}`,
+                  background: "var(--surface-2)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontFamily: "var(--font-body)",
+                  fontSize: "0.84rem",
+                }}
+              >
+                <FileSearch size={13} color={LEVEL_FILL[level] || "var(--text-muted)"} aria-hidden />
+                <span style={{ fontWeight: 600, color: "var(--text)" }}>Recommended: {result.recommended_action}</span>
               </div>
             </div>
 
-            {/* signals */}
-            <div className="glass" style={{ padding: 18 }}>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 10 }}>Why — signals</div>
+            {/* Signals */}
+            <div style={panelStyle}>
+              <div style={labelStyle}>WHY — SIGNALS</div>
               <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 6 }}>
-                {result.signals.map((s, i) => <li key={i} style={{ fontSize: "0.86rem", lineHeight: 1.5 }}>{s}</li>)}
+                {result.signals.map((s, i) => (
+                  <li key={i} style={{ fontSize: "0.84rem", lineHeight: 1.55, color: "var(--text)", fontFamily: "var(--font-body)" }}>{s}</li>
+                ))}
               </ul>
             </div>
 
-            {/* regulatory matches */}
+            {/* Regulatory matches */}
             {result.regulatory_matches.length > 0 && (
-              <div className="glass" style={{ padding: 18 }}>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 10 }}>Regulatory matches</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <div style={panelStyle}>
+                <div style={labelStyle}>REGULATORY MATCHES</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {result.regulatory_matches.map((m, i) => (
-                    <span key={i} style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: 999, color: FRAMEWORK_COLOR[m.framework] || "#8c97b5", background: `${FRAMEWORK_COLOR[m.framework] || "#8c97b5"}1f`, border: `1px solid ${FRAMEWORK_COLOR[m.framework] || "#8c97b5"}40` }}>
+                    <span
+                      key={i}
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "0.62rem",
+                        letterSpacing: "0.1em",
+                        padding: "4px 10px",
+                        color: "var(--text)",
+                        background: "var(--surface-2)",
+                        border: `1px solid ${FRAMEWORK_COLOR[m.framework] || "var(--border)"}`,
+                      }}
+                    >
                       <strong>{m.framework}</strong> · {m.keyword}
                     </span>
                   ))}
                 </div>
               </div>
             )}
-          </motion.div>
+          </div>
         )}
       </div>
 
-      {/* highlighted entities (full width) */}
+      {/* Highlighted entities */}
       {result && result.entities.length > 0 && (
-        <div className="glass" style={{ padding: 20, marginTop: 18 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 12 }}>
-            Extracted entities · {result.entities.length}
-          </div>
-          <p style={{ lineHeight: 2, fontSize: "0.95rem" }}>{highlight(text, result.entities)}</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 14 }}>
+        <div style={{ ...panelStyle, marginTop: 14 }}>
+          <div style={labelStyle}>EXTRACTED ENTITIES · {result.entities.length}</div>
+          <p style={{ lineHeight: 2, fontSize: "0.92rem", color: "var(--text)", fontFamily: "var(--font-body)" }}>
+            {highlight(text, result.entities)}
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 14 }}>
             {Object.entries(ENTITY_COLOR).map(([label, color]) => (
-              <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                <span style={{ width: 10, height: 10, borderRadius: 3, background: color }} />{label}
+              <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-mono)", fontSize: "0.58rem", letterSpacing: "0.1em", color: "var(--text-muted)" }}>
+                <span aria-hidden style={{ width: 8, height: 8, background: color, display: "inline-block" }} />
+                {label}
               </span>
             ))}
           </div>
@@ -162,6 +285,3 @@ export default function NLP() {
     </div>
   );
 }
-
-const ghostBtn: React.CSSProperties = { padding: "6px 12px", borderRadius: 8, fontSize: "0.78rem", fontWeight: 600, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)" };
-const aiBtn: React.CSSProperties = { marginTop: 12, padding: "11px 20px", borderRadius: 10, fontSize: "0.9rem", fontWeight: 600, border: "none", color: "#fff", background: "linear-gradient(120deg, #6366f1, #a855f7)", boxShadow: "0 6px 24px -8px rgba(168,85,247,0.6)", display: "inline-flex", alignItems: "center", gap: 8 };

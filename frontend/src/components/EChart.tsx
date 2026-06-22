@@ -9,7 +9,12 @@ export default function EChart({ option, height = 240 }: { option: echarts.EChar
   useEffect(() => {
     if (!ref.current) return;
     chart.current = echarts.init(ref.current, undefined, { renderer: "canvas" });
-    const ro = new ResizeObserver(() => chart.current?.resize());
+    const ro = new ResizeObserver((entries) => {
+      const { width, height: h } = entries[0]?.contentRect ?? {};
+      // Only resize when the container actually has dimensions (avoids 0×0 init
+      // in hidden tabs / accordions — the resize fires again when revealed).
+      if (width && h) chart.current?.resize();
+    });
     ro.observe(ref.current);
     return () => {
       ro.disconnect();
@@ -19,7 +24,8 @@ export default function EChart({ option, height = 240 }: { option: echarts.EChar
   }, []);
 
   useEffect(() => {
-    chart.current?.setOption(option, true);
+    // notMerge:false preserves legend selection, dataZoom window, tooltip state
+    chart.current?.setOption(option, false);
   }, [option]);
 
   return <div ref={ref} style={{ width: "100%", height }} />;
