@@ -24,3 +24,7 @@ data/_*.txt
 # large local datasets (root-level) — never commit
 *.csv
 !data/sample_*.csv
+
+# Claude Code config — not tracked
+.claude/
+CLAUDE.md
