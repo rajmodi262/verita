@@ -1,0 +1,16 @@
+# Ruff configuration — Verita backend
+line-length = 100
+target-version = "py311"
+
+[lint]
+# Default rules (pyflakes + a subset of pycodestyle) plus import sorting.
+select = ["E", "F", "I"]
+ignore = [
+    # Imports placed after runtime setup (env loading / logging / router
+    # registration) in main.py and risk_engine.py — intentional ordering.
+    "E402",
+]
+
+[lint.per-file-ignores]
+# Test modules may keep unused fixtures/imports for readability.
+"tests/*" = ["F401", "F841"]

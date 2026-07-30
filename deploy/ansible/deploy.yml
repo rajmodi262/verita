@@ -1,0 +1,95 @@
+---
+# Verita — provision a Linux host and deploy the full Docker Compose stack
+# (postgres, backend, frontend, prometheus, grafana) with a health-check gate.
+#
+#   ansible-galaxy collection install -r requirements.yml
+#   ansible-playbook -i inventory.ini deploy.yml
+#
+# Idempotent: re-running only applies drift (new commits, changed images).
+
+- name: Deploy Verita to a Linux host
+  hosts: verita
+  become: true
+
+  vars:
+    app_dir: "{{ app_dir | default('/opt/verita') }}"
+    repo_url: "{{ repo_url | default('https://github.com/rajmodi262/verita.git') }}"
+    repo_version: "{{ repo_version | default('main') }}"
+    health_url: "http://localhost:8000/health"
+
+  tasks:
+    - name: Install prerequisite packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - git
+        state: present
+        update_cache: true
+
+    - name: Create apt keyrings directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Add Docker's official GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+
+    - name: Add the Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch={{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}
+          signed-by=/etc/apt/keyrings/docker.asc]
+          https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        filename: docker
+        state: present
+
+    - name: Install Docker Engine and the Compose plugin
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker is running and enabled at boot
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Clone or update the Verita repository
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ repo_version }}"
+        force: true
+
+    - name: Build images and start the stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        build: always
+        state: present
+
+    - name: Wait for the backend health endpoint to return 200
+      ansible.builtin.uri:
+        url: "{{ health_url }}"
+        status_code: 200
+      register: health
+      retries: 30
+      delay: 5
+      until: health.status == 200
+
+    - name: Report the deployed service endpoints
+      ansible.builtin.debug:
+        msg:
+          - "Backend    : http://{{ ansible_host }}:8000"
+          - "Frontend   : http://{{ ansible_host }}:5173"
+          - "Grafana    : http://{{ ansible_host }}:3000"
+          - "Prometheus : http://{{ ansible_host }}:9090"
