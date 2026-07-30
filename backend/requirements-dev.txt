@@ -1,6 +1,7 @@
 # ─── Testing ───
 pytest==8.4.2
 pytest-cov==7.0.0
+httpx==0.28.1              # required by FastAPI TestClient in tests/conftest.py
 hypothesis==6.155.2
 
 # ─── Security & code quality ───
