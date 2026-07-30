@@ -10,7 +10,7 @@ No BI tool to learn, no black boxes.**
 
 `Python · FastAPI · Pandas · scikit-learn · DuckDB` · `React · TypeScript · ECharts · Three.js`
 
-[![CI](https://github.com/rajmodi262/verita/actions/workflows/ci.yml/badge.svg)](https://github.com/rajmodi262/verita/actions/workflows/ci.yml) ![tests](https://img.shields.io/badge/tests-82%20passing-brightgreen) ![backend](https://img.shields.io/badge/backend-72%20pytest-blue) ![frontend](https://img.shields.io/badge/frontend-10%20vitest-blue) ![typecheck](https://img.shields.io/badge/tsc-clean-success) ![license](https://img.shields.io/badge/db-PostgreSQL%20%2B%20DuckDB-336791)
+[![CI](https://github.com/rajmodi262/verita/actions/workflows/ci.yml/badge.svg)](https://github.com/rajmodi262/verita/actions/workflows/ci.yml) [![CodeQL](https://github.com/rajmodi262/verita/actions/workflows/codeql.yml/badge.svg)](https://github.com/rajmodi262/verita/actions/workflows/codeql.yml) ![tests](https://img.shields.io/badge/tests-120%20passing-brightgreen) ![backend](https://img.shields.io/badge/backend-110%20pytest-blue) ![coverage](https://img.shields.io/badge/coverage-81%25%20line-green) ![frontend](https://img.shields.io/badge/frontend-10%20vitest-blue) ![typecheck](https://img.shields.io/badge/tsc-clean-success) ![license](https://img.shields.io/badge/db-PostgreSQL%20%2B%20DuckDB-336791)
 
 <br/>
 

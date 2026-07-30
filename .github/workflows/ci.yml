@@ -7,7 +7,32 @@ on:
     branches: [main]
 
 jobs:
-  # Phase 5 + 6: test the backend on every push
+  # ── Static analysis + security scanning ──────────────────────────
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dev tooling
+        run: pip install -r requirements-dev.txt
+      - name: Ruff — hard gate (syntax errors + undefined names)
+        run: ruff check --select E9,F63,F7,F82 .
+      - name: Ruff — full lint (advisory)
+        run: ruff check . || true
+      - name: Ruff — format check (advisory)
+        run: ruff format --check . || true
+      - name: Bandit (security static analysis, advisory)
+        run: bandit -r app -q || true
+      - name: pip-audit (dependency vulnerability scan, advisory)
+        run: pip-audit -r requirements.txt || true
+
+  # ── Backend tests with coverage gate ─────────────────────────────
   backend:
     runs-on: ubuntu-latest
     defaults:
@@ -20,11 +45,16 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Install dependencies
-        run: pip install -r requirements.txt pytest httpx
-      - name: Run pytest
-        run: python -m pytest -q
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Run pytest with coverage (fail under 70%)
+        run: python -m pytest --cov-fail-under=70
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
 
-  # Phase 5 + 6: type-check, test and build the frontend
+  # ── Frontend: type-check, test and build ─────────────────────────
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -44,7 +74,7 @@ jobs:
       - name: Type-check + build
         run: npm run build
 
-  # Phase 7: verify the container images build
+  # ── Verify the container images build ────────────────────────────
   docker:
     runs-on: ubuntu-latest
     needs: [backend, frontend]

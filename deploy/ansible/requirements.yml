@@ -1,0 +1,5 @@
+---
+# Ansible collections required by deploy.yml
+collections:
+  - name: community.docker
+    version: ">=3.10.0"
