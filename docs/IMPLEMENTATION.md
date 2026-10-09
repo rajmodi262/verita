@@ -1,7 +1,7 @@
 # Verita — Implementation Plan (2–3 day sprint)
 
-Goal: a focused, **real**, polished FCC analytics app that maps 1:1 to the Wolters Kluwer
-FSS/FCC Data Science JD. Fewer features, all genuinely working, zero fabricated numbers.
+Goal: a focused, **real**, polished financial-crime analytics app. Fewer features, all genuinely
+working, zero fabricated numbers.
 
 ## Scope priority (build in this order)
 1. **Auto-Dashboard Studio** ⭐ — upload → instant editable dashboard. *The differentiator.*

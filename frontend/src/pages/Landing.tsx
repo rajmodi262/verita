@@ -188,7 +188,7 @@ const HeroSection = memo(function HeroSection() {
           </div>
           {/* AML badges */}
           <div style={{ display: "flex", gap: 18, marginTop: 44, paddingTop: 28, borderTop: `1px solid ${BORDER}`, flexWrap: "wrap" }}>
-            {["AML / BSA / OFAC", "SHAP-traced", "5-fold CV", "Wolter Kluwer"].map(b => (
+            {["AML / BSA / OFAC", "SHAP-traced", "5-fold CV", "Hash-chained audit"].map(b => (
               <span key={b} style={{ fontFamily: "var(--font-mono)", fontSize: "0.46rem", letterSpacing: "0.1em", color: "rgba(243,238,226,0.28)", textTransform: "uppercase" }}>◈ {b}</span>
             ))}
           </div>
@@ -706,7 +706,7 @@ function LedgerCTA() {
       <div className="guilloche" style={{ height: 26 }} />
       <div style={{ borderBottom: "1px solid rgba(168,132,44,0.2)", overflow: "hidden", padding: "8px 0", background: "rgba(168,132,44,0.025)" }}>
         <div className="marquee-track">
-          {[0,1].map(k => <span key={k} style={{ fontFamily: "var(--font-mono)", fontSize: "0.48rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--foil-gold)", opacity: 0.6 }}>FORENSIC INTELLIGENCE · AML · BSA · OFAC · SHAP-TRACED · AUDIT-SEALED · 5-FOLD CV · COURT-READY · WOLTER KLUWER COMPATIBLE · </span>)}
+          {[0,1].map(k => <span key={k} style={{ fontFamily: "var(--font-mono)", fontSize: "0.48rem", letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--foil-gold)", opacity: 0.6 }}>FORENSIC INTELLIGENCE · AML · BSA · OFAC · SHAP-TRACED · AUDIT-SEALED · 5-FOLD CV · COURT-READY · TAMPER-EVIDENT · </span>)}
         </div>
       </div>
 
@@ -723,7 +723,7 @@ function LedgerCTA() {
               Built for the teams that cannot afford to be wrong.
             </h2>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "1.01rem", color: "var(--ink-soft)", lineHeight: 1.74, maxWidth: "50ch", marginBottom: 36 }}>
-              SHAP-traced. Hash-sealed. Audit-logged. Compatible with <strong style={{ color: "var(--ink)" }}>Wolter Kluwer</strong> compliance frameworks — CCH Tagetik, TeamMate, and OneSumX documentation standards.
+              SHAP-traced. Hash-sealed. Audit-logged. Every score carries its reasons, every agent step carries its query, and the whole trail is <strong style={{ color: "var(--ink)" }}>tamper-evident</strong>.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <button onClick={() => navigate("/studio")} style={{ padding: "14px 28px", background: "var(--ink)", color: "var(--paper)", border: "none", cursor: "pointer", fontFamily: "var(--font-mono)", fontSize: "0.64rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, boxShadow: "5px 5px 0 var(--stamp-red)", transition: "transform .11s, box-shadow .11s" }}
@@ -758,7 +758,7 @@ function LedgerCTA() {
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-              {([["Regulation","AML · BSA · OFAC"],["Evidence","Court-admissible"],["Hash","SHA-256"],["Compat.","Wolter Kluwer"]] as const).map(([k,v]) => (
+              {([["Regulation","AML · BSA · OFAC"],["Evidence","Court-admissible"],["Hash","SHA-256"],["Audit","Tamper-evident"]] as const).map(([k,v]) => (
                 <div key={k} style={{ padding: "10px 12px", border: "1px solid rgba(20,18,11,0.08)", background: "var(--paper)" }}>
                   <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.42rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-soft)", marginBottom: 3 }}>{k}</div>
                   <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.58rem", color: "var(--ink)", fontWeight: 600 }}>{v}</div>

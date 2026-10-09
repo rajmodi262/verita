@@ -11,10 +11,8 @@ product
 
 Two audiences, layered:
 
-1. **Primary: recruiters and hiring managers** (specifically the Wolters Kluwer FSS/FCC Data
-   Science panel) evaluating craft in a ~3-minute demo. Their context: skimming many portfolios,
-   deciding fast. The job: be convinced this candidate ships production-grade, honest, auditable
-   data work. See `JD_FEATURE_MAP.md` for the traceability matrix.
+1. **Primary: technical reviewers** evaluating the system in a ~3-minute demo. Their context:
+   deciding fast. The job: see production-grade, honest, auditable data work.
 2. **In-fiction: compliance analysts and FCC investigators** screening transactions for fraud/AML.
    Their context: regulated work where every number must be defensible to a regulator. The job:
    investigate, score, and document financial crime with a full evidence trail.

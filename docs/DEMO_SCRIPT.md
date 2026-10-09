@@ -70,8 +70,7 @@ Sidebar → **Risk Engine**.
 Drag the threshold slider.
 
 ### 2:50 — Close (10s)
-> "Three pillars, eleven flagship features, 72 tests, full CI/Docker — and a `JD_FEATURE_MAP` that
-> traces every line of the job description to a working feature. Every number you saw was real."
+> "Three pillars, eleven flagship features, full CI/Docker — and every number you saw was real."
 
 ---
 

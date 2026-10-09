@@ -4,8 +4,7 @@
 > rule-based systems most institutions use today.*
 
 This document is deliberately commercial, not technical. Every claim about model behaviour is
-backed by code you can run — see [`README.md`](README.md) and
-[`INTERVIEW_PREP.md`](INTERVIEW_PREP.md) for the engineering detail. Dollar figures are clearly
+backed by code you can run — see [`README.md`](README.md) for the engineering detail. Dollar figures are clearly
 labelled as **illustrative assumptions** wherever they are not measured; the *method* of the
 calculation is the point, and the inputs are yours to change.
 

@@ -61,10 +61,6 @@ Power BI's real cost isn't the charts — it's the *first hour* of setup before 
 collapses that hour to a single file drop: it profiles your data, finds what matters, and builds the
 dashboard an analyst would have built — then lets you rearrange it, query it in SQL, and forecast it.
 
-Built to map 1:1 against the **Wolters Kluwer FSS/FCC Data Science** role. The full traceability
-matrix (every JD keyword → the feature that satisfies it) lives in
-**[`JD_FEATURE_MAP.md`](JD_FEATURE_MAP.md)**.
-
 ## The honesty policy (the project's spine)
 
 Every number Verita shows is computed from your data at request time. There are **no hardcoded
@@ -203,16 +199,14 @@ verita/
 ├── docs/           implementation plan, design system, demo script
 ├── monitoring/     prometheus + grafana config
 ├── .github/        CI pipeline
-├── JD_FEATURE_MAP.md   ← JD keyword → feature traceability
 └── docker-compose.yml
 ```
 
 See **[`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)** for the 3-minute walkthrough.
 
-### For interviewers / reviewers
+### For reviewers
 
 - **[`BUSINESS_CASE.md`](BUSINESS_CASE.md)** — why a bank should run this, ROI math, vs rule-based systems.
-- **[`INTERVIEW_PREP.md`](INTERVIEW_PREP.md)** — 150 Q&A, each mapped to the exact code that backs it.
 - **Report figures:** `cd backend && python scripts/generate_report_figures.py` renders the confusion
   matrix, ROC/PR curves, feature importance, SHAP summary, and the cost-vs-threshold curve to
   `backend/reports/*.png` — all from the trained model, nothing hardcoded.
