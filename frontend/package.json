@@ -24,7 +24,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-grid-layout": "^1.5.0",
-    "react-router-dom": "^7.17.0",
+    "react-router-dom": "^7.18.2",
     "three": "^0.169.0",
     "zustand": "^5.0.1"
   },
